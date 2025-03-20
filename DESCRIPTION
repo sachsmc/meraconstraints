@@ -1,0 +1,42 @@
+Package: meraconstraints
+Type: Package
+Title: Derive Observable Probabilistic Constraints Implied by Causal Models
+Version: 0.1.0
+Author: Authors@R: 
+    c(person(given = "Michael C",
+             family = "Sachs",
+             role = c("aut", "cre"),
+             email = "sachsmc@gmail.com"),
+      person(given = "Erin E", 
+      family = "Gabriel", 
+      role = "aut"),
+      person(given = "Robin J", 
+      family = "Evans", 
+      role = "aut"),
+      person(given = "Arvid", 
+             family = "Sjölander", role = c("aut")))
+Maintainer: Michael C Sachs <sachsmc@gmail.com>
+Description: Structural causal models with unobserved variables can sometimes 
+    imply constraints on the observable distribution that are more complex than 
+    simple conditional independencies. These constraints are often systems of 
+    inequalities, such as the instrumental inequalities in the randomized 
+    treatment setting with noncompliance, or Bell's inequalities in the context 
+    of quantum physics; outside of these settings there has been little 
+    research. In models with categorical observed variables and a joint 
+    distribution that is completely characterized by linear relations to the 
+    unobservable response function variables, we implement a systematic method 
+    for deriving linear constraints in terms of the observable probabilities. 
+    These constraints can be used to falsify assumptions the model in ways 
+    that would otherwise be untestable due to the latent variables. 
+Encoding: UTF-8
+LazyData: true
+License: MIT + file LICENSE
+Imports:
+    igraph,
+    rcdd,
+    causaloptim,
+    gRbase
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+RoxygenNote: 7.3.2
