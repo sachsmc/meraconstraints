@@ -130,6 +130,36 @@ dag_transform_merge_latents <- function(dag) {
   }
 
   dag
+}
+
+
+#' Add attributes to an igraph
+#'
+#' @param graph an igraph object with names vertices
+#' @param latent.pattern The regular expression pattern used to identify latent variables
+#' @returns An igraph with additional attributes latent (logical) and nvals (integer)
+#' @export
+#' @examples
+#' initialize_graph(graph_from_literal(Z -+ X, X -+ Y, U -+ X:Y))
+#'
+
+initialize_graph <- function(graph, latent.pattern = "^U") {
+
+  nvars <- length(V(graph))
+
+  if(is.null(V(graph)$latent)) {
+    Unodes <- grep(latent.pattern, names(V(graph)))
+    V(graph)$latent <- rep(FALSE, nvars)
+    V(graph)$latent[Unodes] <- TRUE
+  }
+
+
+  if(is.null(V(graph)$nvals)) {
+    V(graph)$nvals <- rep(2, nvars)
+  }
+
+
+  graph
 
 }
 
