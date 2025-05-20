@@ -1,4 +1,5 @@
 #' @import igraph
+NULL
 
 #' Partition into districts
 #'

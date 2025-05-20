@@ -9,7 +9,7 @@
 
 dag_get_moebius_params <- function(dag) {
 
-  am <- as_adjacency_matrix(dag, sparse = FALSE)  # get adjacency matrix
+  am <- as_adjacency_matrix(dag, sparse = FALSE)
   if (igraph::is_named(dag)) {
     vnames <- igraph::V(dag)$name
   } else vnames <- NULL
@@ -20,7 +20,7 @@ dag_get_moebius_params <- function(dag) {
 
   admg <- ADMGs2::latentProject(mdag, latent = match(names(V(dag)[latent == TRUE]), mdag$vnames))
 
-  ADMGs2:::maps(admg, dims = V(dag)[latent == FALSE]$nvals)
+  amap <- ADMGs2:::maps(admg, dims = V(dag)[latent == FALSE]$nvals)
   mobin <- ADMGs2::moebius(admg)
 
   ## get out and cond for each district

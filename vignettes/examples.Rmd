@@ -27,7 +27,7 @@ library(glue)
 
 
 ```{r}
-d1 <- initialize_graph(graph_from_literal(V1 -+ V2, V2 -+ V3, U -+ V1:V3))
+d1 <- initialize_graph(graph_from_literal(V1 -+ V2, V2 -+ V3, V3 -+ V4, U1 -+ V1:V3, U2 -+ V2:V4))
 plot(d1)
 ```
 
