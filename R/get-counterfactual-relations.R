@@ -59,8 +59,10 @@ dag_get_cf_tables <- function(dag, event.table){
   nochildren <- intersect(names(nochildren[sapply(nochildren, length) == 0]),
                           colnames(event.table))
 
+  toporder <- obs_tops(subdag)[[1]]
+
   thistab2 <- event.table
-  for(vs in names(event.table)) {
+  for(vs in toporder) {
     thistab2 <- upmerge(thistab2, dag, vs)
   }
   ## merge back in any variables without children
@@ -74,4 +76,93 @@ dag_get_cf_tables <- function(dag, event.table){
 
 
 }
+
+#' For testing
+
+dag_get_cf_tables2 <- function(dag) {
+
+  obsVars <- V(dag)[latent == FALSE]
+  qlist <- lapply(obsVars$response_function, \(vf) unique(vf[, intersect(names(vf), paste0("R_", names(obsVars)))]))
+  names(qlist) <- paste0("R_", names(obsVars))
+  q.vals <- do.call(expand.grid, qlist)
+  respvars <- obsVars$response_function
+  names(respvars) <- names(obsVars)
+
+  PAs <- lapply(obsVars, function(x) names(neighbors(dag, x, mode = "in")[latent == FALSE]))
+
+  gee_r <- function(r, i) {
+
+    parents <- PAs[[i]]
+    if(length(parents) == 0) {
+
+      respvars[[i]][respvars[[i]][[paste0("R_", i)]] == r[, paste0("R_", i)], i]
+
+    } else {
+
+      lookin <- lapply(parents, function(gu) {
+        as.numeric(gee_r(r, gu))
+      })
+      names(lookin) <- parents
+      lookind <- as.data.frame(lookin)
+      lookind[[paste0("R_", i)]] <- r[, paste0("R_", i)]
+
+      inres <- merge(respvars[[i]], lookind)[, i]
+      inres
+
+    }
+
+  }
+
+  res.mat <- matrix(NA, nrow = nrow(q.vals), ncol = length(obsVars))
+  colnames(res.mat) <- names(obsVars)
+  for (k in 1:nrow(q.vals)) {
+    for (j in names(obsVars)) {
+      res.mat[k, j] <- gee_r(r = q.vals[k, , drop = FALSE], i = j)
+    }
+  }
+
+  cbind(res.mat, q.vals)
+
+}
+
+#' Get relations between probabilities and response variables
+#'
+#' @param dag A causal dag
+#' @returns A list of character vectors
+#' @export
+
+dag_get_linear_relations <- function(dag) {
+
+  d1r <- dag_transform_canonical_partition(dag) |>
+    dag_transform_response_functions()
+  vcombs <- lapply(V(dag)[latent == FALSE]$nvals, \(v) seq_len(v) - 1)
+  names(vcombs) <- names(V(dag)[latent == FALSE])
+
+  ptabs <- dag_get_cf_tables(d1r, do.call(expand.grid, vcombs))
+
+  dparms <- dag_get_district_params(dag)
+
+  relation <- prob.fancy <- problevels <- vector(mode = "list", length = length(dparms$pforms))
+  for(j in 1:length(dparms$pforms)) {
+
+    splitptab <- split(ptabs, ptabs[, dparms$vterms[[j]]])
+    relation[[j]] <- lapply(splitptab, \(df) {
+      unique(make_prob_names(list(out = dparms$distrs[[j]], cond = NULL),
+                             df[, dparms$distrs[[j]], drop = FALSE]))
+    })
+    prob.fancy[[j]] <- lapply(splitptab, \(df) {
+      unique(glue::glue_data(df, dparms$pforms[[j]]))
+    })
+    problevels[[j]] <- unique(do.call(rbind, splitptab)[, dparms$vterms[[j]]])
+
+  }
+
+  list(relation = do.call(c, relation),
+       probform = do.call(c, prob.fancy),
+       problevels = problevels)
+
+}
+
+
+
 

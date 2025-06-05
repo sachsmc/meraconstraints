@@ -37,7 +37,9 @@ Imports:
     causaloptim,
     gRbase, 
     MixedGraphs,
-    ADMGs2
+    ADMGs2, 
+    causaleffect, 
+    glue
 Suggests: 
     knitr,
     rmarkdown,

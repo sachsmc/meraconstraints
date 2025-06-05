@@ -53,22 +53,41 @@ dag_get_moebius_params <- function(dag) {
 dag_get_district_params <- function(dag) {
 
   districts <- dag_get_districts(dag)
+  dvars <- lapply(districts, \(vs) names(vs[latent == FALSE]))
+  admg <- dag_transform_latent_project(dag)
 
-  res <- lapply(districts, \(vs) {
+  res <- character(length(districts))
+  remove <- NULL
+  vterms <- distrs <- vector(mode = "list", length = length(districts))
+  for(i in 1:length(districts)) {
 
-    num_latent <- sum(vs$latent == 1)
-    if(num_latent <= 1) {
+    paofdist <- adjacent_vertices(dag, districts[[i]][latent == FALSE], mode = "in")
+    intervenset <- setdiff(unique(unlist(lapply(paofdist, \(vs) names(vs[latent == FALSE])))),
+                           names(districts[[i]][latent == FALSE]))
 
-      candconds <- V(dag)[setdiff(V(dag)[latent == 0], vs[vs$latent == 0])]
-      confconds <- sapply(adjacent_vertices(dag, candconds, mode = "out"), \(ch) any(ch %in% vs))
+    if(length(intervenset) == 0 & length(dvars[[i]] == 1)){
+      remove <- c(remove, i)
+      next
+    }
+    res[i] <- causal.effect(y = dvars[[i]],
+                  x = intervenset, G = admg)
+    vterms[[i]] <- c(dvars[[i]], intervenset)
+    distrs[[i]] <- paste0("R_", dvars[[i]])
+  }
 
-      list(out = names(vs[latent == 0]), cond = names(candconds)[confconds])
+  if(!is.null(remove)) {
+    res <- res[-remove]
+    distrs <- distrs[-remove]
+    vterms <- vterms[-remove]
+  }
 
-    } else NULL
+  alnm <- names(V(dag)[latent == FALSE])
+  for(x in alnm){
+    res <- gsub(x, sprintf("%s = {%s}", x, x), res)
+  }
 
-  })
-
-  res[!sapply(res, is.null)]
+  list(vterms = vterms,
+       pforms = res, distrs = distrs)
 
 }
 

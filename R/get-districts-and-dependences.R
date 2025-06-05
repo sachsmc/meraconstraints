@@ -1,4 +1,5 @@
 #' @import igraph
+#' @importFrom causaleffect causal.effect
 NULL
 
 #' Partition into districts

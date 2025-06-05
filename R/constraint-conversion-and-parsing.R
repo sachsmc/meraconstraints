@@ -21,7 +21,7 @@ cf_relations_to_hrep <- function(prob, relation, thisr) {
 
   vrep <- rcdd::makeV(points = t(Rmat))
 
-  vrep <- rcdd::redundant(vrep)$output
+  #vrep <- rcdd::redundant(vrep)$output
   hrep2 <- rcdd::scdd(vrep, representation = "V")
   foo <- rcdd::q2d(hrep2$output)
 

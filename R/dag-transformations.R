@@ -163,3 +163,29 @@ initialize_graph <- function(graph, latent.pattern = "^U") {
 
 }
 
+
+#' Latent projection for use with causaleffect
+#'
+#' @param graph an igraph object with names vertices and latent variables
+#' @returns An igraph with no latent variables but bidirected edges for use with causaleffect
+#' @export
+#' @examples
+#' graph_from_literal(V1 -+ V2, V2 -+ V3, V3 -+ V4,
+#'   U1 -+ V1:V3, U2 -+ V2:V4) |> initialize_graph() |>
+#'   dag_transform_latent_project()
+
+dag_transform_latent_project <- function(graph) {
+
+
+  for(vs in V(graph)[latent == TRUE]) {
+
+    chofu <- names(neighbors(graph, vs, mode = "out"))
+
+    graph <- add_edges(graph, c(combn(chofu, 2)), attr = list(description = "U"))
+
+  }
+
+  delete_vertices(graph, V(graph)[latent == TRUE])
+
+
+}

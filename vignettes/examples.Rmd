@@ -19,7 +19,8 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(meraconstraints)
-library(glue)
+library(igraph)
+library(rje)
 ```
 
 
@@ -39,103 +40,83 @@ dag_list_independences(d1)
 It does however have a nontrivial inequality constraint that we can find. 
 
 ```{r}
-d1r <- dag_transform_canonical_partition(d1) |> 
-    dag_transform_response_functions()
+d1rels <- dag_get_linear_relations(d1)
+hrepd1 <- cf_relations_to_hrep(d1rels$probform, d1rels$relation)
+hrep_to_text(hrepd1$Hrep, d1rels$probform)
 ```
 
-In this example we want q(V1, V2, V3) = p(V1, V2, V3) / p(V2 | V1)= p(V3 | V2, V1) p(V1)
-examining ptabs, we see that it is linear in p(R_V1, R_V3) because the p(R_V2) cancels out when you divide. 
+
+We can see in the above that there are some obviously trivial constraints, we can remove the rows from Hrep where there is only one 1. 
 
 ```{r}
-ptabs <- dag_get_cf_tables(d1r, expand.grid(V1 = 0:1, V3 = 0:1, V2 = 0:1))
-#dag_get_moebius_params(d1)
-cf.form <- list(out = c("R_V1", "R_V3"), cond = NULL)
-relation <- split(ptabs[, c("R_V1", "R_V3")], ptabs[, c("V1","V2", "V3")]) |> 
-  lapply(\(pt) {
-    unique(make_prob_names(cf.form, pt))
-  })
-prob.fancy <- split(ptabs, ptabs[, c("V1","V2", "V3")]) |> 
-  sapply(\(pt) {
-    unique(glue_data(pt, "p(V3 = {V3} | V2 = {V2}, V1 = {V1}) * p(V1 = {V1})"))
-  })
-
-hrepd1 <- cf_relations_to_hrep(prob.fancy, relation)
-hrep_to_text(hrepd1$Hrep, prob.fancy)
+tokeep <- apply(hrepd1$Hrep, MAR = 1, FUN = \(x) sum(x != 0) > 1)
+hrep_to_text(hrepd1$Hrep[tokeep,], d1rels$probform)
 ```
 
-We can see in the above that there are some obviously trivial constraints, we can remove these by identifying the sets of probabilities that sum to 1. 
+Many of these are still trivial, but it is not so obvious at first glance. Let's sample some probability distributions without any restrictions as see if anything is violated. 
 
 ```{r}
-sets1 <- split(ptabs[, c("V1", "V2", "V3")], ptabs[, c("V2")]) |> 
-  lapply(\(pt) {
-    unique(glue_data(pt, "p(V3 = {V3} | V2 = {V2}, V1 = {V1}) * p(V1 = {V1})"))
-  })
+ptable <- expand.grid(V1 = 0:1, V2 = 0:1, V3 = 0:1, V4 = 0:1)
 
-hrep_to_text(hrepd1$Hrep, prob.fancy, sets1, simplify = TRUE)
-```
-The first 2 elements here are the nontrivial inequalities but the second pair are problematic. Elements 3 and 4 both represent the same equality constraint (after some simple manipulation): 
-$$
-p(V_1 = 0 | V_2 = 0) = p(V_1 = 0 | V_2 = 1), 
-$$
-or in other words $V_1$ is independent of $V_2$, which is obviously not true given the DAG. This is a spurious independence that we know is coming. It is because the post-truncation distribution is obtained by the fixing operation on $V_2$, i.e., removing incoming arrows into $V_2$. That graph looks like this: 
-```{r}
-d1f <- initialize_graph(graph_from_literal(V2 -+ V3, U -+ V1:V3))
-plot(d1f)
+sprob <- function(k) {
+  diff(sort(c(runif(k - 1), 0, 1)))
+}
 
-dag_list_independences(d1f)
-```
-from which we can clearly see the independence between $V_2$ and $V_1$. We just need to remove it from our "discovered" constraints. To do that, let's identify all ways of representing the independence in terms of the probabilities of the form $p(V_3, V_1 | V_2)$. 
+pv1 <- sprob(2)
+ptable <- do.call(rbind, split(ptable, ptable[, -which(colnames(ptable) == "V1")]) |> lapply(\(df) {
+  df$pV1 <- pv1 
+  df}))
 
-Marginalize out $V_3$, sum terms where $V_3$ differs but $V_1, V_2$ are the same, subtract the same but where $V_2$ is the other value.
-```{r}
-pfd1 <- do.call(rbind, split(ptabs[, c("V1","V2", "V3")], ptabs[, c("V1","V2", "V3")]) |> 
-  lapply(\(pt) {
-    unique(pt)
-  }))
+ptable <- do.call(rbind, split(ptable, ptable[, c("V1", "V2")]) |> lapply(\(df) {
+  df$pV3.12 <- sprob(2)
+  df}
+  ))
+ptable <- do.call(rbind, split(ptable, ptable[, c("V1")]) |> lapply(\(df) {
+  df$pV2.1 <- rep(sprob(2), each = 4)
+  df}
+  ))
 
-M <- NULL
-
-zeros <- c(1, 0, rep(0, length(prob.fancy)))
-zeros[2 + which(with(pfd1, V1 == 0 & V2 == 0 & V3 %in% 0:1))] <- 1
-zeros[2 + which(with(pfd1, V1 == 0 & V2 == 1 & V3 %in% 0:1))] <- -1
-zeros[2] <- 0
-M <- rbind(M, zeros)
-zeros <- c(1, 0, rep(0, length(prob.fancy)))
-zeros[2 + which(with(pfd1, V1 == 1 & V2 == 0 & V3 %in% 0:1))] <- 1
-zeros[2 + which(with(pfd1, V1 == 1 & V2 == 1 & V3 %in% 0:1))] <- -1
-zeros[2] <- 0
-M <- rbind(M, zeros)
-
-zeros <- c(1, 0, rep(0, length(prob.fancy)))
-zeros[2 + which(with(pfd1, V1 == 0 & V2 == 0 & V3 %in% 0:1))] <- -1
-zeros[2 + which(with(pfd1, V1 == 0 & V2 == 1 & V3 %in% 0:1))] <- 1
-zeros[2] <- 0
-M <- rbind(M, zeros)
-zeros <- c(1, 0, rep(0, length(prob.fancy)))
-zeros[2 + which(with(pfd1, V1 == 1 & V2 == 0 & V3 %in% 0:1))] <- -1
-zeros[2 + which(with(pfd1, V1 == 1 & V2 == 1 & V3 %in% 0:1))] <- 1
-zeros[2] <- 0
-M <- rbind(M, zeros)
+ptable <- do.call(rbind, split(ptable, ptable[, c("V1", "V2", "V3")]) |> lapply(\(df) {
+  df$pV4.123 <- sprob(2)
+  df}
+  ))
 
 
-## other cases where we have a 1 - something
-zeros <- c(1, 0, rep(0, length(prob.fancy)))
-zeros[2 + which(with(pfd1, V1 == 0 & V2 == 0 & V3 %in% 0:1))] <- -1
-zeros[2 + which(with(pfd1, V1 == 1 & V2 == 1 & V3 %in% 0:1))] <- -1
-zeros[2] <- -1
-M <- rbind(M, zeros)
-zeros <- c(1, 0, rep(0, length(prob.fancy)))
-zeros[2 + which(with(pfd1, V1 == 1 & V2 == 0 & V3 %in% 0:1))] <- -1
-zeros[2 + which(with(pfd1, V1 == 0 & V2 == 1 & V3 %in% 0:1))] <- -1
-zeros[2] <- -1
-M <- rbind(M, zeros)
-M[, -c(1:2)] <- M[, -c(1:2)] * -1
+ptable$pform1 <- with(ptable, pV1 * pV3.12)
+ptable$pform2 <- with(ptable, pV2.1 * pV4.123)
 
-## find rows of Hrep that match M, then remove them
+p1 <- do.call(rbind.data.frame, strsplit(names(d1rels$probform[1:8]), ".", fixed = TRUE))
+colnames(p1) <- paste0("V", 1:3)
+p2 <- do.call(rbind.data.frame, strsplit(names(d1rels$probform[-c(1:8)]), ".", fixed = TRUE))
+colnames(p2) <- paste0("V", 1:4)
 
-hremove <- which(colSums(apply(hrepd1$Hrep, MAR = 1, \(rr) apply(M, MAR = 1, \(dd) all(dd == rr)))) > 0)
+pvect <- c(merge(p1, ptable, all = FALSE)$pform1[seq(1, 16, by = 2)], 
+  merge(p2, ptable, all = FALSE)$pform2)
 
-hrep_to_text(hrepd1$Hrep[-hremove,], prob.fancy, sets1, simplify = TRUE)
+axb <- ((-hrepd1$Hrep[, -c(1, 2)]) %*% pvect - hrepd1$Hrep[, 2])[,1]
+axb <= 0 & hrepd1$Hrep[, 1] * axb == 0
+
+sampdist <- function(ptable) {
+  ptable$prob <- diff(sort(c(runif(nrow(ptable) - 1), 0, 1)))
+  ptable
+}
+
+
+pi <- sampdist(ptable)
+piar <- array(pi$prob, dim = c(2, 2, 2, 2))
+
+pi$pV1 <- marginTable(piar, 1)
+pi$pV3.12 <- c(conditionTable2(piar, variables = 3, condition = 1:2))
+pi$pV2.1 <- c(conditionTable2(piar, variables = 2, condition = 1))
+pi$pV4.123 <- c(conditionTable2(piar, variables = 4, condition = 1:3))
+
+pi$pform1 <- with(pi, pV1 * pV3.12)
+pi$pform2 <- with(pi, pV2.1 * pV4.123)
+
+pvect <- c(pi$pform1[1:8], pi$pform2)
+
+axb <- (-hrepd1$Hrep[, -c(1, 2)] %*% pvect - hrepd1$Hrep[, 2])[,1]
+axb <= 0 & hrepd1$Hrep[, 1] * axb == 0
 ```
 
-Ok now we just need to do this automatically, and also remove the independence constraints from standard conditional independences that we treat separately. 
+
