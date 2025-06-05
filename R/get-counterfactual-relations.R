@@ -157,8 +157,8 @@ dag_get_linear_relations <- function(dag) {
 
   }
 
-  list(relation = do.call(c, relation),
-       probform = do.call(c, prob.fancy),
+  list(relation = relation,
+       probform = prob.fancy,
        problevels = problevels)
 
 }

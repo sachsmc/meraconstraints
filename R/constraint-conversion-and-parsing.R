@@ -9,23 +9,27 @@
 
 cf_relations_to_hrep <- function(prob, relation, thisr) {
   ## make the matrix
-  rvarprobs <- unique(unlist(relation))
-  Rmat <- matrix("0", nrow = length(unlist(prob)), ncol = length(rvarprobs))
 
-  rdex <- do.call(rbind, lapply(1:length(relation), \(i) {
-    rr <- relation[[i]]
-    cbind(i, match(rr, rvarprobs))
-  }))
-  if(missing(thisr)) thisr <- rep("1", nrow(rdex))
-  Rmat[rdex] <- thisr[rdex[, 1]]
+  foos <- vreps <- vector(mode = "list", length = length(prob))
+  for(j in 1:length(prob)) {
+    rvarprobs <- unique(unlist(relation[[j]]))
+    Rmat <- matrix("0", nrow = length(unlist(prob[[j]])), ncol = length(rvarprobs))
 
-  vrep <- rcdd::makeV(points = t(Rmat))
+    rdex <- do.call(rbind, lapply(1:length(relation[[j]]), \(i) {
+      rr <- relation[[j]][[i]]
+      cbind(i, match(rr, rvarprobs))
+    }))
+    if(missing(thisr)) thisr <- rep("1", nrow(rdex))
+    Rmat[rdex] <- thisr[rdex[, 1]]
 
-  #vrep <- rcdd::redundant(vrep)$output
-  hrep2 <- rcdd::scdd(vrep, representation = "V")
-  foo <- rcdd::q2d(hrep2$output)
+    vreps[[j]] <- rcdd::makeV(points = t(Rmat))
 
-  list(Vrep = vrep, Hrep = foo)
+    #vrep <- rcdd::redundant(vrep)$output
+    hrep2 <- rcdd::scdd(vreps[[j]], representation = "V")
+    foos[[j]] <- rcdd::q2d(hrep2$output)
+  }
+
+  list(Vrep = vreps, Hrep = foos)
 
 }
 

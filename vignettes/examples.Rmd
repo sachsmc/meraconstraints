@@ -24,7 +24,38 @@ library(rje)
 ```
 
 
-## Minimal example
+## IV inequalities
+
+```{r}
+ivdag <- graph_from_literal(Z -+ X, X -+ Y, U -+ X:Y) |> initialize_graph()
+ivrels <- dag_get_linear_relations(ivdag)
+hrepiv <- cf_relations_to_hrep(ivrels$probform, ivrels$relation)
+hrep_to_text(hrepiv$Hrep[[1]], ivrels$probform[[1]])
+```
+
+Rows 2, 3, 5 and 6 are the familiar IV inequalities. As you can see below, when we sample distributions unconstrained, only those 4 are ever violated. 
+
+```{r}
+ptable <- expand.grid(X = 0:1, Y = 0:1, Z = 0:1)
+
+sprob <- function(k) {
+  diff(sort(c(runif(k - 1), 0, 1)))
+}
+
+res <- matrix(NA, nrow = 2000, ncol = 14)
+for(i in 1:nrow(res)) {
+  ptable$pv <- NA
+  ptable$pv[c(1:4)] <- sprob(4)
+  ptable$pv[c(5:8)] <- sprob(4)
+  
+  axb <- ((-hrepiv$Hrep[, -c(1, 2)]) %*% ptable$pv - hrepiv$Hrep[, 2])[,1]
+  res[i, ] <- axb <= 0 & hrepiv$Hrep[, 1] * axb == 0
+}
+colMeans(res)
+```
+
+
+## More difficult example
 
 
 ```{r}
@@ -42,18 +73,10 @@ It does however have a nontrivial inequality constraint that we can find.
 ```{r}
 d1rels <- dag_get_linear_relations(d1)
 hrepd1 <- cf_relations_to_hrep(d1rels$probform, d1rels$relation)
-hrep_to_text(hrepd1$Hrep, d1rels$probform)
+#hrep_to_text(hrepd1$Hrep, d1rels$probform)
 ```
 
-
-We can see in the above that there are some obviously trivial constraints, we can remove the rows from Hrep where there is only one 1. 
-
-```{r}
-tokeep <- apply(hrepd1$Hrep, MAR = 1, FUN = \(x) sum(x != 0) > 1)
-hrep_to_text(hrepd1$Hrep[tokeep,], d1rels$probform)
-```
-
-Many of these are still trivial, but it is not so obvious at first glance. Let's sample some probability distributions without any restrictions as see if anything is violated. 
+Let's sample some probability distributions without any restrictions as see if anything is violated. 
 
 ```{r}
 ptable <- expand.grid(V1 = 0:1, V2 = 0:1, V3 = 0:1, V4 = 0:1)
@@ -85,38 +108,17 @@ ptable <- do.call(rbind, split(ptable, ptable[, c("V1", "V2", "V3")]) |> lapply(
 ptable$pform1 <- with(ptable, pV1 * pV3.12)
 ptable$pform2 <- with(ptable, pV2.1 * pV4.123)
 
-p1 <- do.call(rbind.data.frame, strsplit(names(d1rels$probform[1:8]), ".", fixed = TRUE))
-colnames(p1) <- paste0("V", 1:3)
-p2 <- do.call(rbind.data.frame, strsplit(names(d1rels$probform[-c(1:8)]), ".", fixed = TRUE))
-colnames(p2) <- paste0("V", 1:4)
+pvect <- list(ptable$pform1[c(1, 3, 9, 11, 5, 7, 13, 15)], 
+           ptable$pform2[c(1, 5, 2, 6, 3, 7, 4, 8, 9, 13, 10, 14, 11, 15, 12, 16)])
 
-pvect <- c(merge(p1, ptable, all = FALSE)$pform1[seq(1, 16, by = 2)], 
-  merge(p2, ptable, all = FALSE)$pform2)
+lapply(1:2, \(i) {
+  axb <- ((-hrepd1$Hrep[[i]][, -c(1, 2)]) %*% pvect[[i]])[, 1] - hrepd1$Hrep[[i]][, 2]
+  axb <= 0 & hrepd1$Hrep[[i]][, 1] * axb == 0
 
-axb <- ((-hrepd1$Hrep[, -c(1, 2)]) %*% pvect - hrepd1$Hrep[, 2])[,1]
-axb <= 0 & hrepd1$Hrep[, 1] * axb == 0
+})
 
-sampdist <- function(ptable) {
-  ptable$prob <- diff(sort(c(runif(nrow(ptable) - 1), 0, 1)))
-  ptable
-}
+hrep_to_text(hrepd1$Hrep[[2]], d1rels$probform[[2]])
 
-
-pi <- sampdist(ptable)
-piar <- array(pi$prob, dim = c(2, 2, 2, 2))
-
-pi$pV1 <- marginTable(piar, 1)
-pi$pV3.12 <- c(conditionTable2(piar, variables = 3, condition = 1:2))
-pi$pV2.1 <- c(conditionTable2(piar, variables = 2, condition = 1))
-pi$pV4.123 <- c(conditionTable2(piar, variables = 4, condition = 1:3))
-
-pi$pform1 <- with(pi, pV1 * pV3.12)
-pi$pform2 <- with(pi, pV2.1 * pV4.123)
-
-pvect <- c(pi$pform1[1:8], pi$pform2)
-
-axb <- (-hrepd1$Hrep[, -c(1, 2)] %*% pvect - hrepd1$Hrep[, 2])[,1]
-axb <= 0 & hrepd1$Hrep[, 1] * axb == 0
 ```
 
 
