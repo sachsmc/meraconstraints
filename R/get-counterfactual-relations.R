@@ -59,7 +59,7 @@ dag_get_cf_tables <- function(dag, event.table){
   nochildren <- intersect(names(nochildren[sapply(nochildren, length) == 0]),
                           colnames(event.table))
 
-  toporder <- obs_tops(subdag)[[1]]
+  toporder <- dag_order(subdag)[[1]]
 
   thistab2 <- event.table
   for(vs in toporder) {

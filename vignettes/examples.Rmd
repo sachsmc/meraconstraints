@@ -73,52 +73,48 @@ It does however have a nontrivial inequality constraint that we can find.
 ```{r}
 d1rels <- dag_get_linear_relations(d1)
 hrepd1 <- cf_relations_to_hrep(d1rels$probform, d1rels$relation)
-#hrep_to_text(hrepd1$Hrep, d1rels$probform)
+#hrep_to_text(hrepd1$Hrep[[2]], d1rels$probform[[2]])
 ```
 
 Let's sample some probability distributions without any restrictions as see if anything is violated. 
 
 ```{r}
-ptable <- expand.grid(V1 = 0:1, V2 = 0:1, V3 = 0:1, V4 = 0:1)
+probs <- dag_sample_distribution(d1, parmsamp = \(k) rnorm(k, sd = 5))
 
-sprob <- function(k) {
-  diff(sort(c(runif(k - 1), 0, 1)))
-}
+probs1 <- merge(probs$V3, probs$V1, by = NULL)
+probs1$prob <- with(probs1, probs.x * probs.y)
+probs1 <- probs1[with(probs1, order(V2, V3, V1)),]
 
-pv1 <- sprob(2)
-ptable <- do.call(rbind, split(ptable, ptable[, -which(colnames(ptable) == "V1")]) |> lapply(\(df) {
-  df$pV1 <- pv1 
-  df}))
-
-ptable <- do.call(rbind, split(ptable, ptable[, c("V1", "V2")]) |> lapply(\(df) {
-  df$pV3.12 <- sprob(2)
-  df}
-  ))
-ptable <- do.call(rbind, split(ptable, ptable[, c("V1")]) |> lapply(\(df) {
-  df$pV2.1 <- rep(sprob(2), each = 4)
-  df}
-  ))
-
-ptable <- do.call(rbind, split(ptable, ptable[, c("V1", "V2", "V3")]) |> lapply(\(df) {
-  df$pV4.123 <- sprob(2)
-  df}
-  ))
+hrep_test(hrepd1$Hrep[[1]], probs1$prob)
 
 
-ptable$pform1 <- with(ptable, pV1 * pV3.12)
-ptable$pform2 <- with(ptable, pV2.1 * pV4.123)
+probs2 <- merge(probs$V4, probs$V2, by = NULL)
+probs2$prob <- with(probs2, probs.x * probs.y)
+probs2 <- probs2[with(probs2, order(V3, V1, V4, V2)),]
 
-pvect <- list(ptable$pform1[c(1, 3, 9, 11, 5, 7, 13, 15)], 
-           ptable$pform2[c(1, 5, 2, 6, 3, 7, 4, 8, 9, 13, 10, 14, 11, 15, 12, 16)])
-
-lapply(1:2, \(i) {
-  axb <- ((-hrepd1$Hrep[[i]][, -c(1, 2)]) %*% pvect[[i]])[, 1] - hrepd1$Hrep[[i]][, 2]
-  axb <= 0 & hrepd1$Hrep[[i]][, 1] * axb == 0
-
-})
-
-hrep_to_text(hrepd1$Hrep[[2]], d1rels$probform[[2]])
-
+hrep_test(hrepd1$Hrep[[2]], probs2$prob)
 ```
 
+Great, nothing is violated if we sample a distribution from the DAG, but let's see what happens when sampling from an unconstrained model: 
 
+```{r}
+dun <- initialize_graph(graph_from_literal(V1 -+ V2:V4:V3, V2 -+ V3:V4, V3 -+ V4, U1 -+ V1:V2:V3:V4))
+plot(dun)
+
+probs <- dag_sample_distribution(dun, parmsamp = \(k) rnorm(k, sd = 5))
+
+probs1 <- merge(probs$V3, probs$V1, by = "V1")
+probs1$prob <- with(probs1, probs.x * probs.y)
+probs1 <- probs1[with(probs1, order(V2, V3, V1)),]
+
+probs2 <- merge(probs$V4, probs$V2, by = c("V1", "V2"))
+probs2$prob <- with(probs2, probs.x * probs.y)
+probs2 <- probs2[with(probs2, order(V3, V1, V4, V2)),]
+
+hrep_test(hrepd1$Hrep[[1]], probs1$prob) & hrep_test(hrepd1$Hrep[[2]], probs2$prob)
+
+nontriv <- hrep_test(hrepd1$Hrep[[2]], probs2$prob, which = TRUE)[1]
+hrep_to_text(hrepd1$Hrep[[2]], d1rels$probform[[2]])[nontriv]
+```
+
+The above constraint is a nontrivial inequality constraint.
