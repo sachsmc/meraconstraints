@@ -1,0 +1,79 @@
+---
+title: "Inference and compatibility with data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Inference and compatibility with data}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(meraconstraints)
+library(rcdd)
+```
+
+
+## basic IV example
+
+
+```{r}
+ivdag <- graph_from_literal(V1 -+ V2 -+ V3, U1 -+ V2:V3) |> initialize_graph()
+dag_list_independences(ivdag)
+
+ivrels <- dag_get_linear_relations(ivdag)
+hrepiv <- cf_relations_to_hrep(ivrels$probform, ivrels$relation)
+```
+
+```{r}
+hrep <- hrepiv$Hrep[[1]]
+d <- 8
+equalities <- hrep[ , 1] == "1"
+av <- scdd(hrep[equalities, ])$output
+av.point <- av[av[ , 1] == "0", ]
+av.lines <- av[av[ , 1] == "1", ]
+av.point <- as.vector(av.point[- c(1, 2)])
+av.lines <- av.lines[ , - c(1, 2)]
+av.point
+av.lines
+
+m <- t(av.lines)
+lambda.zero <- (av.point)
+x <- (1:d)
+as.vector(rbind(rep(1, d)) %*% m)
+as.vector(rbind(x) %*% m)
+```
+
+
+```{r}
+library(causaloptim)
+ivmod <- create_causalmodel(causaloptim::initialize_graph(graph_from_literal(V1 -+ V2 -+ V3, Ur -+ V2:V3)),
+                            prob.form = list(cond = "V1", out = c("V2", "V3")))
+
+probs <- sample_distribution(ivmod)
+
+d1 <- rmultinom(1, 500, probs[1:4])
+d2 <- rmultinom(1, 500, probs[5:8])
+
+lambda.hat <- c(d1, d2)/ 500
+
+lout <- lm(lambda.hat - lambda.zero ~ 0 + m,
+    weights = 1 / lambda.hat)
+beta.star <- lout$coefficients
+varmat <- solve(t(m) %*% diag(1 / lambda.hat) %*% m) / 500
+
+library(MASS)
+nboot <- 15
+beta <- mvrnorm(nboot, beta.star, varmat)
+lambda <- beta %*% t(m)
+lambda <- sweep(lambda, 2, lambda.zero, "+")
+```
+

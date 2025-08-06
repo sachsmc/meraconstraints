@@ -70,7 +70,7 @@ dag_get_district_params <- function(dag) {
       next
     }
     res[i] <- causal.effect(y = dvars[[i]],
-                  x = intervenset, G = admg)
+                  x = intervenset, G = admg, prune = TRUE)
     vterms[[i]] <- c(dvars[[i]], intervenset)
     distrs[[i]] <- paste0("R_", dvars[[i]])
   }

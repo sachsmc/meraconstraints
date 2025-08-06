@@ -21,6 +21,26 @@ knitr::opts_chunk$set(
 library(meraconstraints)
 library(igraph)
 library(rje)
+
+
+hrep_test <- function(Hrep, probform, tol = 1e-10, which = FALSE) {
+
+  l <- Hrep[ , 1]
+  b <- Hrep[ , 2]
+  v <- Hrep[ , - c(1, 2)]
+  a <- (- v)
+
+  axb <- a %*% probform - b
+
+  chk <- axb <= tol & abs(l * axb) < tol
+  if(which) {
+    chk
+  } else {
+    all(chk)
+  }
+
+}
+
 ```
 
 
@@ -29,6 +49,8 @@ library(rje)
 ```{r}
 ivdag <- graph_from_literal(Z -+ X, X -+ Y, U -+ X:Y) |> initialize_graph()
 ivrels <- dag_get_linear_relations(ivdag)
+dag_list_independences(ivdag)
+
 hrepiv <- cf_relations_to_hrep(ivrels$probform, ivrels$relation)
 hrep_to_text(hrepiv$Hrep[[1]], ivrels$probform[[1]])
 ```
@@ -48,11 +70,151 @@ for(i in 1:nrow(res)) {
   ptable$pv[c(1:4)] <- sprob(4)
   ptable$pv[c(5:8)] <- sprob(4)
   
-  axb <- ((-hrepiv$Hrep[, -c(1, 2)]) %*% ptable$pv - hrepiv$Hrep[, 2])[,1]
-  res[i, ] <- axb <= 0 & hrepiv$Hrep[, 1] * axb == 0
+  res[i, ] <- hrep_test(hrepiv$Hrep[[1]], ptable$pv, which = TRUE)[, 1]
+  
 }
 colMeans(res)
 ```
+
+## Sequential IV example
+
+```{r}
+ivdag2 <- graph_from_literal(V1 -+ V2 -+ V3 -+ V4 -+ V5, U1 -+ V2:V3, U2 -+ V4:V5) |> initialize_graph()
+dag_list_independences(ivdag2)
+
+ivrels2 <- dag_get_linear_relations(ivdag2)
+hrepiv2 <- cf_relations_to_hrep(ivrels2$probform, ivrels2$relation)
+
+ptable1 <- expand.grid(V3 = 0:1, V2 = 0:1, V1 = 0:1)
+ptable2 <- expand.grid(V4 = 0:1, V5 = 0:1, V3 = 0:1)
+
+sprob <- function(k) {
+  diff(sort(c(runif(k - 1), 0, 1)))
+}
+
+res <- matrix(NA, nrow = 2000, ncol = sum(sapply(hrepiv2$Hrep, nrow)))
+for(i in 1:nrow(res)) {
+  ptable1$pv <- ptable2$pv <- NA
+  ptable1$pv[c(1:4)] <- sprob(4)
+  ptable1$pv[c(5:8)] <- sprob(4)
+  ptable2$pv[c(1:4)] <- sprob(4)
+  ptable2$pv[c(5:8)] <- sprob(4)
+  
+  res[i, ] <- c(hrep_test(hrepiv2$Hrep[[1]], ptable1$pv, which = TRUE)[, 1], 
+                hrep_test(hrepiv2$Hrep[[2]], ptable2$pv, which = TRUE)[, 1])
+  
+}
+colMeans(res)
+
+c(hrep_to_text(hrepiv2$Hrep[[1]], ivrels2$probform[[1]]), 
+hrep_to_text(hrepiv2$Hrep[[2]], ivrels2$probform[[2]]))[which(colMeans(res) < 1)]
+```
+
+## Robin's example
+
+```{r}
+r1dag <- graph_from_literal(V1 -+ V2 -+ V3 -+ V4, V1 -+ V4, U2 -+ V2:V4) |> initialize_graph()
+r2dag <- graph_from_literal(V1 -+ V2 -+ V3 -+ V4, V2 -+ V4, U2 -+ V2:V4) |> initialize_graph()
+
+dag_list_independences(r1dag)
+dag_list_independences(r2dag)
+
+r1rels <- dag_get_linear_relations(r1dag)
+r1hreps <- cf_relations_to_hrep(r1rels$probform, r1rels$relation)
+
+r2rels <- dag_get_linear_relations(r2dag)
+r2hreps <- cf_relations_to_hrep(r2rels$probform, r2rels$relation)
+
+hrep_to_text(r1hreps$Hrep[[2]], r1rels$probform[[2]]) ## trivial
+hrep_to_text(r2hreps$Hrep[[2]], r2rels$probform[[2]]) ## trivial
+```
+
+
+Let's see if we can distinguish these two models:
+```{r}
+
+res <- matrix(NA, nrow = 1000, ncol = nrow(r2hreps$Hrep[[1]]))
+for(i in 1:nrow(res)) {
+
+  probs <- dag_sample_distribution(r1dag, parmsamp = \(k) rnorm(k, sd = 5))
+  probs1 <- merge(probs$V4, probs$V2, by = "V1")
+  probs1$prob <- with(probs1, probs.x * probs.y)
+  probs1 <- probs1[with(probs1, order(V3, V1, V4, V2)),]
+
+
+  res[i,] <- hrep_test(r2hreps$Hrep[[1]], probs1$prob, which = TRUE)
+             
+}
+
+hrep_to_text(r2hreps$Hrep[[1]], r2rels$probform[[1]])[colMeans(res) < 1]
+```
+
+These are 4 nontrivial inequality constraints that can tell us that a distribution sampled from model 1 does not come from model 2. The other direction does not work, if we sample from model 2, we cannot distinguish it from model 1. 
+
+
+## Incomplete linear example
+
+```{r}
+duarg <- graph_from_literal(A -+ B -+ C -+ D, A -+ E -+ C, D -+ F, U1 -+ A:C:E, U2 -+ F:D, U3 -+ B:D) |> 
+  initialize_graph()
+
+dag_list_independences(duarg)
+
+duarg2 <- dag_transform_merge_latents(duarg)
+
+drels <- dag_get_linear_relations(duarg2)
+dhreps <- cf_relations_to_hrep(drels$probform, drels$relation)
+
+lapply(dhreps$Hrep, dim)
+drels$probform[[2]][1]
+```
+
+
+Let's try to get the equality constraints for the nonlinear district using the NM factorization
+
+```{r}
+library(ADMGs2)
+library(MixedGraphs)
+
+duargadmg <- dag_transform_latent_project(duarg, admg = TRUE)
+duargarid <- aridProj(duaradmg)
+
+localMarkovProperty(duargadmg)
+```
+
+
+## Front door model
+
+```{r}
+fd <- initialize_graph(graph_from_literal(A -+ M -+ Y, U1 -+ A:Y))
+dag_list_independences(fd)
+
+fdrels <- dag_get_linear_relations(fd)
+fdreps <- cf_relations_to_hrep(fdrels$probform, fdrels$relation)
+
+
+## all trivial
+hrep_to_text(fdreps$Hrep[[2]], prob = fdrels$probform[[2]])
+
+unfd <- initialize_graph(graph_from_literal(A -+ M -+ Y, A-+ Y, U1 -+ A:M:Y))
+res <- matrix(NA, nrow = 1000, ncol = nrow(fdreps$Hrep[[1]]))
+
+for(i in 1:nrow(res)) {
+
+  probs <- dag_sample_distribution(unfd, parmsamp = \(k) rnorm(k, sd = 5))
+  probs1 <- merge(probs$Y, probs$A, by = "A", all = TRUE)
+  probs1$prob <- with(probs1, probs.x * probs.y)
+  probs1 <- probs1[with(probs1, order(M, Y, A)),]
+
+
+  res[i,] <- hrep_test(fdreps$Hrep[[1]], probs1$prob, which = TRUE)[, 1]
+             
+}
+
+hrep_to_text(fdreps$Hrep[[1]], fdrels$probform[[1]])[colMeans(res) < 1]
+```
+
+
 
 
 ## More difficult example
@@ -101,20 +263,31 @@ Great, nothing is violated if we sample a distribution from the DAG, but let's s
 dun <- initialize_graph(graph_from_literal(V1 -+ V2:V4:V3, V2 -+ V3:V4, V3 -+ V4, U1 -+ V1:V2:V3:V4))
 plot(dun)
 
-probs <- dag_sample_distribution(dun, parmsamp = \(k) rnorm(k, sd = 5))
 
-probs1 <- merge(probs$V3, probs$V1, by = "V1")
-probs1$prob <- with(probs1, probs.x * probs.y)
-probs1 <- probs1[with(probs1, order(V2, V3, V1)),]
+res <- matrix(NA, nrow = 1000, ncol = sum(sapply(hrepd1$Hrep, nrow)))
+for(i in 1:nrow(res)) {
 
-probs2 <- merge(probs$V4, probs$V2, by = c("V1", "V2"))
-probs2$prob <- with(probs2, probs.x * probs.y)
-probs2 <- probs2[with(probs2, order(V3, V1, V4, V2)),]
+  probs <- dag_sample_distribution(dun, parmsamp = \(k) rnorm(k, sd = 5))
+  probs1 <- merge(probs$V3, probs$V1, by = "V1")
+  probs1$prob <- with(probs1, probs.x * probs.y)
+  probs1 <- probs1[with(probs1, order(V2, V3, V1)),]
 
-hrep_test(hrepd1$Hrep[[1]], probs1$prob) & hrep_test(hrepd1$Hrep[[2]], probs2$prob)
+  probs2 <- merge(probs$V4, probs$V2, by = c("V1", "V2"))
+  probs2$prob <- with(probs2, probs.x * probs.y)
+  probs2 <- probs2[with(probs2, order(V3, V1, V4, V2)),]
 
-nontriv <- hrep_test(hrepd1$Hrep[[2]], probs2$prob, which = TRUE)[1]
-hrep_to_text(hrepd1$Hrep[[2]], d1rels$probform[[2]])[nontriv]
+  res[i,] <- c(hrep_test(hrepd1$Hrep[[1]], probs1$prob, which = TRUE), 
+               hrep_test(hrepd1$Hrep[[2]], probs2$prob, which = TRUE))
+}
+
+sapply(hrepd1$Hrep, nrow)
+which(colMeans(res) < 1)
 ```
 
-The above constraint is a nontrivial inequality constraint.
+So none of the first set of constraints on probabilities of the form `r `d1rels$probform[[1]][[1]]` are nontrivial, but the following ones are: 
+
+```{r}
+cat(hrep_to_text(hrepd1$Hrep[[2]], d1rels$probform[[2]])[which(colMeans(res)[-c(1:11)] < 1)], sep = "\n")
+```
+
+Some of these are inequality constraints, which were previously unknown. 

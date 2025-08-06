@@ -74,7 +74,8 @@ dag_sample_distribution <- function(dag, parmsamp = \(k) rnorm(k)) {
 
       iform <- as.formula(paste("~", paste(pa, collapse = "*")))
       inmat <- cbind(dmat, u)
-      colnames(inmat)[ncol(inmat)] <- intersect(pa, latents)
+      unms <- intersect(pa, latents)
+      colnames(inmat)[ncol(inmat)] <- if(length(unms) == 0) "U" else unms
       dmat <- model.matrix(iform, inmat)
       parm <- parmsamp(ncol(dmat))
       plogis(dmat %*% parm)[, 1]
@@ -85,7 +86,9 @@ dag_sample_distribution <- function(dag, parmsamp = \(k) rnorm(k)) {
       if(v %in% latents) -1 else 0:(nvals[which(revtop == v)]-1)
     }, simplify = FALSE))[, setdiff(pa, latents), drop = FALSE]
 
-    probs <- suppressWarnings(sapply(1:nrow(outmat), \(i) integrate(\(u) u * pr.var(outmat[i,, drop = FALSE], u), 0, 1)$value))
+    probs <- suppressWarnings(sapply(1:nrow(outmat), \(i){
+      integrate(\(u) u * pr.var(outmat[i,, drop = FALSE], u), 0, 1)$value
+      }))
     outmat1 <- outmat0 <- outmat
     outmat1[[var]] <- 1
     outmat1$probs <- probs
