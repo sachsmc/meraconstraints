@@ -2,12 +2,11 @@
 #'
 #' @param prob A list of probability forms
 #' @param relation A list of relations for the corresponding probability forms
-#' @param thisr Multiplication factor
 #' @returns An hrep object, see \link[rcdd]{scdd}
 #' @export
 
 
-cf_relations_to_hrep <- function(prob, relation, thisr) {
+cf_relations_to_hrep <- function(prob, relation) {
   ## make the matrix
 
   foos <- vreps <- vector(mode = "list", length = length(prob))
@@ -19,7 +18,9 @@ cf_relations_to_hrep <- function(prob, relation, thisr) {
       rr <- relation[[j]][[i]]
       cbind(i, match(rr, rvarprobs))
     }))
-    if(missing(thisr)) thisr <- rep("1", nrow(rdex))
+    #if(missing(thisr)){
+      thisr <- rep("1", nrow(rdex))
+    #}
     Rmat[rdex] <- thisr[rdex[, 1]]
 
     vreps[[j]] <- rcdd::makeV(points = t(Rmat))
@@ -78,10 +79,16 @@ hrep_to_text <- function(hrep, prob, sets, simplify = FALSE) {
 
     #thisp <- prob[as.logical(abs(a[i,]))]
 
-    inp <- paste(paste(a[i,a[i,]!=0], "*", thisp), collapse = " + ")
+    termfact <- c("-1" = " - ", "1" = " + ")[as.character(a[i,a[i,]!=0])]
+    if(termfact[1] == "+") termfact[1] <- "" else termfact[1] <- "-"
+    inp <- paste(rbind(termfact, thisp), collapse = "")
 
     inequalities.text[i] <- if(l[i] == 0) paste(inp, "<=", b[i]) else{
+      if(l[i] == 1) {
+        paste(inp, " = ", c("0" = "0", "-1" = "-1", "1" = "1")[as.character(b[i])])
+      } else {
       paste(l[i], "*(", inp, " - ", b[i], ") = 0")
+      }
     }
   }
 

@@ -215,6 +215,40 @@ hrep_to_text(fdreps$Hrep[[1]], fdrels$probform[[1]])[colMeans(res) < 1]
 ```
 
 
+## Longitudinal front door model
+
+```{r}
+lfd <- initialize_graph(graph_from_literal(A0 -+ A1 -+ Y, M0 -+ M1 -+ Y, A0 -+ M0:M1, A1 -+ M1, M0 -+ A1:Y, Ur -+ A0:A1:Y))
+dag_list_independences(lfd)
+
+lfdrels <- dag_get_linear_relations(lfd)
+lfdreps <- cf_relations_to_hrep(lfdrels$probform, lfdrels$relation)
+
+
+## all trivial
+hrep_to_text(lfdreps$Hrep[[1]], prob = lfdrels$probform[[1]])
+
+ulfd <- initialize_graph(graph_from_literal(A0 -+ A1 -+ Y, M0 -+ M1 -+ Y, A0 -+ M0:M1, A1 -+ M1, M0 -+ A1:Y, Ur -+ A0:A1:M0:M1:Y))
+res <- matrix(NA, nrow = 1000, ncol = nrow(lfdreps$Hrep[[1]]))
+
+for(i in 1:nrow(res)) {
+
+  probs <- dag_sample_distribution(ulfd, parmsamp = \(k) rnorm(k, sd = 2.5))
+  probs1 <- merge(probs$Y, probs$A1, by = c("A1", "M0"), all = TRUE)
+  probs1$prob <- with(probs1, probs.x * probs.y)
+  probs2 <- merge(probs1, probs$A0, by = "A0", all = TRUE)
+  probs2$prob.fin <- with(probs2, prob * probs)
+  probs2 <- probs2[with(probs2, order(M1, M0, Y, A1, A0)),]
+
+
+  res[i,] <- hrep_test(lfdreps$Hrep[[1]], probs2$prob, which = TRUE)[, 1]
+             
+}
+
+hrep_to_text(lfdreps$Hrep[[1]], lfdrels$probform[[1]])[colMeans(res) < 1]
+```
+
+
 
 
 ## More difficult example
@@ -291,3 +325,28 @@ cat(hrep_to_text(hrepd1$Hrep[[2]], d1rels$probform[[2]])[which(colMeans(res)[-c(
 ```
 
 Some of these are inequality constraints, which were previously unknown. 
+
+
+
+## Test graph
+
+```{r}
+d2 <- initialize_graph(graph_from_literal(V0 -+ V1:V4, V1 -+ V2 -+ V3 -+ V4, Ur -+ V2:V4))
+plot(d2)
+```
+
+This has some conditional independences: 
+```{r}
+dag_list_independences(d2)
+```
+
+It does however have a nontrivial inequality constraint that we can find. 
+
+```{r}
+d2rels <- dag_get_linear_relations(d2)
+hrepd2 <- cf_relations_to_hrep(d2rels$probform[2], d2rels$relation[2])
+hrep_to_text(hrepd2$Hrep[[2]], d2rels$probform[[2]])
+
+hrepd2 <- cf_relations_to_hrep(d2rels$probform, d2rels$relation)
+
+```
