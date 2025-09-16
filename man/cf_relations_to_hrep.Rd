@@ -4,14 +4,12 @@
 \alias{cf_relations_to_hrep}
 \title{Convert counterfactual relations to the H-representation of a polytope}
 \usage{
-cf_relations_to_hrep(prob, relation, thisr)
+cf_relations_to_hrep(prob, relation)
 }
 \arguments{
 \item{prob}{A list of probability forms}
 
 \item{relation}{A list of relations for the corresponding probability forms}
-
-\item{thisr}{Multiplication factor}
 }
 \value{
 An hrep object, see \link[rcdd]{scdd}

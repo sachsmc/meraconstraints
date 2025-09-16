@@ -53,12 +53,13 @@ dag_list_independences(ivdag)
 
 hrepiv <- cf_relations_to_hrep(ivrels$probform, ivrels$relation)
 hrep_to_text(hrepiv$Hrep[[1]], ivrels$probform[[1]])
+hrep_to_text(hrepiv$Hrep[[1]], ivrels$probform[[1]])[prob_simplex_extremes(ivrels, hrepiv$Hrep)[[1]]]
 ```
 
 Rows 2, 3, 5 and 6 are the familiar IV inequalities. As you can see below, when we sample distributions unconstrained, only those 4 are ever violated. 
 
 ```{r}
-ptable <- expand.grid(X = 0:1, Y = 0:1, Z = 0:1)
+ptable <- data.table(expand.grid(X = 0:1, Y = 0:1, Z = 0:1))
 
 sprob <- function(k) {
   diff(sort(c(runif(k - 1), 0, 1)))
@@ -66,9 +67,15 @@ sprob <- function(k) {
 
 res <- matrix(NA, nrow = 2000, ncol = 14)
 for(i in 1:nrow(res)) {
-  ptable$pv <- NA
-  ptable$pv[c(1:4)] <- sprob(4)
-  ptable$pv[c(5:8)] <- sprob(4)
+  # ptable$pv <- NA
+  # ptable$pv[c(1:4)] <- sprob(4)
+  # ptable$pv[c(5:8)] <- sprob(4)
+  ptable$joint <- sprob(8)
+  ptable[, pXZ := sum(joint), by = .(X, Z)]
+  ptable[, pXY := sum(joint), by = .(X, Y)]
+  ptable[, pZ := sum(joint), by = .(Z)]
+  ptable[, pX := sum(joint), by = .(X)]
+  ptable[, pv := (pXZ / pZ) * (pXY / pX)]
   
   res[i, ] <- hrep_test(hrepiv$Hrep[[1]], ptable$pv, which = TRUE)[, 1]
   
@@ -85,6 +92,8 @@ dag_list_independences(ivdag2)
 ivrels2 <- dag_get_linear_relations(ivdag2)
 hrepiv2 <- cf_relations_to_hrep(ivrels2$probform, ivrels2$relation)
 
+prob_simplex_extremes(ivrels2, hrepiv2$Hrep)
+
 ptable1 <- expand.grid(V3 = 0:1, V2 = 0:1, V1 = 0:1)
 ptable2 <- expand.grid(V4 = 0:1, V5 = 0:1, V3 = 0:1)
 
@@ -99,6 +108,7 @@ for(i in 1:nrow(res)) {
   ptable1$pv[c(5:8)] <- sprob(4)
   ptable2$pv[c(1:4)] <- sprob(4)
   ptable2$pv[c(5:8)] <- sprob(4)
+  ptable2 <- merge(ptable2, ptable1[, c("V1", "V2")], all = TRUE)
   
   res[i, ] <- c(hrep_test(hrepiv2$Hrep[[1]], ptable1$pv, which = TRUE)[, 1], 
                 hrep_test(hrepiv2$Hrep[[2]], ptable2$pv, which = TRUE)[, 1])
@@ -132,6 +142,9 @@ hrep_to_text(r2hreps$Hrep[[2]], r2rels$probform[[2]]) ## trivial
 
 Let's see if we can distinguish these two models:
 ```{r}
+
+prob_simplex_extremes(r2rels, r2hreps$Hrep)
+prob_simplex_extremes(r1rels, r1hreps$Hrep)
 
 res <- matrix(NA, nrow = 1000, ncol = nrow(r2hreps$Hrep[[1]]))
 for(i in 1:nrow(res)) {

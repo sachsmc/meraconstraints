@@ -55,10 +55,11 @@ dag_get_district_params <- function(dag) {
   districts <- dag_get_districts(dag)
   dvars <- lapply(districts, \(vs) names(vs[latent == FALSE]))
   admg <- dag_transform_latent_project(dag)
+  dord <- dag_order(dag)[[1]]
 
   res <- character(length(districts))
   remove <- NULL
-  vterms <- distrs <- vector(mode = "list", length = length(districts))
+  vterms <- distrs <- resterms <- vector(mode = "list", length = length(districts))
   for(i in 1:length(districts)) {
 
     paofdist <- adjacent_vertices(dag, districts[[i]][latent == FALSE], mode = "in")
@@ -69,8 +70,24 @@ dag_get_district_params <- function(dag) {
       remove <- c(remove, i)
       next
     }
-    res[i] <- causal.effect(y = dvars[[i]],
-                  x = intervenset, G = admg, prune = TRUE)
+
+    ## product of each variable given it's parents
+
+      padistudist <- union(dvars[[i]], unlist(lapply(paofdist, \(pa) names(pa[latent == FALSE]))))
+      prodterm <- lapply(dvars[[i]], \(di) {
+        setdiff(intersect(padistudist, dord[1:which(di == dord)]), di)
+      })
+
+    names(prodterm) <- dvars[[i]]
+    resterms[[i]] <- prodterm
+
+    res[i] <- Reduce(\(x, y) paste0(x, y), lapply(names(prodterm), \(y) {
+      sprintf("P(%s = {%s}|%s)", y, y, paste(paste0(prodterm[[y]], " = {", prodterm[[y]], "}"), collapse = ","))
+    }))
+    #res[i] <- causal.effect(y = dvars[[i]],
+    #              x = intervenset, G = admg, prune = TRUE)
+
+
     vterms[[i]] <- c(dvars[[i]], intervenset)
     distrs[[i]] <- paste0("R_", dvars[[i]])
   }
@@ -79,15 +96,13 @@ dag_get_district_params <- function(dag) {
     res <- res[-remove]
     distrs <- distrs[-remove]
     vterms <- vterms[-remove]
+    resterms <- resterms[-remove]
   }
 
-  alnm <- names(V(dag)[latent == FALSE])
-  for(x in alnm){
-    res <- gsub(x, sprintf("%s = {%s}", x, x), res)
-  }
 
   list(vterms = vterms,
-       pforms = res, distrs = distrs)
+       pforms = res, distrs = distrs,
+       plist = resterms)
 
 }
 
