@@ -59,7 +59,7 @@ dag_get_district_params <- function(dag) {
 
   res <- character(length(districts))
   remove <- NULL
-  vterms <- distrs <- resterms <- vector(mode = "list", length = length(districts))
+  vterms <- poterms <- distrs <- resterms <- vector(mode = "list", length = length(districts))
   for(i in 1:length(districts)) {
 
     paofdist <- adjacent_vertices(dag, districts[[i]][latent == FALSE], mode = "in")
@@ -87,7 +87,7 @@ dag_get_district_params <- function(dag) {
     #res[i] <- causal.effect(y = dvars[[i]],
     #              x = intervenset, G = admg, prune = TRUE)
 
-
+    poterms[[i]] <- list(out = dvars[[i]], do = intervenset)
     vterms[[i]] <- c(dvars[[i]], intervenset)
     distrs[[i]] <- paste0("R_", dvars[[i]])
   }
@@ -97,12 +97,13 @@ dag_get_district_params <- function(dag) {
     distrs <- distrs[-remove]
     vterms <- vterms[-remove]
     resterms <- resterms[-remove]
+    poterms <- poterms[-remove]
   }
 
 
   list(vterms = vterms,
        pforms = res, distrs = distrs,
-       plist = resterms)
+       plist = resterms, poterms = poterms)
 
 }
 

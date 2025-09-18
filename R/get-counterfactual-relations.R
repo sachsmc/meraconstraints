@@ -160,7 +160,8 @@ dag_get_linear_relations <- function(dag) {
   list(relation = relation,
        probform = prob.fancy,
        problevels = problevels,
-       problist = dparms$plist)
+       problist = dparms$plist,
+       poterms = dparms$poterms)
 
 }
 

@@ -32,7 +32,7 @@ cf_relations_to_hrep <- function(prob, relation) {
     #if(missing(thisr)){
     #  thisr <- rep("1", nrow(rdex))
     #}
-    #Rmat[rdex] <- thisr[rdex[, 1]]
+    #                                      Rmat[rdex] <- thisr[rdex[, 1]]
 
     vreps[[j]] <- rcdd::makeV(points = t(Rmat))
 
@@ -54,7 +54,7 @@ cf_relations_to_hrep <- function(prob, relation) {
 #' @export
 #' @returns A character vector
 
-hrep_to_text <- function(hrep, prob, sets, simplify = FALSE) {
+hrep_to_text <- function(hrep, prob) {
 
   l <- hrep[ , 1]
   b <- hrep[ , 2]
@@ -68,35 +68,16 @@ hrep_to_text <- function(hrep, prob, sets, simplify = FALSE) {
   inequalities.text <- rep(NA_character_, nrow(a))
   for(i in 1:nrow(a)) {
     thisp <- prob[as.logical(a[i,] != 0)]
-    # ## checking conditions for standard probabilistic constraints that we omit
-    if(simplify) {
-      if(l[i] == 0) {  ## inequalities
-        if((sum(a[i,] == -1) == 1 & b[i] == 0) |
-           (sum(a[i,] == 1) == 1 & b[i] == 1)) {
-          next
-        }
-        if(any(sapply(sets, \(se) length(setdiff(thisp, se)) == 0))){
-          if(all(a[i,][a[i,]!=0] == b[i]) & abs(b[i]) == 1) next
-        }
-      } else { ## equalities
-
-        if(any(sapply(sets, \(se) length(setdiff(thisp, se)) == 0)) &
-           (all(sign(a[i,][a[i,]!=0]) == -1) & b[i] == -1) |
-           (all(sign(a[i,][a[i,]!=0]) == 1) & b[i] == 1)){
-          next
-        }
-      }
-    }
 
     #thisp <- prob[as.logical(abs(a[i,]))]
 
     termfactl <- (a[i,a[i,]!=0])
-    termfact <- ifelse(termfactl < 0, paste0(" ", termfactl, "*"),
-                       paste0(" + ", termfactl, "*"))
-    termfact[abs(termfactl) == 1] <- gsub("1*", " ", termfact[abs(termfactl) == 1], fixed = TRUE)
+    termfact <- ifelse(termfactl < 0, paste0(" ", termfactl, "* "),
+                       paste0(" +", termfactl, "* "))
+    termfact[abs(termfactl) == 1] <- gsub("1*", "", termfact[abs(termfactl) == 1], fixed = TRUE)
 
-    termfact[1] <- gsub("+", "", termfact[1], fixed = TRUE)
-    inp <- paste(rbind(termfact, thisp), collapse = "")
+    termfact[1] <- gsub(" - ", "-", gsub("+", "", termfact[1], fixed = TRUE))
+    inp <- trimws(paste(rbind(termfact, thisp), collapse = ""))
 
     inequalities.text[i] <- if(l[i] == 0) paste(inp, "<=", b[i]) else{
       if(l[i] == 1) {
@@ -133,7 +114,7 @@ hrep_test <- function(Hrep, probform, tol = 1e-10, which = FALSE) {
 }
 
 
-prob_simplex_extremes <- function(drels, hreps) {
+prob_simplex_extremes0 <- function(drels, hreps) {
 
   checks <- vector(mode = "list", length = length(hreps))
   for(i in 1:length(hreps)) {
@@ -184,6 +165,51 @@ prob_simplex_extremes <- function(drels, hreps) {
     }
 
   checks[[i]] <- colMeans(check) < 1
+  }
+
+  checks
+}
+
+
+
+#' @export
+prob_simplex_extremes <- function(drels, hreps) {
+
+  checks <- vector(mode = "list", length = length(hreps))
+  for(i in 1:length(hreps)) {
+
+
+    hrep <- hreps[[i]]
+
+    ctabin <- split(drels$problevels[[i]], drels$problevels[[i]][, drels$poterms[[i]]$do])
+    constgrps <- lapply(ctabin, \(cin) {
+        # res <- c(glue::glue_data(cin,
+        #                   paste(c("p", paste0("{", drels$poterms[[i]]$out, "}"),
+        #                         "d", paste0("{", drels$poterms[[i]]$do, "}")),
+        #                         collapse = "")))
+        res <- do.call(paste, c(as.list(cin), sep = "."))
+        res
+    })
+
+    rawprobs <- unlist(drels$probform[[i]])
+
+    set1<- sapply(constgrps,"[", 1)
+    combos <- combinations(rep(length(constgrps[[1]]), length(constgrps))) + 1
+    #combos <- matrix(runif(length(set1) * 10000), ncol = length(set1))
+    check <- matrix(NA, nrow = nrow(combos), ncol = nrow(hrep))
+    for(j in 1:nrow(combos)) {
+      theseprobs <- rep(0, length(rawprobs))
+      names(theseprobs) <- names(rawprobs)
+      for(k in 1:ncol(combos)) {
+        theseprobs[constgrps[[k]][combos[j, k]]] <- 1
+      }
+
+      check[j, ] <- hrep_test(hrep, theseprobs, tol = 1e-8, which = TRUE)
+
+
+    }
+
+    checks[[i]] <- colMeans(check) < 1
   }
 
   checks

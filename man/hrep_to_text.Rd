@@ -4,7 +4,7 @@
 \alias{hrep_to_text}
 \title{Parse Hrep and remove redundancies}
 \usage{
-hrep_to_text(hrep, prob, sets, simplify = FALSE)
+hrep_to_text(hrep, prob)
 }
 \arguments{
 \item{hrep}{H-representation}

@@ -23,24 +23,6 @@ library(igraph)
 library(rje)
 
 
-hrep_test <- function(Hrep, probform, tol = 1e-10, which = FALSE) {
-
-  l <- Hrep[ , 1]
-  b <- Hrep[ , 2]
-  v <- Hrep[ , - c(1, 2)]
-  a <- (- v)
-
-  axb <- a %*% probform - b
-
-  chk <- axb <= tol & abs(l * axb) < tol
-  if(which) {
-    chk
-  } else {
-    all(chk)
-  }
-
-}
-
 ```
 
 
@@ -108,8 +90,7 @@ for(i in 1:nrow(res)) {
   ptable1$pv[c(5:8)] <- sprob(4)
   ptable2$pv[c(1:4)] <- sprob(4)
   ptable2$pv[c(5:8)] <- sprob(4)
-  ptable2 <- merge(ptable2, ptable1[, c("V1", "V2")], all = TRUE)
-  
+
   res[i, ] <- c(hrep_test(hrepiv2$Hrep[[1]], ptable1$pv, which = TRUE)[, 1], 
                 hrep_test(hrepiv2$Hrep[[2]], ptable2$pv, which = TRUE)[, 1])
   
