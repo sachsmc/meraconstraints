@@ -82,7 +82,13 @@ dag_get_district_params <- function(dag) {
     resterms[[i]] <- prodterm
 
     res[i] <- Reduce(\(x, y) paste0(x, y), lapply(names(prodterm), \(y) {
-      sprintf("P(%s = {%s}|%s)", y, y, paste(paste0(prodterm[[y]], " = {", prodterm[[y]], "}"), collapse = ","))
+      if(length(prodterm[[y]] > 0)) {
+        sprintf("P(%s = {%s}|%s)", y, y,
+                paste(paste0(prodterm[[y]], " = {", prodterm[[y]], "}"), collapse = ","))
+      } else {
+        sprintf("P(%s = {%s})", y, y)
+      }
+
     }))
     #res[i] <- causal.effect(y = dvars[[i]],
     #              x = intervenset, G = admg, prune = TRUE)

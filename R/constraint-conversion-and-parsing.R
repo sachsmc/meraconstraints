@@ -93,7 +93,7 @@ hrep_to_text <- function(hrep, prob) {
 }
 
 
-
+#' @export
 
 hrep_test <- function(Hrep, probform, tol = 1e-10, which = FALSE) {
 
@@ -205,7 +205,7 @@ prob_simplex_extremes <- function(drels, hreps) {
       }
 
       check[j, ] <- hrep_test(hrep, theseprobs, tol = 1e-8, which = TRUE)
-
+      #allprobs[j, ] <- theseprobs
 
     }
 
@@ -213,6 +213,21 @@ prob_simplex_extremes <- function(drels, hreps) {
   }
 
   checks
+}
+
+
+#' @export
+combinations <- function(p) {
+
+  tot = prod(p)
+  cp = cumprod(p)
+  retval = rep.int(0, tot * length(p))
+  dim(retval) = c(tot, length(p))
+  for (i in seq_along(p)) {
+    retval[, i] <- rep(seq_len(p[i]) - 1, each = cp[i]/p[i])
+  }
+  retval
+
 }
 
 
