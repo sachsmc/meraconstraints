@@ -1,14 +1,15 @@
 #' Convert counterfactual relations to the H-representation of a polytope
 #'
-#' @param prob A list of probability forms
-#' @param relation A list of relations for the corresponding probability forms
-#' @returns An hrep object, see \link[rcdd]{scdd}
+#' @param relations A list of relations for the corresponding probability forms as returned by \link[meraconstraints]{dag_get_linear-relations}
+#' @returns A list with the v-representation and the h-repesentation object, see \link[rcdd]{scdd}
 #' @export
 
 
-cf_relations_to_hrep <- function(prob, relation) {
+cf_relations_to_hrep <- function(relations) {
   ## make the matrix
 
+  prob <- relations$probform
+  relation <- relations$relation
   foos <- vreps <- vector(mode = "list", length = length(prob))
   for(j in 1:length(prob)) {
     rvarprobs <- unique(unlist(relation[[j]]))

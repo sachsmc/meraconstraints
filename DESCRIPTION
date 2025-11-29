@@ -2,6 +2,7 @@ Package: meraconstraints
 Type: Package
 Title: Derive Observable Probabilistic Constraints Implied by Causal Models
 Version: 0.1.0
+Date: 2025-11-20
 Author: Authors@R: 
     c(person(given = "Michael C",
              family = "Sachs",
@@ -16,18 +17,7 @@ Author: Authors@R:
       person(given = "Arvid", 
              family = "Sjölander", role = c("aut")))
 Maintainer: Michael C Sachs <sachsmc@gmail.com>
-Description: Structural causal models with unobserved variables can sometimes 
-    imply constraints on the observable distribution that are more complex than 
-    simple conditional independencies. These constraints are often systems of 
-    inequalities, such as the instrumental inequalities in the randomized 
-    treatment setting with noncompliance, or Bell's inequalities in the context 
-    of quantum physics; outside of these settings there has been little 
-    research. In models with categorical observed variables and a joint 
-    distribution that is completely characterized by linear relations to the 
-    unobservable response function variables, we implement a systematic method 
-    for deriving linear constraints in terms of the observable probabilities. 
-    These constraints can be used to falsify assumptions the model in ways 
-    that would otherwise be untestable due to the latent variables. 
+Description: Structural causal models with unobserved variables can sometimes imply constraints on the observable distribution that are more complex than simple conditional independencies. These observable constraints can allow for falsification of assumptions of the model that would otherwise be untestable due to the unobserved variables and can be used to constrain estimation procedures to improve efficiency. In causal models with categorical observed variables and a joint distribution that is completely characterized by linear relations to the unobservable response function variables, we implement a systematic method for deriving the complete set of observable constraints. 
 Encoding: UTF-8
 LazyData: true
 License: MIT + file LICENSE

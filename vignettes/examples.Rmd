@@ -33,7 +33,7 @@ ivdag <- graph_from_literal(Z -+ X, X -+ Y, U -+ X:Y) |> initialize_graph()
 ivrels <- dag_get_linear_relations(ivdag)
 dag_list_independences(ivdag)
 
-hrepiv <- cf_relations_to_hrep(ivrels$probform, ivrels$relation)
+hrepiv <- cf_relations_to_hrep(ivrels)
 hrep_to_text(hrepiv$Hrep[[1]], ivrels$probform[[1]])
 hrep_to_text(hrepiv$Hrep[[1]], ivrels$probform[[1]])[prob_simplex_extremes(ivrels, hrepiv$Hrep)[[1]]]
 ```
@@ -72,7 +72,7 @@ ivdag2 <- graph_from_literal(V1 -+ V2 -+ V3 -+ V4 -+ V5, U1 -+ V2:V3, U2 -+ V4:V
 dag_list_independences(ivdag2)
 
 ivrels2 <- dag_get_linear_relations(ivdag2)
-hrepiv2 <- cf_relations_to_hrep(ivrels2$probform, ivrels2$relation)
+hrepiv2 <- cf_relations_to_hrep(ivrels2)
 
 prob_simplex_extremes(ivrels2, hrepiv2$Hrep)
 
@@ -111,10 +111,10 @@ dag_list_independences(r1dag)
 dag_list_independences(r2dag)
 
 r1rels <- dag_get_linear_relations(r1dag)
-r1hreps <- cf_relations_to_hrep(r1rels$probform, r1rels$relation)
+r1hreps <- cf_relations_to_hrep(r1rels)
 
 r2rels <- dag_get_linear_relations(r2dag)
-r2hreps <- cf_relations_to_hrep(r2rels$probform, r2rels$relation)
+r2hreps <- cf_relations_to_hrep(r2rels)
 
 hrep_to_text(r1hreps$Hrep[[2]], r1rels$probform[[2]]) ## trivial
 hrep_to_text(r2hreps$Hrep[[2]], r2rels$probform[[2]]) ## trivial
@@ -157,7 +157,7 @@ dag_list_independences(duarg)
 duarg2 <- dag_transform_merge_latents(duarg)
 
 drels <- dag_get_linear_relations(duarg2)
-dhreps <- cf_relations_to_hrep(drels$probform, drels$relation)
+dhreps <- cf_relations_to_hrep(drels)
 
 nontriv <- prob_simplex_extremes(drels, dhreps$Hrep)
 lapply(nontriv, sum)
@@ -169,18 +169,6 @@ hrep_to_text(dhreps$Hrep[[1]], doprobs1)[nontriv[[1]]]
 ```
 
 
-Let's try to get the equality constraints for the nonlinear district using the NM factorization
-
-```{r}
-library(ADMGs2)
-library(MixedGraphs)
-
-duargadmg <- dag_transform_latent_project(duarg, admg = TRUE)
-duargarid <- aridProj(duaradmg)
-
-localMarkovProperty(duargadmg)
-```
-
 
 ## Front door model
 
@@ -189,62 +177,31 @@ fd <- initialize_graph(graph_from_literal(A -+ M -+ Y, U1 -+ A:Y))
 dag_list_independences(fd)
 
 fdrels <- dag_get_linear_relations(fd)
-fdreps <- cf_relations_to_hrep(fdrels$probform, fdrels$relation)
+fdreps <- cf_relations_to_hrep(fdrels)
 
+hrep_to_text(fdreps$Hrep[[1]], prob = fdrels$probform[[1]])[prob_simplex_extremes(fdrels, fdreps$Hrep)[[1]]]
 
 ## all trivial
 hrep_to_text(fdreps$Hrep[[2]], prob = fdrels$probform[[2]])
 
-unfd <- initialize_graph(graph_from_literal(A -+ M -+ Y, A-+ Y, U1 -+ A:M:Y))
+unfd <- initialize_graph(graph_from_literal(A +- M -+ Y, U1 -+ A:Y))
 res <- matrix(NA, nrow = 1000, ncol = nrow(fdreps$Hrep[[1]]))
 
 for(i in 1:nrow(res)) {
 
   probs <- dag_sample_distribution(unfd, parmsamp = \(k) rnorm(k, sd = 5))
-  probs1 <- merge(probs$Y, probs$A, by = "A", all = TRUE)
-  probs1$prob <- with(probs1, probs.x * probs.y)
-  probs1 <- probs1[with(probs1, order(M, Y, A)),]
+  probs1 <- merge(probs$Y, probs$A, by = "M", all = TRUE)
+  probs2 <- merge(probs1, probs$M, by = "M", all = TRUE)
+  
+  probs2$probf <- with(probs2, probs.x * probs.y * probs)
+  probs2 <- probs2[with(probs2, order(M, Y, A)),]
 
 
-  res[i,] <- hrep_test(fdreps$Hrep[[1]], probs1$prob, which = TRUE)[, 1]
+  res[i,] <- hrep_test(fdreps$Hrep[[1]], probs2$probf, which = TRUE)[, 1]
              
 }
 
 hrep_to_text(fdreps$Hrep[[1]], fdrels$probform[[1]])[colMeans(res) < 1]
-```
-
-
-## Longitudinal front door model
-
-```{r}
-lfd <- initialize_graph(graph_from_literal(A0 -+ A1 -+ Y, M0 -+ M1 -+ Y, A0 -+ M0:M1, A1 -+ M1, M0 -+ A1:Y, Ur -+ A0:A1:Y))
-dag_list_independences(lfd)
-
-lfdrels <- dag_get_linear_relations(lfd)
-lfdreps <- cf_relations_to_hrep(lfdrels$probform, lfdrels$relation)
-
-
-## all trivial
-hrep_to_text(lfdreps$Hrep[[1]], prob = lfdrels$probform[[1]])
-
-ulfd <- initialize_graph(graph_from_literal(A0 -+ A1 -+ Y, M0 -+ M1 -+ Y, A0 -+ M0:M1, A1 -+ M1, M0 -+ A1:Y, Ur -+ A0:A1:M0:M1:Y))
-res <- matrix(NA, nrow = 1000, ncol = nrow(lfdreps$Hrep[[1]]))
-
-for(i in 1:nrow(res)) {
-
-  probs <- dag_sample_distribution(ulfd, parmsamp = \(k) rnorm(k, sd = 2.5))
-  probs1 <- merge(probs$Y, probs$A1, by = c("A1", "M0"), all = TRUE)
-  probs1$prob <- with(probs1, probs.x * probs.y)
-  probs2 <- merge(probs1, probs$A0, by = "A0", all = TRUE)
-  probs2$prob.fin <- with(probs2, prob * probs)
-  probs2 <- probs2[with(probs2, order(M1, M0, Y, A1, A0)),]
-
-
-  res[i,] <- hrep_test(lfdreps$Hrep[[1]], probs2$prob, which = TRUE)[, 1]
-             
-}
-
-hrep_to_text(lfdreps$Hrep[[1]], lfdrels$probform[[1]])[colMeans(res) < 1]
 ```
 
 
@@ -267,7 +224,7 @@ It does however have a nontrivial inequality constraint that we can find.
 
 ```{r}
 d1rels <- dag_get_linear_relations(d1)
-hrepd1 <- cf_relations_to_hrep(d1rels$probform, d1rels$relation)
+hrepd1 <- cf_relations_to_hrep(d1rels)
 #hrep_to_text(hrepd1$Hrep[[2]], d1rels$probform[[2]])
 ```
 

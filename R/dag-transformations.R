@@ -135,15 +135,16 @@ dag_transform_merge_latents <- function(dag) {
 
 #' Add attributes to an igraph
 #'
-#' @param graph an igraph object with names vertices
+#' @param graph an igraph object with named vertices
 #' @param latent.pattern The regular expression pattern used to identify latent variables
+#' @param nvals A named vector that maps node names to the number of categories for that node. If NULL defaults to 2.
 #' @returns An igraph with additional attributes latent (logical) and nvals (integer)
 #' @export
 #' @examples
-#' initialize_graph(graph_from_literal(Z -+ X, X -+ Y, U -+ X:Y))
+#' initialize_graph(graph_from_literal(Z -+ X, X -+ Y, U -+ X:Y), nvals = c(Z = 3, X = 3))
 #'
 
-initialize_graph <- function(graph, latent.pattern = "^U") {
+initialize_graph <- function(graph, latent.pattern = "^U", nvals = NULL) {
 
   nvars <- length(V(graph))
 
@@ -156,6 +157,11 @@ initialize_graph <- function(graph, latent.pattern = "^U") {
 
   if(is.null(V(graph)$nvals)) {
     V(graph)$nvals <- rep(2, nvars)
+    if(!is.null(nvals)) {
+      thisnvals <- names(nvals)
+      V(graph)[thisnvals]$nvals <- nvals
+    }
+
   }
 
 
