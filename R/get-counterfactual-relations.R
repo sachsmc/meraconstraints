@@ -142,7 +142,7 @@ dag_get_linear_relations <- function(dag) {
 
   dparms <- dag_get_district_params(dag)
 
-  relation <- prob.fancy <- problevels <- vector(mode = "list", length = length(dparms$pforms))
+  relation <- prob.fancy <- prob.star <- problevels <- vector(mode = "list", length = length(dparms$pforms))
   for(j in 1:length(dparms$pforms)) {
 
     splitptab <- split(ptabs, ptabs[, dparms$vterms[[j]]])
@@ -153,12 +153,24 @@ dag_get_linear_relations <- function(dag) {
     prob.fancy[[j]] <- lapply(splitptab, \(df) {
       unique(glue::glue_data(df, dparms$pforms[[j]]))
     })
+
+    startemplate <- if(length(dparms$poterms[[j]]$do > 0)) {
+      sprintf("P*(%s|%s)", paste(paste0(dparms$poterms[[j]]$out, " = {", dparms$poterms[[j]]$out, "}"), collapse = ","),
+              paste(paste0(dparms$poterms[[j]]$do, " = {", dparms$poterms[[j]]$do, "}"), collapse = ",")
+              )
+    } else {
+      sprintf("P(%s)", paste(paste0(dparms$poterms[[j]]$out, " = {", dparms$poterms[[j]]$out, "}"), collapse = ","))
+    }
+    prob.star[[j]] <- lapply(splitptab, \(df) {
+      unique(glue::glue_data(df,  startemplate))
+    })
     problevels[[j]] <- unique(do.call(rbind, splitptab)[, dparms$vterms[[j]]])
 
   }
 
   list(relation = relation,
        probform = prob.fancy,
+       probstarform = prob.star,
        problevels = problevels,
        problist = dparms$plist,
        poterms = dparms$poterms)

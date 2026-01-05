@@ -21,24 +21,70 @@ knitr::opts_chunk$set(
 library(meraconstraints)
 library(igraph)
 library(rje)
-
-
+library(glue)
+library(data.table)
 ```
 
 
 ## IV inequalities
 
+These are the steps to get the complete constraints, illustrated in the IV example:
+
+1. Define the DAG using `igraph`. Our function `initialize_graph` does some basic setup, and by default assumes that any variable starting with a capital U is latent. 
+
 ```{r}
 ivdag <- graph_from_literal(Z -+ X, X -+ Y, U -+ X:Y) |> initialize_graph()
-ivrels <- dag_get_linear_relations(ivdag)
-dag_list_independences(ivdag)
-
-hrepiv <- cf_relations_to_hrep(ivrels)
-hrep_to_text(hrepiv$Hrep[[1]], ivrels$probform[[1]])
-hrep_to_text(hrepiv$Hrep[[1]], ivrels$probform[[1]])[prob_simplex_extremes(ivrels, hrepiv$Hrep)[[1]]]
+plot(ivdag)
 ```
 
-Rows 2, 3, 5 and 6 are the familiar IV inequalities. As you can see below, when we sample distributions unconstrained, only those 4 are ever violated. 
+2. List the conditional independence relations. In this case there are none. 
+
+```{r}
+dag_list_independences(ivdag)
+```
+
+3. Get the linear relations describing the functional constraints. One such constraint is printed out below.
+
+```{r}
+ivrels <- dag_get_linear_relations(ivdag)
+paste(ivrels$probform[[1]][1], "=", paste(ivrels$relation[[1]][[1]], collapse = " + "))
+```
+
+4. Convert the functional constraint matrix into the H-representation. 
+
+```{r}
+hrepiv <- cf_relations_to_hrep(ivrels)
+hrepiv$Hrep[[1]]
+```
+
+Extra features/optional steps: 
+
+5. Convert the H-rep matrix into the text-based constraints. This includes trivial ones. You can print them using either the observable probabilities or the interventional probabilities, which we use the notation P* in the paper. 
+
+```{r}
+hrep_to_text(hrepiv$Hrep[[1]], ivrels$probform[[1]])
+hrep_to_text(hrepiv$Hrep[[1]], ivrels$probstarform[[1]])
+```
+
+6. Identify and exclude the definitely trivial constraints.
+```{r}
+trivial_if_false <- prob_simplex_extremes(ivrels, hrepiv$Hrep)[[1]]
+hrep_to_text(hrepiv$Hrep[[1]], ivrels$probstarform[[1]])[trivial_if_false]
+```
+
+Those are the familiar IV inequalities.
+
+7. For a given distribution, test whether the constraints are satisfied, optionally show which one(s).  
+
+```{r}
+obsprobs <- c(0.101, 0.338, 0.013, 0.548, 0.317, 0.51, 0.004, 0.168)
+
+hrep_test(hrepiv$Hrep[[1]], obsprobs)
+hrep_test(hrepiv$Hrep[[1]], obsprobs, which = TRUE)
+```
+
+
+As you can see below, when we sample distributions unconstrained from the uniform distribution, only those 4 nontrival ones are ever violated. 
 
 ```{r}
 ptable <- data.table(expand.grid(X = 0:1, Y = 0:1, Z = 0:1))
@@ -57,7 +103,8 @@ for(i in 1:nrow(res)) {
   ptable[, pXY := sum(joint), by = .(X, Y)]
   ptable[, pZ := sum(joint), by = .(Z)]
   ptable[, pX := sum(joint), by = .(X)]
-  ptable[, pv := (pXZ / pZ) * (pXY / pX)]
+  ptable[, pv := (pXZ / pZ) * (joint / pXZ)]
+  hrep_test(hrepiv$Hrep[[1]], ptable$pv, which = FALSE)
   
   res[i, ] <- hrep_test(hrepiv$Hrep[[1]], ptable$pv, which = TRUE)[, 1]
   
@@ -162,8 +209,8 @@ dhreps <- cf_relations_to_hrep(drels)
 nontriv <- prob_simplex_extremes(drels, dhreps$Hrep)
 lapply(nontriv, sum)
 
-doprobs1 <- glue::glue_data(drels$problevels[[1]], paste0("P(", paste0(drels$poterms[[1]]$out, " = {", drels$poterms[[1]]$out, "}", collapse = ", "), "| do(", 
-       paste0(drels$poterms[[1]]$do, " = {", drels$poterms[[1]]$do, "}", collapse = ", "), "))"))
+doprobs1 <- getdoprobs(drels)
+
 hrep_to_text(dhreps$Hrep[[1]], doprobs1)[nontriv[[1]]]
 #hrep_to_text(dhreps$Hrep[[2]], drels$probform[[2]])[nontriv[[2]]]
 ```
@@ -179,32 +226,70 @@ dag_list_independences(fd)
 fdrels <- dag_get_linear_relations(fd)
 fdreps <- cf_relations_to_hrep(fdrels)
 
+## all trivial unless you can intervene on M
 hrep_to_text(fdreps$Hrep[[1]], prob = fdrels$probform[[1]])[prob_simplex_extremes(fdrels, fdreps$Hrep)[[1]]]
+hrep_to_text(fdreps$Hrep[[1]], prob = getdoprobs(fdrels))[prob_simplex_extremes(fdrels, fdreps$Hrep)[[1]]]
 
 ## all trivial
 hrep_to_text(fdreps$Hrep[[2]], prob = fdrels$probform[[2]])
-
-unfd <- initialize_graph(graph_from_literal(A +- M -+ Y, U1 -+ A:Y))
-res <- matrix(NA, nrow = 1000, ncol = nrow(fdreps$Hrep[[1]]))
-
-for(i in 1:nrow(res)) {
-
-  probs <- dag_sample_distribution(unfd, parmsamp = \(k) rnorm(k, sd = 5))
-  probs1 <- merge(probs$Y, probs$A, by = "M", all = TRUE)
-  probs2 <- merge(probs1, probs$M, by = "M", all = TRUE)
-  
-  probs2$probf <- with(probs2, probs.x * probs.y * probs)
-  probs2 <- probs2[with(probs2, order(M, Y, A)),]
-
-
-  res[i,] <- hrep_test(fdreps$Hrep[[1]], probs2$probf, which = TRUE)[, 1]
-             
-}
-
-hrep_to_text(fdreps$Hrep[[1]], fdrels$probform[[1]])[colMeans(res) < 1]
 ```
 
 
+
+```{r}
+fd2 <- initialize_graph(graph_from_literal(Z -+ A -+ M -+ Y, U1 -+ A:Y))
+dag_list_independences(fd2)
+
+fd2rels <- dag_get_linear_relations(fd2)
+fd2reps <- cf_relations_to_hrep(fd2rels)
+
+## not all trivial
+hrep_to_text(fd2reps$Hrep[[1]], prob = fd2rels$probform[[1]])[prob_simplex_extremes(fd2rels, fd2reps$Hrep)[[1]]]
+
+doprobs2 <- getdoprobs(fd2rels)
+hrep_to_text(fd2reps$Hrep[[1]], prob = doprobs2)[prob_simplex_extremes(fd2rels, fd2reps$Hrep)[[1]]]
+
+## all trivial
+hrep_to_text(fd2reps$Hrep[[2]], prob = fd2rels$probform[[2]])
+```
+
+
+```{r}
+fd2c <- initialize_graph(graph_from_literal(Z -+ A -+ M -+ Y,  U1 -+ A:Y, U2 -+ Z:M))
+dag_list_independences(fd2c)
+
+
+fd2crels <- dag_get_linear_relations(fd2c)
+fd2creps <- cf_relations_to_hrep(fd2crels)
+
+## not all trivial
+hrep_to_text(fd2creps$Hrep[[1]], prob = fd2crels$probform[[1]])[prob_simplex_extremes(fd2crels, fd2creps$Hrep)[[1]]]
+hrep_to_text(fd2creps$Hrep[[2]], prob = fd2crels$probform[[2]])[prob_simplex_extremes(fd2crels, fd2creps$Hrep)[[2]]]
+
+doprobs2c <- getdoprobs(fd2crels, 2)
+hrep_to_text(fd2creps$Hrep[[2]], prob = doprobs2c)[prob_simplex_extremes(fd2crels, fd2creps$Hrep)[[2]]]
+
+## all trivial
+hrep_to_text(fd2creps$Hrep[[1]], prob = fd2crels$probform[[1]])
+```
+
+
+```{r}
+res <- matrix(NA, nrow = 1000, ncol = nrow(fd2reps$Hrep[[1]]))
+for(i in 1:nrow(res)) {
+
+  probs <- dag_sample_distribution(fd2c, parmsamp = \(k) rnorm(k, sd = 5))
+  probs1 <- merge(merge(probs$Y, probs$M, by = "M"), probs$A, by = c("A"))
+  probs1$prob <- with(probs1, probs.x * probs)
+  probs1 <- probs1[with(probs1, order(M, Z, Y, A)),]
+
+
+  res[i,] <- hrep_test(fd2reps$Hrep[[1]], probs1$prob, which = TRUE)
+             
+}
+
+hrep_to_text(fd2reps$Hrep[[1]], fd2rels$probform[[1]])[colMeans(res) < 1]
+```
 
 
 ## More difficult example

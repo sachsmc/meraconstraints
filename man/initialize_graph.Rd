@@ -4,12 +4,14 @@
 \alias{initialize_graph}
 \title{Add attributes to an igraph}
 \usage{
-initialize_graph(graph, latent.pattern = "^U")
+initialize_graph(graph, latent.pattern = "^U", nvals = NULL)
 }
 \arguments{
-\item{graph}{an igraph object with names vertices}
+\item{graph}{an igraph object with named vertices}
 
 \item{latent.pattern}{The regular expression pattern used to identify latent variables}
+
+\item{nvals}{A named vector that maps node names to the number of categories for that node. If NULL defaults to 2.}
 }
 \value{
 An igraph with additional attributes latent (logical) and nvals (integer)
@@ -18,6 +20,6 @@ An igraph with additional attributes latent (logical) and nvals (integer)
 Add attributes to an igraph
 }
 \examples{
-initialize_graph(graph_from_literal(Z -+ X, X -+ Y, U -+ X:Y))
+initialize_graph(graph_from_literal(Z -+ X, X -+ Y, U -+ X:Y), nvals = c(Z = 3, X = 3))
 
 }

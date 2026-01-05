@@ -4,15 +4,13 @@
 \alias{cf_relations_to_hrep}
 \title{Convert counterfactual relations to the H-representation of a polytope}
 \usage{
-cf_relations_to_hrep(prob, relation)
+cf_relations_to_hrep(relations)
 }
 \arguments{
-\item{prob}{A list of probability forms}
-
-\item{relation}{A list of relations for the corresponding probability forms}
+\item{relations}{A list of relations for the corresponding probability forms as returned by \link[meraconstraints]{dag_get_linear-relations}}
 }
 \value{
-An hrep object, see \link[rcdd]{scdd}
+A list with the v-representation and the h-repesentation object, see \link[rcdd]{scdd}
 }
 \description{
 Convert counterfactual relations to the H-representation of a polytope
