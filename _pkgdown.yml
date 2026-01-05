@@ -1,0 +1,12 @@
+template:
+  bootstrap: 5
+  bootswatch: lux
+  bslib:
+    pkgdown-nav-height: 100px
+
+url: https://sachsmc.github.io/meraconstraints
+
+navbar:
+  structure:
+    left:  [intro, reference, articles, news]
+    right: [search, github]

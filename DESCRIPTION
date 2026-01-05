@@ -2,7 +2,7 @@ Package: meraconstraints
 Type: Package
 Title: Derive Observable Probabilistic Constraints Implied by Causal Models
 Version: 0.1.0
-Date: 2025-11-20
+Date: 2026-01-05
 Author: Authors@R: 
     c(person(given = "Michael C",
              family = "Sachs",
@@ -18,6 +18,8 @@ Author: Authors@R:
              family = "Sjölander", role = c("aut")))
 Maintainer: Michael C Sachs <sachsmc@gmail.com>
 Description: Hidden variable graphical models can sometimes imply constraints on the observable distribution that are more complex than simple conditional independence relations. These observable constraints can allow for falsification of assumptions of the model that would otherwise be untestable due to the unobserved variables and can be used to constrain estimation procedures to improve efficiency. In models with categorical observed variables, we develop a systematic method for deriving the complete set of observable constraints. 
+URL: https://sachsmc.github.io/meraconstraints/
+BugReports: https://github.com/sachsmc/meraconstraints/issues/
 Encoding: UTF-8
 LazyData: true
 License: MIT + file LICENSE
