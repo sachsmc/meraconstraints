@@ -17,18 +17,14 @@ Author: Authors@R:
       person(given = "Arvid", 
              family = "Sjölander", role = c("aut")))
 Maintainer: Michael C Sachs <sachsmc@gmail.com>
-Description: Structural causal models with unobserved variables can sometimes imply constraints on the observable distribution that are more complex than simple conditional independencies. These observable constraints can allow for falsification of assumptions of the model that would otherwise be untestable due to the unobserved variables and can be used to constrain estimation procedures to improve efficiency. In causal models with categorical observed variables and a joint distribution that is completely characterized by linear relations to the unobservable response function variables, we implement a systematic method for deriving the complete set of observable constraints. 
+Description: Hidden variable graphical models can sometimes imply constraints on the observable distribution that are more complex than simple conditional independence relations. These observable constraints can allow for falsification of assumptions of the model that would otherwise be untestable due to the unobserved variables and can be used to constrain estimation procedures to improve efficiency. In models with categorical observed variables, we develop a systematic method for deriving the complete set of observable constraints. 
 Encoding: UTF-8
 LazyData: true
 License: MIT + file LICENSE
 Imports:
     igraph,
     rcdd,
-    causaloptim,
-    gRbase, 
-    MixedGraphs,
-    ADMGs2, 
-    causaleffect, 
+    gRbase,
     glue
 Suggests: 
     knitr,

@@ -1,0 +1,154 @@
+---
+title: "Other examples"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Illustrative examples}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+bibliography: references.bib
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(meraconstraints)
+library(igraph)
+library(rje)
+library(glue)
+library(data.table)
+```
+
+
+## Test graph
+
+```{r}
+d2 <- initialize_graph(graph_from_literal(V0 -+ V1:V4, V1 -+ V2 -+ V3 -+ V4, Ur -+ V2:V4))
+plot(d2)
+```
+
+This has some conditional independences: 
+```{r}
+dag_list_independences(d2)
+```
+
+It does however have a nontrivial inequality constraint that we can find. 
+
+```{r}
+d2rels <- dag_get_linear_relations(d2)
+hrepd2 <- cf_relations_to_hrep(d2rels$probform[2], d2rels$relation[2])
+hrep_to_text(hrepd2$Hrep[[2]], d2rels$probform[[2]])
+
+hrepd2 <- cf_relations_to_hrep(d2rels$probform, d2rels$relation)
+
+```
+
+
+## Bi/Tripartite Bell scenario
+
+```{r}
+bell2 <- graph_from_literal(X -+ A, Y -+ B, Ur -+ A:B) |> initialize_graph()
+#V(bell2)[c("A", "B")]$nvals <- 3
+b2rels <- dag_get_linear_relations(bell2)
+hrepb2 <- cf_relations_to_hrep(b2rels$probform, b2rels$relation)
+hrep_to_text(hrepb2$Hrep[[1]], b2rels$probform)[prob_simplex_extremes(b2rels, hrepb2$Hrep)[[1]]]
+
+```
+
+
+```{r}
+bell3 <- graph_from_literal(X -+ A, Y -+ B, Z -+ C, Ur -+ A:B:C) |> initialize_graph()
+dag_list_independences(bell3)
+b3rels <- dag_get_linear_relations(bell3)
+hrepb3 <- cf_relations_to_hrep(b3rels$probform, b3rels$relation)
+hrep <- hrepb3$Hrep[[1]]
+
+ctabin <- split(b3rels$problevels[[1]], b3rels$problevels[[1]][, b3rels$poterms[[1]]$do])
+constgrps <- lapply(ctabin, \(cin) {
+        # res <- c(glue::glue_data(cin,
+        #                   paste(c("p", paste0("{", b3rels$poterms[[i]]$out, "}"),
+        #                         "d", paste0("{", b3rels$poterms[[i]]$do, "}")),
+        #                         collapse = "")))
+        res <- do.call(paste, c(as.list(cin), sep = "."))
+        res
+})
+
+fast_htest <- function(l, b, a, probform, tol = 1e-10, which = FALSE) {
+
+  axb <- a %*% probform - b
+
+  chk <- axb <= tol & abs(l * axb) <= tol
+  if(which) {
+    chk
+  } else {
+    all(chk)
+  }
+
+}
+
+
+rawprobs <- unlist(b3rels$probform[[1]])
+
+
+  l <- hrep[ , 1]
+  b <- hrep[ , 2]
+  a <- -hrep[ , - c(1, 2)]
+
+set1<- sapply(constgrps,"[", 1)
+combos <- combinations(rep(length(constgrps[[1]]), length(constgrps))) + 1
+    
+nontrivial <- rep(FALSE, nrow(hrep))
+for(j in 1:nrow(combos)) {
+  theseprobs <- rep(0, length(rawprobs))
+  names(theseprobs) <- names(rawprobs)
+  for(k in 1:ncol(combos)) {
+      theseprobs[constgrps[[k]][combos[j, k]]] <- 1
+  }
+
+  htest <- !fast_htest(l, b, a, theseprobs, tol = 1e-8, which = TRUE)[,1]
+  if(any(htest)) {
+        nontrivial[which(htest)] <- TRUE
+        l <- l[-which(htest)]
+        b <- b[-which(htest)]
+        a <- a[-which(htest),]
+      }
+      
+      #allprobs[j, ] <- theseprobs
+
+}
+    
+    
+
+
+b3tcons <-hrep_to_text(hrepb3$Hrep[[1]], b3rels$probform[[1]])
+
+doprobs <- glue::glue_data(b3rels$problevels[[1]],
+  paste0("P(", paste(paste0(b3rels$poterms[[1]]$out, " = {", b3rels$poterms[[1]]$out, "}"), collapse = ", "), " | do(", 
+  paste(paste0(b3rels$poterms[[1]]$do, " = {", b3rels$poterms[[1]]$do, "}"), collapse = ", "), "))"))
+
+b3docon <- hrep_to_text(hrepb3$Hrep[[1]], doprobs)
+
+table(hrepb3$Hrep[[1]][,1]== 1)
+b3docon[hrepb3$Hrep[[1]][,1] == 0 & nontrivial][1:4]
+
+```
+
+## Napkin graph
+
+```{r}
+nap <- graph_from_literal(W -+ Z -+ X -+ Y, Ur -+ W:X:Y) |> initialize_graph()
+naprels <- dag_get_linear_relations(nap)
+dag_list_independences(nap)
+
+hrepnap <- cf_relations_to_hrep(naprels)
+hrep_to_text(hrepnap$Hrep[[1]], naprels$probform[[1]])
+hrep_to_text(hrepnap$Hrep[[1]], naprels$probform[[1]])[prob_simplex_extremes(naprels, hrepnap$Hrep)[[1]]]
+
+```
+

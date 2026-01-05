@@ -4,7 +4,7 @@
 \alias{make_prob_names}
 \title{From a probability form as a list create text}
 \usage{
-make_prob_names(form, values, letter = "p")
+make_prob_names(form, values, letter = "P")
 }
 \arguments{
 \item{form}{A prob.form object}

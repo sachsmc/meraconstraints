@@ -180,7 +180,7 @@ initialize_graph <- function(graph, latent.pattern = "^U", nvals = NULL) {
 #'   U1 -+ V1:V3, U2 -+ V2:V4) |> initialize_graph() |>
 #'   dag_transform_latent_project()
 
-dag_transform_latent_project <- function(graph, admg = FALSE) {
+dag_transform_latent_project <- function(graph) {
 
 
   for(vs in V(graph)[latent == TRUE]) {
@@ -193,27 +193,7 @@ dag_transform_latent_project <- function(graph, admg = FALSE) {
 
   newgraph <- delete_vertices(graph, V(graph)[latent == TRUE])
 
-  if(admg) {
-
-    E(newgraph)$bid <- 1.0 * (!is.na(E(duargm)$description))
-    E(newgraph)$di <- 1.0 * (is.na(E(duargm)$description))
-
-    bidir <- lapply(E(newgraph)[bid == 1], \(v) {
-      match(c(names(tail_of(newgraph, v)), names(head_of(newgraph, v))), names(V(newgraph)))
-    })
-
-    dir <- lapply(E(newgraph)[di == 1], \(v) {
-      match(c(names(tail_of(newgraph, v)), names(head_of(newgraph, v))), names(V(newgraph)))
-    })
-
-    MixedGraphs::mixedgraph(length(V(newgraph)),
-                           vnames = names(V(newgraph)),
-                           edges = list(bidirected = bidir,
-                                        directed = dir))
-
-  } else {
-    newgraph
-  }
+  newgraph
 
 
 }

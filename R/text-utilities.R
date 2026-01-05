@@ -11,7 +11,7 @@
 #'
 
 
-make_prob_names <- function(form, values, letter = "p") {
+make_prob_names <- function(form, values, letter = "P") {
 
   nameplace <- if(length(form$cond) > 0) {
     paste0(letter, "(", paste(paste0(form$out, " = %s"), collapse = ", ")," | ",

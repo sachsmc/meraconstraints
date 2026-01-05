@@ -4,7 +4,7 @@
 \alias{dag_transform_latent_project}
 \title{Latent projection for use with causaleffect}
 \usage{
-dag_transform_latent_project(graph, admg = FALSE)
+dag_transform_latent_project(graph)
 }
 \arguments{
 \item{graph}{an igraph object with names vertices and latent variables}
