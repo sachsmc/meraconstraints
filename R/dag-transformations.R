@@ -132,7 +132,6 @@ dag_transform_merge_latents <- function(dag) {
   dag
 }
 
-
 #' Add attributes to an igraph
 #'
 #' @param graph an igraph object with named vertices

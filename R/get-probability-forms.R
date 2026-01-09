@@ -23,7 +23,7 @@ dag_get_district_params <- function(dag) {
     intervenset <- setdiff(unique(unlist(lapply(paofdist, \(vs) names(vs[latent == FALSE])))),
                            names(districts[[i]][latent == FALSE]))
 
-    if(length(intervenset) == 0 & length(dvars[[i]] == 1)){
+    if(length(intervenset) == 0 & length(dvars[[i]]) == 1){
       remove <- c(remove, i)
       next
     }

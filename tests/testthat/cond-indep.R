@@ -1,6 +1,5 @@
 test_that("conditional independence", {
 
-  library(causaloptim)
   dag <- initialize_graph(graph_from_literal(V1 -+ V2, V2 -+ V3, V3 -+ V4, U -+ V2:V4))
   cd1 <- dag_list_independences(dag)
   expect_true(
