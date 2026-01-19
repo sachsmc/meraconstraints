@@ -19,56 +19,50 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(meraconstraints)
-library(igraph)
-#library(caugi)
 library(data.table)
 ```
+
+
+Our package `meraconstraints` depends on `caugi` to create the graphical models and do some operations. `caugi` is very fast, user friendly, and supports mixed graphs. Read more about `caugi` here: <https://caugi.org>. 
 
 
 ## IV inequalities
 
 These are the steps to get the complete constraints, illustrated in the IV example:
 
-1. Define the DAG using `igraph`. Our function `initialize_graph` does some basic setup, and by default assumes that any variable starting with a capital U is latent. The DAG is plotted, with latent variables indicated in grey.
+1. Define the DAG using `caugi`. Our function `dhvm` does some basic setup for Discrete Hidden Variables Models (dhvm), and by default assumes that any variable starting with a capital U is latent. The DAG is plotted, with latent variables indicated in grey.
 
 ```{r}
-ivdag <- graph_from_literal(Z -+ X, X -+ Y, U -+ X:Y) |> initialize_graph()
-plot(ivdag, vertex.color = ifelse(V(ivdag)$latent, "grey70", "skyblue"))
+ivdag <- caugi(Z %-->% X, X %-->% Y, U %-->% X + Y) |> dhvm()
+plot(ivdag)
+print(ivdag)
 ```
 
-2. List the conditional independence relations. In this case there are none. 
+2. Get the constraints
 
 ```{r}
-dag_list_independences(ivdag)
+ivmera <- dhvm_meraconstraints(ivdag)
 ```
 
-3. Get the linear relations describing the functional constraints. One such constraint is printed out below.
+3. Print and try to understand them. 
 
 ```{r}
-ivrels <- dag_get_linear_relations(ivdag)
-paste(ivrels$probform[[1]][1], "=", paste(ivrels$relation[[1]][[1]], collapse = " + "))
+ivmera
+paste(ivmera$functional_relations$probform[[1]][1], "=", 
+      paste(ivmera$functional_relations$relation[[1]][[1]], collapse = " + "))
 ```
 
-4. Convert the functional constraint matrix into the H-representation. 
-
-```{r}
-hrepiv <- cf_relations_to_hrep(ivrels)
-hrepiv$Hrep[[1]]
-```
-
-Extra features/optional steps: 
 
 5. Convert the H-rep matrix into the text-based constraints. This includes trivial ones. You can print them using either the observable probabilities or the interventional probabilities, which we use the notation P* in the paper. 
 
 ```{r}
-hrep_to_text(hrepiv$Hrep[[1]], ivrels$probform[[1]])
-hrep_to_text(hrepiv$Hrep[[1]], ivrels$probstarform[[1]])
+hrep_to_text(ivmera$polytope$Hrep[[1]], ivmera$functional_relations$probform[[1]])
+hrep_to_text(ivmera$polytope$Hrep[[1]], ivmera$functional_relations$probstarform[[1]])
 ```
 
 6. Identify and exclude the definitely trivial constraints.
 ```{r}
-trivial_if_false <- prob_simplex_extremes(ivrels, hrepiv$Hrep)[[1]]
-hrep_to_text(hrepiv$Hrep[[1]], ivrels$probstarform[[1]])[trivial_if_false]
+hrep_to_text(ivmera$polytope$Hrep[[1]], ivmera$functional_relations$probform[[1]])[ivmera$trivial_if_false[[1]]]
 ```
 
 Those are the familiar IV inequalities.
@@ -78,8 +72,8 @@ Those are the familiar IV inequalities.
 ```{r}
 obsprobs <- c(0.101, 0.338, 0.013, 0.548, 0.317, 0.51, 0.004, 0.168)
 
-hrep_test(hrepiv$Hrep[[1]], obsprobs)
-hrep_test(hrepiv$Hrep[[1]], obsprobs, which = TRUE)
+hrep_test(ivmera$polytope$Hrep[[1]], obsprobs)
+hrep_test(ivmera$polytope$Hrep[[1]], obsprobs, which = TRUE)
 ```
 
 
@@ -103,9 +97,8 @@ for(i in 1:nrow(res)) {
   ptable[, pZ := sum(joint), by = .(Z)]
   ptable[, pX := sum(joint), by = .(X)]
   ptable[, pv := (pXZ / pZ) * (joint / pXZ)]
-  hrep_test(hrepiv$Hrep[[1]], ptable$pv, which = FALSE)
   
-  res[i, ] <- hrep_test(hrepiv$Hrep[[1]], ptable$pv, which = TRUE)[, 1]
+  res[i, ] <- hrep_test(ivmera$polytope$Hrep[[1]], ptable$pv, which = TRUE)[, 1]
   
 }
 colMeans(res)
@@ -114,36 +107,33 @@ colMeans(res)
 ## Sequential IV example
 
 ```{r}
-ivdag2 <- graph_from_literal(V1 -+ V2 -+ V3 -+ V4 -+ V5, U1 -+ V2:V3, U2 -+ V4:V5) |> initialize_graph()
-plot(ivdag2, vertex.color = ifelse(V(ivdag2)$latent, "grey70", "skyblue"))
+ivdag2 <- caugi(V1 %-->% V2 %-->% V3 %-->% V4 %-->% V5, U1 %-->% V2 +V3, U2 %-->% V4 +V5) |> dhvm()
+plot(ivdag2)
 ```
 
 In this example we get some regular independences, and 2 sets of the 4 IV inequalities. 
 
 ```{r}
-dag_list_independences(ivdag2)
+ivmera2 <- dhvm_meraconstraints(ivdag2)
 
-ivrels2 <- dag_get_linear_relations(ivdag2)
-hrepiv2 <- cf_relations_to_hrep(ivrels2)
+ivmera2$independences
+hrep_to_text(ivmera2$polytope$Hrep[[1]], ivmera2$functional_relations$probform[[1]])[ivmera2$trivial_if_false[[1]]]
+hrep_to_text(ivmera2$polytope$Hrep[[2]], ivmera2$functional_relations$probform[[2]])[ivmera2$trivial_if_false[[2]]]
 
-tifflist <- prob_simplex_extremes(ivrels2, hrepiv2$Hrep)
-
-hrep_to_text(hrepiv2$Hrep[[1]], ivrels2$probform[[1]])[tifflist[[1]]]
-hrep_to_text(hrepiv2$Hrep[[1]], ivrels2$probform[[1]])[tifflist[[2]]]
 ```
 
 ## Robin's nested examples
 
-Here are 2 DAGs that have the same equality constraints. 
+Here are 3 DAGs that have the same equality constraints. 
 
 ```{r}
-r0dag <- graph_from_literal(V1 -+ V2 -+ V3 -+ V4, V1 -+ V4, V2 -+ V4, U2 -+ V2:V4) |> initialize_graph()
-r1dag <- graph_from_literal(V1 -+ V2 -+ V3 -+ V4, V1 -+ V4, U2 -+ V2:V4) |> initialize_graph()
-r2dag <- graph_from_literal(V1 -+ V2 -+ V3 -+ V4, V2 -+ V4, U2 -+ V2:V4) |> initialize_graph()
+r0dag <- caugi(V1 %-->% V2 %-->% V3 %-->% V4, V1 %-->% V4, V2 %-->% V4, U2 %-->% V2+V4) |> dhvm()
+r1dag <- caugi(V1 %-->% V2 %-->% V3 %-->% V4, V1 %-->% V4, U2 %-->% V2+V4) |> dhvm()
+r2dag <- caugi(V1 %-->% V2 %-->% V3 %-->% V4, V2 %-->% V4, U2 %-->% V2+V4) |> dhvm()
 
-plot(r0dag, vertex.color = ifelse(igraph::V(r0dag)$latent, "grey70", "skyblue"))
-plot(r1dag, vertex.color = ifelse(igraph::V(r1dag)$latent, "grey70", "skyblue"))
-plot(r2dag, vertex.color = ifelse(igraph::V(r2dag)$latent, "grey70", "skyblue"))
+plot(r0dag)
+plot(r1dag)
+plot(r2dag)
 ```
 
 
@@ -200,7 +190,7 @@ These are 4 nontrivial inequality constraints that can tell us that a distributi
 Can the equality constraints be violated in R1? 
 
 ```{r}
-rbdag <- graph_from_literal(V1 -+ V2 +- V3 -+ V4, V1 -+ V4, V2 -+ V4) |> initialize_graph()
+rbdag <- graph_from_literal(V1 %-->% V2 +- V3 %-->% V4, V1 %-->% V4, V2 %-->% V4) |> initialize_graph()
 
 chk <- matrix(NA, nrow = 1000, ncol = 22) 
 for(i in 1:nrow(chk)) {
@@ -240,7 +230,7 @@ colMeans(chk)
 
 
 ```{r}
-duarg <- graph_from_literal(A -+ B -+ C -+ D, A -+ E -+ C, D -+ F, U1 -+ A:C:E, U2 -+ F:D, U3 -+ B:D) |> 
+duarg <- graph_from_literal(A %-->% B %-->% C %-->% D, A %-->% E %-->% C, D %-->% F, U1 %-->% A:C:E, U2 %-->% F:D, U3 %-->% B:D) |> 
   initialize_graph()
 plot(duarg, vertex.color = ifelse(V(duarg)$latent, "grey70", "skyblue"))
 
@@ -272,7 +262,7 @@ hrep_to_text(dhreps$Hrep[[1]], drels$probstarform[[1]])[nontriv[[1]]]
 The classic front door model has no observable constraints. 
 
 ```{r}
-fd <- initialize_graph(graph_from_literal(A -+ M -+ Y, U1 -+ A:Y))
+fd <- initialize_graph(graph_from_literal(A %-->% M %-->% Y, U1 %-->% A:Y))
 dag_list_independences(fd)
 plot(fd, vertex.color = ifelse(V(fd)$latent, "grey70", "skyblue"))
 
@@ -299,7 +289,7 @@ hrep_to_text(fdreps$Hrep[[1]], prob = fdrels$probstarform[[1]])[pontriv]
 Some variations on the front door model. 
 
 ```{r}
-fd2 <- initialize_graph(graph_from_literal(Z -+ A -+ M -+ Y, U1 -+ A:Y))
+fd2 <- initialize_graph(graph_from_literal(Z %-->% A %-->% M %-->% Y, U1 %-->% A:Y))
 dag_list_independences(fd2)
 
 fd2rels <- dag_get_linear_relations(fd2)
@@ -316,7 +306,7 @@ hrep_to_text(fd2reps$Hrep[[2]], prob = fd2rels$probform[[2]])
 
 
 ```{r}
-fd2c <- initialize_graph(graph_from_literal(Z -+ A -+ M -+ Y,  U1 -+ A:Y, U2 -+ Z:M))
+fd2c <- initialize_graph(graph_from_literal(Z %-->% A %-->% M %-->% Y,  U1 %-->% A:Y, U2 %-->% Z:M))
 dag_list_independences(fd2c)
 
 
@@ -338,7 +328,7 @@ hrep_to_text(fd2creps$Hrep[[1]], prob = fd2crels$probform[[1]])
 
 
 ```{r}
-d1 <- initialize_graph(graph_from_literal(V1 -+ V2, V2 -+ V3, V3 -+ V4, U1 -+ V1:V3, U2 -+ V2:V4))
+d1 <- initialize_graph(graph_from_literal(V1 %-->% V2, V2 %-->% V3, V3 %-->% V4, U1 %-->% V1:V3, U2 %-->% V2:V4))
 plot(d1, vertex.color = ifelse(V(d1)$latent, "grey70", "skyblue"))
 ```
 
@@ -361,7 +351,7 @@ Let's sample some probability distributions without any restrictions as see if a
 
 
 ```{r}
-dun <- initialize_graph(graph_from_literal(V1 -+ V2:V4:V3, V2 -+ V3:V4, V3 -+ V4, U1 -+ V1:V2:V3:V4))
+dun <- initialize_graph(graph_from_literal(V1 %-->% V2:V4:V3, V2 %-->% V3:V4, V3 %-->% V4, U1 %-->% V1:V2:V3:V4))
 plot(dun)
 
 

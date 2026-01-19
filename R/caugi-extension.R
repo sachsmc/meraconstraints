@@ -65,7 +65,15 @@ plot.dhvm <- function(x,
   })
   names(filllist) <- x$nodes_data$name
   plot(x$caugi_graph,
-       node_style = list(by_node = filllist))
+       node_style = list(by_node = filllist),
+       edge_style = edge_style,
+       label_style = label_style,
+       main = main,
+       title_style = title_style,
+       outer_margin = outer_margin,
+       title_gap = title_gap,
+       layout = layout,
+       ...)
 }
 
 
@@ -82,6 +90,27 @@ nvals <- function(dhvm, node) {
 
 }
 
+
+#' Get the districts of a dhvm
+#'
+#' The districts of a DHVM are the sets of nodes that remain connected after removing all edges that have tails at observed nodes. The set of districts forms a partition of the variables in the model.
+#'
+#' @param dhvm A object of class dhvm
+#' @returns A list of character vectors
+#' @export
+#' @examples
+#' dhvm_districts(dhvm(caugi(U1 %-->% X + Y, U2 %-->% Z + X)))
+#' dhvm_districts(dhvm(caugi(Z %-->% X %-->% Y, U1 %-->% X + Y)))
+#'
+dhvm_districts <- function(dhvm) {
+
+  unobs <- subset(dhvm$nodes_data, latent == TRUE)$name
+  lpdists <- districts(latent_project(dhvm$caugi_graph, latents = unobs))
+  lapply(lpdists, \(i) union(i, intersect(unique(unlist(parents(dhvm$caugi_graph, i))), unobs)))
+
+}
+
+
 #' Get the c-degree of a dhvm
 #'
 #' The c-degree is the maximum of 1 and the numbers of latent variables in each district
@@ -97,16 +126,17 @@ nvals <- function(dhvm, node) {
 dhvm_c_degree <- function(dhvm) {
 
   unobs <- subset(dhvm$nodes_data, latent == TRUE)$name
-  ccomps <- districts(latent_project(dhvm$caugi_graph, latents = unobs))
+  ccomps <- dhvm_districts(dhvm)
 
   cdegs <- rep(NA, length(ccomps))
   unobs_dist <- vector(mode = "list", length = length(ccomps))
   nmstmp <- rep(NA_character_, length(ccomps))
   for(i in seq_along(ccomps)) {
 
-    unobs_dist <- sort(intersect(unique(unlist(parents(dhvm$caugi_graph, ccomps[[i]]))), unobs))
+    unobs_dist <- sort(intersect(ccomps[[i]], unobs))
+    obs_dist <- sort(setdiff(ccomps[[i]], unobs))
     cdegs[[i]] <- max(1, length(unobs_dist))
-    nmstmp[i] <- paste0("{", paste(c(ccomps[[i]],
+    nmstmp[i] <- paste0("{", paste(c(obs_dist,
                         if(length(unobs_dist) == 0) NULL else paste0(unobs_dist, "[u]")), collapse = ", "), "}")
 
   }
@@ -393,9 +423,45 @@ dhvm_linear_relations <- function(dhvm) {
        probform = prob.fancy,
        probstarform = prob.star,
        problevels = problevels,
-       problist = dparms$plist,
-       poterms = dparms$poterms),
+       district_parms = dparms,
+       dhvm_partitioned = d1r
+       ),
        class = "fnrels")
+
+}
+
+#' Get constraints implied by a discrete hidden variables model
+#'
+#' @param dhvm An object of class `dhvm`, see [dhvm()]
+#' @returns An object of class `meraconstraints`, with some methods.
+#' @export
+#' @examples
+#' ivd <- dhvm(caugi(Z %-->% X %-->% Y, U %-->% X + Y))
+#' dhvm_meraconstraints(ivd)
+#'
+
+dhvm_meraconstraints <- function(dhvm) {
+
+  c_degs <- dhvm_c_degree(dhvm)
+  dhrels <- dhvm_linear_relations(dhvm)
+  indeps <- dhvm_list_independences(dhvm)
+  dhtope <- dhvm_relations_to_polytope(dhrels)
+  trivial_if_false <- prob_simplex_extremes(dhrels, dhtope$Hrep)
+
+  cpart <- dhrels$dhvm_partitioned
+  dhrels$dhvm_partitioned <- NULL
+
+  names(dhtope$Vrep) <- names(dhtope$Hrep) <- names(trivial_if_false) <-
+    sapply(dhrels$district_parms$poterms, \(x) paste(x$out, collapse = "_"))
+
+  structure(list(
+    district_info = c_degs,
+    dhvm_partitioned = cpart,
+    functional_relations = dhrels,
+    independences = indeps,
+    polytope = dhtope,
+    trivial_if_false = trivial_if_false
+  ), class = "meraconstraints")
 
 }
 

@@ -16,7 +16,7 @@ test_that("Known constraints are recovered", {
 
   ivd <- dhvm(caugi(Z %-->% X %-->% Y, U %-->% X + Y))
   ivrels2 <- dhvm_linear_relations(ivd)
-  hrepiv2 <- cf_relations_to_hrep(ivrels2)
+  hrepiv2 <- dhvm_relations_to_polytope(ivrels2)
   expect_equal(hrepiv2$Hrep[[1]], ivhrep)
 
   ## sequential IV
@@ -39,7 +39,7 @@ test_that("Known constraints are recovered", {
 10L), representation = "H"))
 
  ivd2 <- dhvm(caugi(V1 %-->% V2 %-->% V3 %-->% V4 %-->% V5, U1 %-->% V2 + V3, U2 %-->% V4 + V5))
- hrepsiv <- dhvm_linear_relations(ivd2) |> cf_relations_to_hrep()
+ hrepsiv <- dhvm_linear_relations(ivd2) |> dhvm_relations_to_polytope()
 
  expect_true(hreps_are_equal(hrepsiv$Hrep[[1]], seqivh[[1]]))
  expect_true(hreps_are_equal(hrepsiv$Hrep[[2]], seqivh[[2]]))
@@ -107,8 +107,8 @@ test_that("Known constraints are recovered", {
  r1dagc <- dhvm(caugi(V1 %-->% V2 %-->% V3 %-->% V4, V1 %-->% V4, U2 %-->% V2 + V4))
  r2dagc <- dhvm(caugi(V1 %-->% V2 %-->% V3 %-->% V4, U2 %-->% V2 + V4, V2 %-->% V4))
 
- expect_true(all(mapply(hreps_are_equal, cf_relations_to_hrep(dhvm_linear_relations(r1dagc))$Hrep, r1hrep)))
- expect_true(all(mapply(hreps_are_equal, cf_relations_to_hrep(dhvm_linear_relations(r2dagc))$Hrep, r2hrep)))
+ expect_true(all(mapply(hreps_are_equal, dhvm_relations_to_polytope(dhvm_linear_relations(r1dagc))$Hrep, r1hrep)))
+ expect_true(all(mapply(hreps_are_equal, dhvm_relations_to_polytope(dhvm_linear_relations(r2dagc))$Hrep, r2hrep)))
 
 
  ## double nested
@@ -152,7 +152,7 @@ test_that("Known constraints are recovered", {
                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1), dim = c(32L,
                                                                                     18L), representation = "H"))
   d2c <- dhvm(caugi(V1 %-->% V2 %-->% V3 %-->% V4, U1 %-->% V1 + V3, U2 %-->% V2 + V4))
-  d2chs <- cf_relations_to_hrep(dhvm_linear_relations(d2c))
+  d2chs <- dhvm_relations_to_polytope(dhvm_linear_relations(d2c))
 
   expect_true(all(mapply(hreps_are_equal, d2chs$Hrep, d2hreps)))
 
@@ -161,7 +161,7 @@ test_that("Known constraints are recovered", {
 
   fdc <- dhvm(caugi(A %-->% M %-->% Y, U %-->% A + Y))
   fdrels <- dhvm_linear_relations(fdc)
-  fdhs <- cf_relations_to_hrep(fdrels)
+  fdhs <- dhvm_relations_to_polytope(fdrels)
   expect_equal(sapply(prob_simplex_extremes(fdrels, fdhs$Hrep), sum), c(4, 0))
 
   fdhreps <- list(structure(c(0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0,
@@ -175,5 +175,11 @@ test_that("Known constraints are recovered", {
                    0, 1), dim = c(6L, 6L), representation = "H"))
 
   expect_true(all(mapply(hreps_are_equal, fdhs$Hrep, fdhreps)))
+
+
+  ## c degree 2 should give an error
+
+  ivdv2 <- dhvm(caugi(Z %-->% X %-->% Y, U %-->% X + Y, U2 %-->% Z + X))
+  expect_error(dhvm_meraconstraints(ivdv2))
 
  })

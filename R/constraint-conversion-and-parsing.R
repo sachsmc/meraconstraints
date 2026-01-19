@@ -1,11 +1,11 @@
 #' Convert counterfactual relations to the H-representation of a polytope
 #'
-#' @param relations A list of relations for the corresponding probability forms as returned by \link[meraconstraints]{dag_get_linear-relations}
-#' @returns A list with the v-representation and the h-representation object, see \link[rcdd]{scdd}
+#' @param relations A list of relations for the corresponding probability forms as returned by [dag_get_linear_relations()]
+#' @returns A list with the v-representation and the h-representation objects, one for each district, see \link[rcdd]{scdd}
 #' @export
 
 
-cf_relations_to_hrep <- function(relations) {
+dhvm_relations_to_polytope <- function(relations) {
   ## make the matrix
 
   prob <- relations$probform
@@ -211,11 +211,11 @@ prob_simplex_extremes <- function(drels, hreps) {
 
     hrep <- hreps[[i]]
 
-    if(length(drels$poterms[[i]]$do) == 0) {
+    if(length(drels$district_parms$poterms[[i]]$do) == 0) {
       checks[[i]] <- rep(FALSE, nrow(hrep))
       next
     }
-    ctabin <- split(drels$problevels[[i]], drels$problevels[[i]][, drels$poterms[[i]]$do])
+    ctabin <- split(drels$problevels[[i]], drels$problevels[[i]][, drels$district_parms$poterms[[i]]$do])
     constgrps <- lapply(ctabin, \(cin) {
         # res <- c(glue::glue_data(cin,
         #                   paste(c("p", paste0("{", drels$poterms[[i]]$out, "}"),

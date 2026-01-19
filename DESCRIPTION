@@ -31,6 +31,8 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
+Depends: 
+    caugi
 Config/testthat/edition: 3
 RoxygenNote: 7.3.3
 VignetteBuilder: knitr

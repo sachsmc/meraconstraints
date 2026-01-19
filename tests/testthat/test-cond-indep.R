@@ -1,7 +1,7 @@
 test_that("conditional independence", {
 
   dag <- dhvm(caugi(V1 %-->% V2 %-->% V3 %-->% V4, U %-->% V2 + V4))
-  cd1 <- dag_list_independences(dag)
+  cd1 <- dhvm_list_independences(dag)
   expect_true(
     setequal(cd1[[1]]$indep, c("V1", "V3")) &
      setequal(cd1[[1]]$given, "V2")
@@ -9,7 +9,7 @@ test_that("conditional independence", {
 
 
   dag2 <- dhvm(caugi(A %-->% C, B %-->% C, C %-->% D))
-  cd2 <- dag_list_independences(dag2)
+  cd2 <- dhvm_list_independences(dag2)
 
   expect_true(setequal(cd2[[1]]$indep, c("A", "B")) & is.null(cd2[[1]]$given) &
     setequal(cd2[[2]]$indep, c("A", "D")) & setequal(cd2[[2]]$given, "C") &
@@ -17,6 +17,6 @@ test_that("conditional independence", {
 
 
   dag3 <- dhvm(caugi(V1 %-->% V2, V2 %-->% V3, V3 %-->% V4, U1 %-->% V1+V3, U2 %-->% V2+V4))
-  expect_true(length(dag_list_independences(dag3)) == 0)
+  expect_true(length(dhvm_list_independences(dag3)) == 0)
 
 })
