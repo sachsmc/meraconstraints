@@ -10,7 +10,7 @@ cf_relations_to_hrep(relations)
 \item{relations}{A list of relations for the corresponding probability forms as returned by \link[meraconstraints]{dag_get_linear-relations}}
 }
 \value{
-A list with the v-representation and the h-repesentation object, see \link[rcdd]{scdd}
+A list with the v-representation and the h-representation object, see \link[rcdd]{scdd}
 }
 \description{
 Convert counterfactual relations to the H-representation of a polytope

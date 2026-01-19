@@ -1,3 +1,5 @@
+#' @import caugi
+NULL
 
 #' @export
 dhvm <- function(caugi_graph, latent.pattern = "^U",
@@ -80,6 +82,39 @@ nvals <- function(dhvm, node) {
 
 }
 
+#' Get the c-degree of a dhvm
+#'
+#' The c-degree is the maximum of 1 and the numbers of latent variables in each district
+#'
+#' @param dhvm A object of class dhvm
+#' @returns An integer vector
+#' @export
+#' @examples
+#' dhvm_c_degree(dhvm(caugi(U1 %-->% X + Y, U2 %-->% Z + X)))
+#' dhvm_c_degree(dhvm(caugi(Z %-->% X %-->% Y, U1 %-->% X + Y)))
+#'
+
+dhvm_c_degree <- function(dhvm) {
+
+  unobs <- subset(dhvm$nodes_data, latent == TRUE)$name
+  ccomps <- districts(latent_project(dhvm$caugi_graph, latents = unobs))
+
+  cdegs <- rep(NA, length(ccomps))
+  unobs_dist <- vector(mode = "list", length = length(ccomps))
+  nmstmp <- rep(NA_character_, length(ccomps))
+  for(i in seq_along(ccomps)) {
+
+    unobs_dist <- sort(intersect(unique(unlist(parents(dhvm$caugi_graph, ccomps[[i]]))), unobs))
+    cdegs[[i]] <- max(1, length(unobs_dist))
+    nmstmp[i] <- paste0("{", paste(c(ccomps[[i]],
+                        if(length(unobs_dist) == 0) NULL else paste0(unobs_dist, "[u]")), collapse = ", "), "}")
+
+  }
+
+  setNames(cdegs, nmstmp)
+
+}
+
 #' Transform a regular dag into canonical partitions and add response function tables
 #'
 #' Replaces latent common causes with correlated response function variables
@@ -98,6 +133,14 @@ nvals <- function(dhvm, node) {
 dhvm_canonical_partition <- function(dag) {
 
   stopifnot(inherits(dag, "dhvm"))
+  ## check for multiple latents
+
+  thiscdeg <- dhvm_c_degree(dag)
+  if(!all(thiscdeg == 1)) {
+    stop("c-degree is greater than 1, cannot do the canonical partitioning. Check district(s): ",
+         names(thiscdeg[thiscdeg > 1])
+         )
+  }
 
   vs <- subset(dag$nodes_data, latent == FALSE)$name
   newvs <- paste0("R_", vs)

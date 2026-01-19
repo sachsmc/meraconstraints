@@ -1,7 +1,7 @@
 #' Convert counterfactual relations to the H-representation of a polytope
 #'
 #' @param relations A list of relations for the corresponding probability forms as returned by \link[meraconstraints]{dag_get_linear-relations}
-#' @returns A list with the v-representation and the h-repesentation object, see \link[rcdd]{scdd}
+#' @returns A list with the v-representation and the h-representation object, see \link[rcdd]{scdd}
 #' @export
 
 
@@ -25,15 +25,7 @@ cf_relations_to_hrep <- function(relations) {
       rRm <- rRm + length(prob[[j]][[k]])
     }
 
-    # rdex <- do.call(rbind, lapply(1:length(relation[[j]]), \(i) {
-    #   rr <- relation[[j]][[i]]
-    #   cbind(i, match(rr, rvarprobs))
-    # }))
 
-    #if(missing(thisr)){
-    #  thisr <- rep("1", nrow(rdex))
-    #}
-    #                                      Rmat[rdex] <- thisr[rdex[, 1]]
 
     vreps[[j]] <- rcdd::makeV(points = t(Rmat))
 
@@ -111,6 +103,43 @@ hrep_test <- function(Hrep, probform, tol = 1e-10, which = FALSE) {
   } else {
     all(chk)
   }
+
+}
+
+#' Check if two Hreps are the same
+#'
+#' Lexigraphical sort the matrices, and then compare them elementwise. Is symmetric.
+#'
+#' @param H1 first hrep
+#' @param H2 second hrep
+#' @returns Logical vector of length 1
+#' @export
+#' @examples
+#' ivhrep <- structure(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0,
+#' 0, 1, 1, 0, 1, 0, 1, 0, 0, -1, -1, 0, 1, 0, 1, 0, -1, 0, 0, 0,
+#' -1, 0, 0, 1, 0, 0, 1, -1, 0, 0, 0, 0, 0, 1, -1, 0, 0, 1, 0, 0,
+#' 1, 0, 0, -1, 0, 0, 0, 0, -1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+#' 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0,
+#' 1, 0, -1, 1, 0, 0, 0, 1, -1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0,
+#' -1, 0, -1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+#' 0, 0, 1), dim = c(14L, 10L), representation = "H")
+#'
+#' ivd <- dhvm(caugi(Z %-->% X %-->% Y, U %-->% X + Y))
+#' ivrels2 <- dhvm_linear_relations(ivd)
+#' hrepiv2 <- cf_relations_to_hrep(ivrels2)
+#' hreps_are_equal(hrepiv2$Hrep[[1]], ivhrep)
+#'
+#'
+hreps_are_equal <- function(H1, H2) {
+
+  if(!identical(dim(H1), dim(H2))) {
+    return(FALSE)
+  }
+
+  ## lexi sort and compare
+  all( H1[do.call(order, apply(H1, 2, \(x) x, simplify = FALSE)), ] ==
+    H2[do.call(order, apply(H2, 2, \(x) x, simplify = FALSE)), ] )
+
 
 }
 

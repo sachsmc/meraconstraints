@@ -10,7 +10,7 @@ dag_sample_distribution(dag, parmsamp = function(k) rnorm(k))
 \item{dag}{A causal model possibly with latent variables, currently only supports binary observed variables}
 }
 \value{
-A list of probability tables
+A data frame where each row represents a distinct observation vector plus the joint probability
 }
 \description{
 Sample a distribution from a causal model
