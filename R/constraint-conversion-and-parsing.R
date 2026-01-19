@@ -182,6 +182,10 @@ prob_simplex_extremes <- function(drels, hreps) {
 
     hrep <- hreps[[i]]
 
+    if(length(drels$poterms[[i]]$do) == 0) {
+      checks[[i]] <- rep(FALSE, nrow(hrep))
+      next
+    }
     ctabin <- split(drels$problevels[[i]], drels$problevels[[i]][, drels$poterms[[i]]$do])
     constgrps <- lapply(ctabin, \(cin) {
         # res <- c(glue::glue_data(cin,

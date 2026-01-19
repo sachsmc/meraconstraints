@@ -25,6 +25,7 @@ LazyData: true
 License: MIT + file LICENSE
 Imports:
     igraph,
+    caugi,
     rcdd,
     gRbase,
     glue

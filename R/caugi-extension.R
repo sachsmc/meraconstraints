@@ -31,7 +31,7 @@ dhvm <- function(caugi_graph, latent.pattern = "^U",
                       }
 
 
-
+#' @export
 print.dhvm <- function(x,
                                     max_nodes = getOption("caugi.max_nodes"),
                                     max_edges = getOption("caugi.max_edges"),
@@ -46,6 +46,7 @@ print.dhvm <- function(x,
 
 }
 
+#' @export
 plot.dhvm <- function(x,
                       layout = "auto",
                       latent_fill = "grey75",
@@ -103,7 +104,7 @@ dhvm_canonical_partition <- function(dag) {
   newnvals <- sapply(vs, \(v) {
 
     obspa <- obs_parents(dag, node = v)
-    pa_nvals <- if(is.null(obspa)) 1 else sapply(obspa, \(v2) nvals(dag, v2))
+    pa_nvals <- if(length(obspa) == 0) 1 else sapply(obspa, \(v2) nvals(dag, v2))
     subset(dag$nodes_data, name == v)$nvals^prod(pa_nvals)
 
   })

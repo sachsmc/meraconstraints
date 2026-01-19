@@ -42,7 +42,7 @@ dag_order <- function (graph) {
 #'
 #' @param dag A causal model possibly with latent variables, currently only supports binary observed variables
 #' @export
-#' @returns A list of probability tables
+#' @returns A data frame where each row represents a distinct observation vector plus the joint probability
 #' @examples
 #' # example code
 #' ivdag <- graph_from_literal(Z -+ X, X -+ Y, U -+ X:Y) |> initialize_graph()
@@ -68,6 +68,7 @@ dag_sample_distribution <- function(dag, parmsamp = \(k) rnorm(k)) {
       names(outmat)[1] <- var
 
       pmats[[var]] <- outmat
+      colnames(pmats[[var]])[which(colnames(pmats[[var]]) == "probs")] <- paste0("prob.", var)
       next
     }
     pr.var <- function(dmat, u) {
@@ -95,11 +96,16 @@ dag_sample_distribution <- function(dag, parmsamp = \(k) rnorm(k)) {
     outmat0[[var]] <- 0
     outmat0$probs <- 1-probs
 
+
     pmats[[var]] <- rbind(outmat1, outmat0)
+    colnames(pmats[[var]])[which(colnames(pmats[[var]]) == "probs")] <-
+      paste0("prob.", var, "_", paste(setdiff(pa, latents), collapse = "."))
 
   }
 
-  pmats
+  jdf <- Reduce(merge, pmats)
+  jdf$prob.joint <- apply(jdf[, grep("prob.", colnames(jdf), fixed = TRUE)], 1, prod)
+  jdf
 
 }
 
