@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">meraconstraints</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/sachsmc/meraconstraints/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -57,79 +58,77 @@
       <h1>Illustrative examples</h1>
             
       
-
+      <small class="dont-index">Source: <a href="https://github.com/sachsmc/meraconstraints/blob/HEAD/vignettes/examples.Rmd" class="external-link"><code>vignettes/examples.Rmd</code></a></small>
       <div class="d-none name"><code>examples.Rmd</code></div>
     </div>
 
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">meraconstraints</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r.igraph.org/" class="external-link">igraph</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'igraph'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     decompose, spectrum</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     union</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sachsmc.github.io/meraconstraints/">meraconstraints</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: caugi</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: package 'data.table' was built under R version 4.5.2</span></span></code></pre></div>
+<p>Our package <code>meraconstraints</code> depends on
+<code>caugi</code> to create the graphical models and do some
+operations. <code>caugi</code> is very fast, user friendly, and supports
+mixed graphs. Read more about <code>caugi</code> here: <a href="https://caugi.org" class="external-link uri">https://caugi.org</a>.</p>
 <div class="section level2">
 <h2 id="iv-inequalities">IV inequalities<a class="anchor" aria-label="anchor" href="#iv-inequalities"></a>
 </h2>
 <p>These are the steps to get the complete constraints, illustrated in
 the IV example:</p>
 <ol style="list-style-type: decimal">
-<li>Define the DAG using <code>igraph</code>. Our function
-<code>initialize_graph</code> does some basic setup, and by default
-assumes that any variable starting with a capital U is latent. The DAG
-is plotted, with latent variables indicated in grey.</li>
+<li>Define the DAG using <code>caugi</code>. Our function
+<code>dhvm</code> does some basic setup for Discrete Hidden Variables
+Models (dhvm), and by default assumes that any variable starting with a
+capital U is latent. The DAG is plotted, with latent variables indicated
+in grey.</li>
 </ol>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ivdag</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r.igraph.org/reference/graph_from_literal.html" class="external-link">graph_from_literal</a></span><span class="op">(</span><span class="va">Z</span> <span class="op">-</span><span class="op">+</span> <span class="va">X</span>, <span class="va">X</span> <span class="op">-</span><span class="op">+</span> <span class="va">Y</span>, <span class="va">U</span> <span class="op">-</span><span class="op">+</span> <span class="va">X</span><span class="op">:</span><span class="va">Y</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/initialize_graph.html">initialize_graph</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ivdag</span>, vertex.color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://r.igraph.org/reference/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">ivdag</span><span class="op">)</span><span class="op">$</span><span class="va">latent</span>, <span class="st">"grey70"</span>, <span class="st">"skyblue"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">ivdag</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://caugi.org/reference/caugi.html" class="external-link">caugi</a></span><span class="op">(</span><span class="va">Z</span> <span class="op">%--&gt;%</span> <span class="va">X</span>, <span class="va">X</span> <span class="op">%--&gt;%</span> <span class="va">Y</span>, <span class="va">U</span> <span class="op">%--&gt;%</span> <span class="va">X</span> <span class="op">+</span> <span class="va">Y</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">dhvm</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://caugi.org/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ivdag</span><span class="op">)</span></span></code></pre></div>
 <p><img src="examples_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<ol start="2" style="list-style-type: decimal">
-<li>List the conditional independence relations. In this case there are
-none.</li>
-</ol>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/dag_list_independences.html">dag_list_independences</a></span><span class="op">(</span><span class="va">ivdag</span><span class="op">)</span></span>
-<span><span class="co">#&gt; list()</span></span></code></pre></div>
-<ol start="3" style="list-style-type: decimal">
-<li>Get the linear relations describing the functional constraints. One
-such constraint is printed out below.</li>
+<code class="sourceCode R"><span><span class="fu"><a href="https://caugi.org/reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ivdag</span><span class="op">)</span></span>
+<span><span class="co">#&gt; A Discrete Hidden Variables Model (dhvm)</span></span>
+<span><span class="co">#&gt; * graph data: </span></span>
+<span><span class="co">#&gt; &lt;caugi object; 4 nodes, 4 edges; simple: TRUE; built: TRUE; ptr=0x617dbd84f000&gt;</span></span>
+<span><span class="co">#&gt;   graph_class: DAG</span></span>
+<span><span class="co">#&gt;   nodes: Z, X, U, Y</span></span>
+<span><span class="co">#&gt;   edges: Z--&gt;X, X--&gt;Y, U--&gt;X, U--&gt;Y</span></span>
+<span><span class="co">#&gt; * node data:  </span></span>
+<span><span class="co">#&gt;      name latent nvals</span></span>
+<span><span class="co">#&gt;    &lt;char&gt; &lt;lgcl&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:      Z  FALSE     2</span></span>
+<span><span class="co">#&gt; 2:      X  FALSE     2</span></span>
+<span><span class="co">#&gt; 3:      U   TRUE     2</span></span>
+<span><span class="co">#&gt; 4:      Y  FALSE     2</span></span></code></pre></div>
+<ol start="2" style="list-style-type: decimal">
+<li>Get the constraints</li>
 </ol>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ivrels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dag_get_linear_relations.html">dag_get_linear_relations</a></span><span class="op">(</span><span class="va">ivdag</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">ivrels</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="st">"="</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">ivrels</span><span class="op">$</span><span class="va">relation</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, collapse <span class="op">=</span> <span class="st">" + "</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "P(X = 0|Z = 0)P(Y = 0|X = 0,Z = 0) = P(R_X = 0, R_Y = 0) + P(R_X = 2, R_Y = 0) + P(R_X = 0, R_Y = 2) + P(R_X = 2, R_Y = 2)"</span></span></code></pre></div>
-<ol start="4" style="list-style-type: decimal">
-<li>Convert the functional constraint matrix into the
-H-representation.</li>
+<code class="sourceCode R"><span><span class="va">ivmera</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/meraconstraints.html">meraconstraints</a></span><span class="op">(</span><span class="va">ivdag</span><span class="op">)</span></span></code></pre></div>
+<ol start="3" style="list-style-type: decimal">
+<li>Print and try to understand them.</li>
 </ol>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">hrepiv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cf_relations_to_hrep.html">cf_relations_to_hrep</a></span><span class="op">(</span><span class="va">ivrels</span><span class="op">)</span></span>
-<span><span class="va">hrepiv</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt;       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]</span></span>
-<span><span class="co">#&gt;  [1,]    0    0    0    0    0    0    1    0    0     0</span></span>
-<span><span class="co">#&gt;  [2,]    0    0    1    1    1    0    0   -1    0     0</span></span>
-<span><span class="co">#&gt;  [3,]    0    0    0   -1    0    0    1    1    1     0</span></span>
-<span><span class="co">#&gt;  [4,]    0    0    1    0    0    0    0    0    0     0</span></span>
-<span><span class="co">#&gt;  [5,]    0    1    0    0   -1    0   -1    0    0     0</span></span>
-<span><span class="co">#&gt;  [6,]    0    1   -1    0    0    0    0    0   -1     0</span></span>
-<span><span class="co">#&gt;  [7,]    0    0    0    0    0    0    0    1    0     0</span></span>
-<span><span class="co">#&gt;  [8,]    0    1    0    0    0    0   -1   -1   -1     0</span></span>
-<span><span class="co">#&gt;  [9,]    0    0    0    1    0    0    0    0    0     0</span></span>
-<span><span class="co">#&gt; [10,]    0    1   -1   -1   -1    0    0    0    0     0</span></span>
-<span><span class="co">#&gt; [11,]    0    0    0    0    1    0    0    0    0     0</span></span>
-<span><span class="co">#&gt; [12,]    0    0    0    0    0    0    0    0    1     0</span></span>
-<span><span class="co">#&gt; [13,]    1   -1    1    1    1    1    0    0    0     0</span></span>
-<span><span class="co">#&gt; [14,]    1   -1    0    0    0    0    1    1    1     1</span></span>
-<span><span class="co">#&gt; attr(,"representation")</span></span>
-<span><span class="co">#&gt; [1] "H"</span></span></code></pre></div>
-<p>Extra features/optional steps:</p>
+<code class="sourceCode R"><span><span class="va">ivmera</span></span>
+<span><span class="co">#&gt; MERA constraints on the dhvm: ivdag </span></span>
+<span><span class="co">#&gt; The model has districts (unobserved variables marked with [u]:</span></span>
+<span><span class="co">#&gt;      {Z} with c-degree 1, {X, Y, U[u]} with c-degree 1 </span></span>
+<span><span class="co">#&gt; The canonical partitioned model is available in x$dhvm_partitioned</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Constraints:</span></span>
+<span><span class="co">#&gt; ------------</span></span>
+<span><span class="co">#&gt; There are no conditional independence relations.</span></span>
+<span><span class="co">#&gt; * Equality and inequality constraints by district:</span></span>
+<span><span class="co">#&gt; There are 4 possibly nontrivial constraints involving X_Y, 4 inequalities and 0 equalities.</span></span>
+<span><span class="co">#&gt; The first 4 expressions are</span></span>
+<span><span class="co">#&gt; -P(X = 0|Z = 0)P(Y = 0|X = 0,Z = 0) - P(X = 1|Z = 0)P(Y = 0| ...[truncated]</span></span>
+<span><span class="co">#&gt; P(X = 1|Z = 0)P(Y = 0|X = 1,Z = 0) - P(X = 0|Z = 1)P(Y = 0|X ...[truncated]</span></span>
+<span><span class="co">#&gt; P(X = 0|Z = 0)P(Y = 1|X = 0,Z = 0) + P(X = 0|Z = 1)P(Y = 0|X ...[truncated]</span></span>
+<span><span class="co">#&gt; P(X = 0|Z = 0)P(Y = 0|X = 0,Z = 0) + P(X = 0|Z = 1)P(Y = 1|X ...[truncated]</span></span></code></pre></div>
 <ol start="5" style="list-style-type: decimal">
 <li>Convert the H-rep matrix into the text-based constraints. This
 includes trivial ones. You can print them using either the observable
@@ -137,7 +136,7 @@ probabilities or the interventional probabilities, which we use the
 notation P* in the paper.</li>
 </ol>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">hrepiv</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">ivrels</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">ivmera</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">ivmera</span><span class="op">$</span><span class="va">functional_relations</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "-P(X = 0|Z = 1)P(Y = 0|X = 0,Z = 1) &lt;= 0"                                                                                                                 </span></span>
 <span><span class="co">#&gt;  [2] "-P(X = 0|Z = 0)P(Y = 0|X = 0,Z = 0) - P(X = 1|Z = 0)P(Y = 0|X = 1,Z = 0) - P(X = 0|Z = 0)P(Y = 1|X = 0,Z = 0) + P(X = 1|Z = 1)P(Y = 0|X = 1,Z = 1) &lt;= 0"  </span></span>
 <span><span class="co">#&gt;  [3] "P(X = 1|Z = 0)P(Y = 0|X = 1,Z = 0) - P(X = 0|Z = 1)P(Y = 0|X = 0,Z = 1) - P(X = 1|Z = 1)P(Y = 0|X = 1,Z = 1) - P(X = 0|Z = 1)P(Y = 1|X = 0,Z = 1) &lt;= 0"   </span></span>
@@ -152,7 +151,7 @@ notation P* in the paper.</li>
 <span><span class="co">#&gt; [12] "-P(X = 0|Z = 1)P(Y = 1|X = 0,Z = 1) &lt;= 0"                                                                                                                 </span></span>
 <span><span class="co">#&gt; [13] "-P(X = 0|Z = 0)P(Y = 0|X = 0,Z = 0) - P(X = 1|Z = 0)P(Y = 0|X = 1,Z = 0) - P(X = 0|Z = 0)P(Y = 1|X = 0,Z = 0) - P(X = 1|Z = 0)P(Y = 1|X = 1,Z = 0)  =  -1"</span></span>
 <span><span class="co">#&gt; [14] "-P(X = 0|Z = 1)P(Y = 0|X = 0,Z = 1) - P(X = 1|Z = 1)P(Y = 0|X = 1,Z = 1) - P(X = 0|Z = 1)P(Y = 1|X = 0,Z = 1) - P(X = 1|Z = 1)P(Y = 1|X = 1,Z = 1)  =  -1"</span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">hrepiv</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">ivrels</span><span class="op">$</span><span class="va">probstarform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">ivmera</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">ivmera</span><span class="op">$</span><span class="va">functional_relations</span><span class="op">$</span><span class="va">probstarform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "-P*(X = 0,Y = 0|Z = 1) &lt;= 0"                                                                          </span></span>
 <span><span class="co">#&gt;  [2] "-P*(X = 0,Y = 0|Z = 0) - P*(X = 1,Y = 0|Z = 0) - P*(X = 0,Y = 1|Z = 0) + P*(X = 1,Y = 0|Z = 1) &lt;= 0"  </span></span>
 <span><span class="co">#&gt;  [3] "P*(X = 1,Y = 0|Z = 0) - P*(X = 0,Y = 0|Z = 1) - P*(X = 1,Y = 0|Z = 1) - P*(X = 0,Y = 1|Z = 1) &lt;= 0"   </span></span>
@@ -171,12 +170,11 @@ notation P* in the paper.</li>
 <li>Identify and exclude the definitely trivial constraints.</li>
 </ol>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">trivial_if_false</span> <span class="op">&lt;-</span> <span class="fu">prob_simplex_extremes</span><span class="op">(</span><span class="va">ivrels</span>, <span class="va">hrepiv</span><span class="op">$</span><span class="va">Hrep</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">hrepiv</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">ivrels</span><span class="op">$</span><span class="va">probstarform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="va">trivial_if_false</span><span class="op">]</span></span>
-<span><span class="co">#&gt; [1] "-P*(X = 0,Y = 0|Z = 0) - P*(X = 1,Y = 0|Z = 0) - P*(X = 0,Y = 1|Z = 0) + P*(X = 1,Y = 0|Z = 1) &lt;= 0"</span></span>
-<span><span class="co">#&gt; [2] "P*(X = 1,Y = 0|Z = 0) - P*(X = 0,Y = 0|Z = 1) - P*(X = 1,Y = 0|Z = 1) - P*(X = 0,Y = 1|Z = 1) &lt;= 0" </span></span>
-<span><span class="co">#&gt; [3] "P*(X = 0,Y = 1|Z = 0) + P*(X = 0,Y = 0|Z = 1) &lt;= 1"                                                 </span></span>
-<span><span class="co">#&gt; [4] "P*(X = 0,Y = 0|Z = 0) + P*(X = 0,Y = 1|Z = 1) &lt;= 1"</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">ivmera</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">ivmera</span><span class="op">$</span><span class="va">functional_relations</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="va">ivmera</span><span class="op">$</span><span class="va">trivial_if_false</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="co">#&gt; [1] "-P(X = 0|Z = 0)P(Y = 0|X = 0,Z = 0) - P(X = 1|Z = 0)P(Y = 0|X = 1,Z = 0) - P(X = 0|Z = 0)P(Y = 1|X = 0,Z = 0) + P(X = 1|Z = 1)P(Y = 0|X = 1,Z = 1) &lt;= 0"</span></span>
+<span><span class="co">#&gt; [2] "P(X = 1|Z = 0)P(Y = 0|X = 1,Z = 0) - P(X = 0|Z = 1)P(Y = 0|X = 0,Z = 1) - P(X = 1|Z = 1)P(Y = 0|X = 1,Z = 1) - P(X = 0|Z = 1)P(Y = 1|X = 0,Z = 1) &lt;= 0" </span></span>
+<span><span class="co">#&gt; [3] "P(X = 0|Z = 0)P(Y = 1|X = 0,Z = 0) + P(X = 0|Z = 1)P(Y = 0|X = 0,Z = 1) &lt;= 1"                                                                           </span></span>
+<span><span class="co">#&gt; [4] "P(X = 0|Z = 0)P(Y = 0|X = 0,Z = 0) + P(X = 0|Z = 1)P(Y = 1|X = 0,Z = 1) &lt;= 1"</span></span></code></pre></div>
 <p>Those are the familiar IV inequalities.</p>
 <ol start="7" style="list-style-type: decimal">
 <li>For a given distribution, test whether the constraints are
@@ -185,9 +183,9 @@ satisfied, optionally show which one(s).</li>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">obsprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.101</span>, <span class="fl">0.338</span>, <span class="fl">0.013</span>, <span class="fl">0.548</span>, <span class="fl">0.317</span>, <span class="fl">0.51</span>, <span class="fl">0.004</span>, <span class="fl">0.168</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">hrep_test</span><span class="op">(</span><span class="va">hrepiv</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">obsprobs</span><span class="op">)</span></span>
+<span><span class="fu">hrep_test</span><span class="op">(</span><span class="va">ivmera</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">obsprobs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] FALSE</span></span>
-<span><span class="fu">hrep_test</span><span class="op">(</span><span class="va">hrepiv</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">obsprobs</span>, which <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">hrep_test</span><span class="op">(</span><span class="va">ivmera</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">obsprobs</span>, which <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        [,1]</span></span>
 <span><span class="co">#&gt;  [1,]  TRUE</span></span>
 <span><span class="co">#&gt;  [2,] FALSE</span></span>
@@ -215,184 +213,165 @@ about 5% of the time.</p>
 <span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="cn">NA</span>, nrow <span class="op">=</span> <span class="fl">200</span>, ncol <span class="op">=</span> <span class="fl">14</span><span class="op">)</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="co"># ptable$pv &lt;- NA</span></span>
-<span>  <span class="co"># ptable$pv[c(1:4)] &lt;- sprob(4)</span></span>
-<span>  <span class="co"># ptable$pv[c(5:8)] &lt;- sprob(4)</span></span>
 <span>  <span class="va">ptable</span><span class="op">$</span><span class="va">joint</span> <span class="op">&lt;-</span> <span class="fu">sprob</span><span class="op">(</span><span class="fl">8</span><span class="op">)</span></span>
 <span>  <span class="va">ptable</span><span class="op">[</span>, <span class="va">pXZ</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">joint</span><span class="op">)</span>, by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">X</span>, <span class="va">Z</span><span class="op">)</span><span class="op">]</span></span>
 <span>  <span class="va">ptable</span><span class="op">[</span>, <span class="va">pXY</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">joint</span><span class="op">)</span>, by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">X</span>, <span class="va">Y</span><span class="op">)</span><span class="op">]</span></span>
 <span>  <span class="va">ptable</span><span class="op">[</span>, <span class="va">pZ</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">joint</span><span class="op">)</span>, by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">Z</span><span class="op">)</span><span class="op">]</span></span>
 <span>  <span class="va">ptable</span><span class="op">[</span>, <span class="va">pX</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">joint</span><span class="op">)</span>, by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">]</span></span>
 <span>  <span class="va">ptable</span><span class="op">[</span>, <span class="va">pv</span> <span class="op">:=</span> <span class="op">(</span><span class="va">pXZ</span> <span class="op">/</span> <span class="va">pZ</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="va">joint</span> <span class="op">/</span> <span class="va">pXZ</span><span class="op">)</span><span class="op">]</span></span>
-<span>  <span class="fu">hrep_test</span><span class="op">(</span><span class="va">hrepiv</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">ptable</span><span class="op">$</span><span class="va">pv</span>, which <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span>  </span>
-<span>  <span class="va">res</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">hrep_test</span><span class="op">(</span><span class="va">hrepiv</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">ptable</span><span class="op">$</span><span class="va">pv</span>, which <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span>
+<span>  <span class="va">res</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">hrep_test</span><span class="op">(</span><span class="va">ivmera</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">ptable</span><span class="op">$</span><span class="va">pv</span>, which <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span>
 <span>  </span>
 <span><span class="op">}</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] 1.00 0.93 0.95 1.00 0.97 0.95 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] 1.000 0.925 0.955 1.000 0.965 0.950 1.000 1.000 1.000 1.000 1.000 1.000</span></span>
+<span><span class="co">#&gt; [13] 1.000 1.000</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="sequential-iv-example">Sequential IV example<a class="anchor" aria-label="anchor" href="#sequential-iv-example"></a>
 </h2>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ivdag2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r.igraph.org/reference/graph_from_literal.html" class="external-link">graph_from_literal</a></span><span class="op">(</span><span class="va">V1</span> <span class="op">-</span><span class="op">+</span> <span class="va">V2</span> <span class="op">-</span><span class="op">+</span> <span class="va">V3</span> <span class="op">-</span><span class="op">+</span> <span class="va">V4</span> <span class="op">-</span><span class="op">+</span> <span class="va">V5</span>, <span class="va">U1</span> <span class="op">-</span><span class="op">+</span> <span class="va">V2</span><span class="op">:</span><span class="va">V3</span>, <span class="va">U2</span> <span class="op">-</span><span class="op">+</span> <span class="va">V4</span><span class="op">:</span><span class="va">V5</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/initialize_graph.html">initialize_graph</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ivdag2</span>, vertex.color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://r.igraph.org/reference/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">ivdag2</span><span class="op">)</span><span class="op">$</span><span class="va">latent</span>, <span class="st">"grey70"</span>, <span class="st">"skyblue"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="examples_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<code class="sourceCode R"><span><span class="va">ivdag2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://caugi.org/reference/caugi.html" class="external-link">caugi</a></span><span class="op">(</span><span class="va">V1</span> <span class="op">%--&gt;%</span> <span class="va">V2</span> <span class="op">%--&gt;%</span> <span class="va">V3</span> <span class="op">%--&gt;%</span> <span class="va">V4</span> <span class="op">%--&gt;%</span> <span class="va">V5</span>, <span class="va">U1</span> <span class="op">%--&gt;%</span> <span class="va">V2</span> <span class="op">+</span><span class="va">V3</span>, <span class="va">U2</span> <span class="op">%--&gt;%</span> <span class="va">V4</span> <span class="op">+</span><span class="va">V5</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">dhvm</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://caugi.org/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ivdag2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="examples_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 <p>In this example we get some regular independences, and 2 sets of the
 4 IV inequalities.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/dag_list_independences.html">dag_list_independences</a></span><span class="op">(</span><span class="va">ivdag2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; [[1]]$indep</span></span>
-<span><span class="co">#&gt; [1] "V1" "V4"</span></span>
+<code class="sourceCode R"><span><span class="va">ivmera2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/meraconstraints.html">meraconstraints</a></span><span class="op">(</span><span class="va">ivdag2</span><span class="op">)</span></span>
+<span><span class="va">ivmera2</span></span>
+<span><span class="co">#&gt; MERA constraints on the dhvm: ivdag2 </span></span>
+<span><span class="co">#&gt; The model has districts (unobserved variables marked with [u]:</span></span>
+<span><span class="co">#&gt;      {V1} with c-degree 1, {V2, V3, U1[u]} with c-degree 1, {V4, V5, U2[u]} with c-degree 1 </span></span>
+<span><span class="co">#&gt; The canonical partitioned model is available in x$dhvm_partitioned</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[1]]$given</span></span>
-<span><span class="co">#&gt; [1] "V3"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]</span></span>
-<span><span class="co">#&gt; [[2]]$indep</span></span>
-<span><span class="co">#&gt; [1] "V1" "V5"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]$given</span></span>
-<span><span class="co">#&gt; [1] "V3"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[3]]</span></span>
-<span><span class="co">#&gt; [[3]]$indep</span></span>
-<span><span class="co">#&gt; [1] "V2" "V4"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[3]]$given</span></span>
-<span><span class="co">#&gt; [1] "V3"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[4]]</span></span>
-<span><span class="co">#&gt; [[4]]$indep</span></span>
-<span><span class="co">#&gt; [1] "V2" "V5"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[4]]$given</span></span>
-<span><span class="co">#&gt; [1] "V3"</span></span>
-<span></span>
-<span><span class="va">ivrels2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dag_get_linear_relations.html">dag_get_linear_relations</a></span><span class="op">(</span><span class="va">ivdag2</span><span class="op">)</span></span>
-<span><span class="va">hrepiv2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cf_relations_to_hrep.html">cf_relations_to_hrep</a></span><span class="op">(</span><span class="va">ivrels2</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">tifflist</span> <span class="op">&lt;-</span> <span class="fu">prob_simplex_extremes</span><span class="op">(</span><span class="va">ivrels2</span>, <span class="va">hrepiv2</span><span class="op">$</span><span class="va">Hrep</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">hrepiv2</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">ivrels2</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="va">tifflist</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; [1] "-P(V2 = 0|V1 = 0)P(V3 = 0|V2 = 0,V1 = 0) - P(V2 = 1|V1 = 0)P(V3 = 0|V2 = 1,V1 = 0) - P(V2 = 0|V1 = 0)P(V3 = 1|V2 = 0,V1 = 0) + P(V2 = 1|V1 = 1)P(V3 = 0|V2 = 1,V1 = 1) &lt;= 0"</span></span>
-<span><span class="co">#&gt; [2] "P(V2 = 1|V1 = 0)P(V3 = 0|V2 = 1,V1 = 0) - P(V2 = 0|V1 = 1)P(V3 = 0|V2 = 0,V1 = 1) - P(V2 = 1|V1 = 1)P(V3 = 0|V2 = 1,V1 = 1) - P(V2 = 0|V1 = 1)P(V3 = 1|V2 = 0,V1 = 1) &lt;= 0" </span></span>
-<span><span class="co">#&gt; [3] "P(V2 = 0|V1 = 0)P(V3 = 1|V2 = 0,V1 = 0) + P(V2 = 0|V1 = 1)P(V3 = 0|V2 = 0,V1 = 1) &lt;= 1"                                                                                     </span></span>
-<span><span class="co">#&gt; [4] "P(V2 = 0|V1 = 0)P(V3 = 0|V2 = 0,V1 = 0) + P(V2 = 0|V1 = 1)P(V3 = 1|V2 = 0,V1 = 1) &lt;= 1"</span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">hrepiv2</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">ivrels2</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="va">tifflist</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; [1] "-P(V2 = 0|V1 = 0)P(V3 = 0|V2 = 0,V1 = 0) - P(V2 = 1|V1 = 0)P(V3 = 0|V2 = 1,V1 = 0) - P(V2 = 0|V1 = 0)P(V3 = 1|V2 = 0,V1 = 0) + P(V2 = 1|V1 = 1)P(V3 = 0|V2 = 1,V1 = 1) &lt;= 0"</span></span>
-<span><span class="co">#&gt; [2] "P(V2 = 1|V1 = 0)P(V3 = 0|V2 = 1,V1 = 0) - P(V2 = 0|V1 = 1)P(V3 = 0|V2 = 0,V1 = 1) - P(V2 = 1|V1 = 1)P(V3 = 0|V2 = 1,V1 = 1) - P(V2 = 0|V1 = 1)P(V3 = 1|V2 = 0,V1 = 1) &lt;= 0" </span></span>
-<span><span class="co">#&gt; [3] "P(V2 = 0|V1 = 0)P(V3 = 1|V2 = 0,V1 = 0) + P(V2 = 0|V1 = 1)P(V3 = 0|V2 = 0,V1 = 1) &lt;= 1"                                                                                     </span></span>
-<span><span class="co">#&gt; [4] "P(V2 = 0|V1 = 0)P(V3 = 0|V2 = 0,V1 = 0) + P(V2 = 0|V1 = 1)P(V3 = 1|V2 = 0,V1 = 1) &lt;= 1"</span></span></code></pre></div>
+<span><span class="co">#&gt; Constraints:</span></span>
+<span><span class="co">#&gt; ------------</span></span>
+<span><span class="co">#&gt; * Conditional independence relations:</span></span>
+<span><span class="co">#&gt; V1 ⟂ V4 | V3, V1 ⟂ V5 | V3, V2 ⟂ V4 | V3, V2 ⟂ V5 | V3 </span></span>
+<span><span class="co">#&gt; * Equality and inequality constraints by district:</span></span>
+<span><span class="co">#&gt; There are 4 possibly nontrivial constraints involving V2_V3, 4 inequalities and 0 equalities.</span></span>
+<span><span class="co">#&gt; The first 4 expressions are</span></span>
+<span><span class="co">#&gt; -P(V2 = 0|V1 = 0)P(V3 = 0|V2 = 0,V1 = 0) - P(V2 = 1|V1 = 0)P ...[truncated]</span></span>
+<span><span class="co">#&gt; P(V2 = 1|V1 = 0)P(V3 = 0|V2 = 1,V1 = 0) - P(V2 = 0|V1 = 1)P( ...[truncated]</span></span>
+<span><span class="co">#&gt; P(V2 = 0|V1 = 0)P(V3 = 1|V2 = 0,V1 = 0) + P(V2 = 0|V1 = 1)P( ...[truncated]</span></span>
+<span><span class="co">#&gt; P(V2 = 0|V1 = 0)P(V3 = 0|V2 = 0,V1 = 0) + P(V2 = 0|V1 = 1)P( ...[truncated]</span></span>
+<span><span class="co">#&gt; There are 4 possibly nontrivial constraints involving V4_V5, 4 inequalities and 0 equalities.</span></span>
+<span><span class="co">#&gt; The first 4 expressions are</span></span>
+<span><span class="co">#&gt; -P(V4 = 0|V3 = 0)P(V5 = 0|V4 = 0,V3 = 0) - P(V4 = 1|V3 = 0)P ...[truncated]</span></span>
+<span><span class="co">#&gt; P(V4 = 1|V3 = 0)P(V5 = 0|V4 = 1,V3 = 0) - P(V4 = 0|V3 = 1)P( ...[truncated]</span></span>
+<span><span class="co">#&gt; P(V4 = 0|V3 = 0)P(V5 = 1|V4 = 0,V3 = 0) + P(V4 = 0|V3 = 1)P( ...[truncated]</span></span>
+<span><span class="co">#&gt; P(V4 = 0|V3 = 0)P(V5 = 0|V4 = 0,V3 = 0) + P(V4 = 0|V3 = 1)P( ...[truncated]</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="robins-nested-examples">Robin’s nested examples<a class="anchor" aria-label="anchor" href="#robins-nested-examples"></a>
 </h2>
-<p>Here are 2 DAGs that have the same equality constraints.</p>
+<p>Here are 3 DAGs that have the same equality constraints.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">r1dag</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r.igraph.org/reference/graph_from_literal.html" class="external-link">graph_from_literal</a></span><span class="op">(</span><span class="va">V1</span> <span class="op">-</span><span class="op">+</span> <span class="va">V2</span> <span class="op">-</span><span class="op">+</span> <span class="va">V3</span> <span class="op">-</span><span class="op">+</span> <span class="va">V4</span>, <span class="va">V1</span> <span class="op">-</span><span class="op">+</span> <span class="va">V4</span>, <span class="va">U2</span> <span class="op">-</span><span class="op">+</span> <span class="va">V2</span><span class="op">:</span><span class="va">V4</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/initialize_graph.html">initialize_graph</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">r2dag</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r.igraph.org/reference/graph_from_literal.html" class="external-link">graph_from_literal</a></span><span class="op">(</span><span class="va">V1</span> <span class="op">-</span><span class="op">+</span> <span class="va">V2</span> <span class="op">-</span><span class="op">+</span> <span class="va">V3</span> <span class="op">-</span><span class="op">+</span> <span class="va">V4</span>, <span class="va">V2</span> <span class="op">-</span><span class="op">+</span> <span class="va">V4</span>, <span class="va">U2</span> <span class="op">-</span><span class="op">+</span> <span class="va">V2</span><span class="op">:</span><span class="va">V4</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/initialize_graph.html">initialize_graph</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">r0dag</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://caugi.org/reference/caugi.html" class="external-link">caugi</a></span><span class="op">(</span><span class="va">V1</span> <span class="op">%--&gt;%</span> <span class="va">V2</span> <span class="op">%--&gt;%</span> <span class="va">V3</span> <span class="op">%--&gt;%</span> <span class="va">V4</span>, <span class="va">V1</span> <span class="op">%--&gt;%</span> <span class="va">V4</span>, <span class="va">V2</span> <span class="op">%--&gt;%</span> <span class="va">V4</span>, <span class="va">U2</span> <span class="op">%--&gt;%</span> <span class="va">V2</span><span class="op">+</span><span class="va">V4</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">dhvm</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">r1dag</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://caugi.org/reference/caugi.html" class="external-link">caugi</a></span><span class="op">(</span><span class="va">V1</span> <span class="op">%--&gt;%</span> <span class="va">V2</span> <span class="op">%--&gt;%</span> <span class="va">V3</span> <span class="op">%--&gt;%</span> <span class="va">V4</span>, <span class="va">V1</span> <span class="op">%--&gt;%</span> <span class="va">V4</span>, <span class="va">U2</span> <span class="op">%--&gt;%</span> <span class="va">V2</span><span class="op">+</span><span class="va">V4</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">dhvm</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">r2dag</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://caugi.org/reference/caugi.html" class="external-link">caugi</a></span><span class="op">(</span><span class="va">V1</span> <span class="op">%--&gt;%</span> <span class="va">V2</span> <span class="op">%--&gt;%</span> <span class="va">V3</span> <span class="op">%--&gt;%</span> <span class="va">V4</span>, <span class="va">V2</span> <span class="op">%--&gt;%</span> <span class="va">V4</span>, <span class="va">U2</span> <span class="op">%--&gt;%</span> <span class="va">V2</span><span class="op">+</span><span class="va">V4</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">dhvm</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">r1dag</span>, vertex.color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://r.igraph.org/reference/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">r1dag</span><span class="op">)</span><span class="op">$</span><span class="va">latent</span>, <span class="st">"grey70"</span>, <span class="st">"skyblue"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="examples_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<span><span class="fu"><a href="https://caugi.org/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">r0dag</span><span class="op">)</span></span></code></pre></div>
+<p><img src="examples_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">r2dag</span>, vertex.color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://r.igraph.org/reference/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">r2dag</span><span class="op">)</span><span class="op">$</span><span class="va">latent</span>, <span class="st">"grey70"</span>, <span class="st">"skyblue"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="examples_files/figure-html/unnamed-chunk-12-2.png" width="700"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://caugi.org/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">r1dag</span><span class="op">)</span></span></code></pre></div>
+<p><img src="examples_files/figure-html/unnamed-chunk-11-2.png" width="700"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/dag_list_independences.html">dag_list_independences</a></span><span class="op">(</span><span class="va">r1dag</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; [[1]]$indep</span></span>
-<span><span class="co">#&gt; [1] "V1" "V3"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[1]]$given</span></span>
-<span><span class="co">#&gt; [1] "V2"</span></span>
-<span><span class="fu"><a href="../reference/dag_list_independences.html">dag_list_independences</a></span><span class="op">(</span><span class="va">r2dag</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; [[1]]$indep</span></span>
-<span><span class="co">#&gt; [1] "V1" "V3"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[1]]$given</span></span>
-<span><span class="co">#&gt; [1] "V2"</span></span>
-<span></span>
-<span><span class="va">r1rels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dag_get_linear_relations.html">dag_get_linear_relations</a></span><span class="op">(</span><span class="va">r1dag</span><span class="op">)</span></span>
-<span><span class="va">r1hreps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cf_relations_to_hrep.html">cf_relations_to_hrep</a></span><span class="op">(</span><span class="va">r1rels</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">r2rels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dag_get_linear_relations.html">dag_get_linear_relations</a></span><span class="op">(</span><span class="va">r2dag</span><span class="op">)</span></span>
-<span><span class="va">r2hreps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cf_relations_to_hrep.html">cf_relations_to_hrep</a></span><span class="op">(</span><span class="va">r2rels</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">r1hreps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="va">r1rels</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="co">## trivial</span></span>
-<span><span class="co">#&gt; [1] "-P(V3 = 0|V2 = 1) &lt;= 0"                     </span></span>
-<span><span class="co">#&gt; [2] "-P(V3 = 0|V2 = 0) &lt;= 0"                     </span></span>
-<span><span class="co">#&gt; [3] "P(V3 = 0|V2 = 1) &lt;= 1"                      </span></span>
-<span><span class="co">#&gt; [4] "P(V3 = 0|V2 = 0) &lt;= 1"                      </span></span>
-<span><span class="co">#&gt; [5] "-P(V3 = 0|V2 = 0) - P(V3 = 1|V2 = 0)  =  -1"</span></span>
-<span><span class="co">#&gt; [6] "-P(V3 = 0|V2 = 1) - P(V3 = 1|V2 = 1)  =  -1"</span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">r2hreps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="va">r2rels</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="co">## trivial</span></span>
-<span><span class="co">#&gt; [1] "-P(V3 = 0|V2 = 1) &lt;= 0"                     </span></span>
-<span><span class="co">#&gt; [2] "-P(V3 = 0|V2 = 0) &lt;= 0"                     </span></span>
-<span><span class="co">#&gt; [3] "P(V3 = 0|V2 = 1) &lt;= 1"                      </span></span>
-<span><span class="co">#&gt; [4] "P(V3 = 0|V2 = 0) &lt;= 1"                      </span></span>
-<span><span class="co">#&gt; [5] "-P(V3 = 0|V2 = 0) - P(V3 = 1|V2 = 0)  =  -1"</span></span>
-<span><span class="co">#&gt; [6] "-P(V3 = 0|V2 = 1) - P(V3 = 1|V2 = 1)  =  -1"</span></span>
-<span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">r1hreps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">r1rels</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="fu">prob_simplex_extremes</span><span class="op">(</span><span class="va">r1rels</span>, <span class="va">r1hreps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; [1] "-P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 0"                                                   </span></span>
-<span><span class="co">#&gt; [2] "-P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) &lt;= 0"                                                   </span></span>
-<span><span class="co">#&gt; [3] "P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 1|V1 = 1)P(V4 = 0|V2 = 1,V1 = 1,V3 = 1) &lt;= 1"                                                    </span></span>
-<span><span class="co">#&gt; [4] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) &lt;= 1"                                                    </span></span>
-<span><span class="co">#&gt; [5] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) - P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 1)  =  0"  </span></span>
-<span><span class="co">#&gt; [6] "-P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) - P(V2 = 1|V1 = 0)P(V4 = 1|V2 = 1,V1 = 0,V3 = 1)  =  -1"</span></span>
-<span><span class="co">#&gt; [7] "P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 1)  =  0"  </span></span>
-<span><span class="co">#&gt; [8] "-P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 1|V1 = 1)P(V4 = 0|V2 = 1,V1 = 1,V3 = 1) - P(V2 = 1|V1 = 1)P(V4 = 1|V2 = 1,V1 = 1,V3 = 1)  =  -1"</span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">r2hreps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">r2rels</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="fu">prob_simplex_extremes</span><span class="op">(</span><span class="va">r2rels</span>, <span class="va">r2hreps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt;  [1] "-P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 1|V1 = 1)P(V4 = 0|V2 = 1,V1 = 1,V3 = 0) &lt;= 0"  </span></span>
-<span><span class="co">#&gt;  [2] "-P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) + P(V2 = 1|V1 = 1)P(V4 = 0|V2 = 1,V1 = 1,V3 = 1) &lt;= 0"  </span></span>
-<span><span class="co">#&gt;  [3] "P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 1|V1 = 1)P(V4 = 0|V2 = 1,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) &lt;= 0"   </span></span>
-<span><span class="co">#&gt;  [4] "-P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) - P(V2 = 1|V1 = 1)P(V4 = 0|V2 = 1,V1 = 1,V3 = 1) &lt;= 0"  </span></span>
-<span><span class="co">#&gt;  [5] "-P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) &lt;= 0"                                                   </span></span>
-<span><span class="co">#&gt;  [6] "-P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 0"                                                   </span></span>
-<span><span class="co">#&gt;  [7] "P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) &lt;= 1"                                                                                                     </span></span>
-<span><span class="co">#&gt;  [8] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) &lt;= 1"                                                                                                     </span></span>
-<span><span class="co">#&gt;  [9] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 1"   </span></span>
-<span><span class="co">#&gt; [10] "P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 1|V1 = 1)P(V4 = 0|V2 = 1,V1 = 1,V3 = 1) &lt;= 1"                                                    </span></span>
-<span><span class="co">#&gt; [11] "P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 1"   </span></span>
-<span><span class="co">#&gt; [12] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) &lt;= 1"                                                    </span></span>
-<span><span class="co">#&gt; [13] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) - P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 1)  =  0"  </span></span>
-<span><span class="co">#&gt; [14] "-P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) - P(V2 = 1|V1 = 0)P(V4 = 1|V2 = 1,V1 = 0,V3 = 1)  =  -1"</span></span>
-<span><span class="co">#&gt; [15] "P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 1)  =  0"  </span></span>
-<span><span class="co">#&gt; [16] "-P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 1|V1 = 1)P(V4 = 0|V2 = 1,V1 = 1,V3 = 1) - P(V2 = 1|V1 = 1)P(V4 = 1|V2 = 1,V1 = 1,V3 = 1)  =  -1"</span></span></code></pre></div>
-<p>The constraints on the 2nd district are trivial in both DAGs but the
-ones on the 1st district are different.</p>
-<p>Let’s see if we can distinguish these two models. Here I am sampling
-a distribution from the first DAG, and seeing if the constraints derived
-from the 2nd DAG are ever violated.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://caugi.org/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">r2dag</span><span class="op">)</span></span></code></pre></div>
+<p><img src="examples_files/figure-html/unnamed-chunk-11-3.png" width="700"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">r0cn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/meraconstraints.html">meraconstraints</a></span><span class="op">(</span><span class="va">r0dag</span><span class="op">)</span></span>
+<span><span class="va">r1cn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/meraconstraints.html">meraconstraints</a></span><span class="op">(</span><span class="va">r1dag</span><span class="op">)</span></span>
+<span><span class="va">r2cn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/meraconstraints.html">meraconstraints</a></span><span class="op">(</span><span class="va">r2dag</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">r0cn</span></span>
+<span><span class="co">#&gt; MERA constraints on the dhvm: r0dag </span></span>
+<span><span class="co">#&gt; The model has districts (unobserved variables marked with [u]:</span></span>
+<span><span class="co">#&gt;      {V1} with c-degree 1, {V2, V4, U2[u]} with c-degree 1, {V3} with c-degree 1 </span></span>
+<span><span class="co">#&gt; The canonical partitioned model is available in x$dhvm_partitioned</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Constraints:</span></span>
+<span><span class="co">#&gt; ------------</span></span>
+<span><span class="co">#&gt; * Conditional independence relations:</span></span>
+<span><span class="co">#&gt; V1 ⟂ V3 | V2 </span></span>
+<span><span class="co">#&gt; * Equality and inequality constraints by district:</span></span>
+<span><span class="co">#&gt; There are 8 possibly nontrivial constraints involving V2_V4, 4 inequalities and 4 equalities.</span></span>
+<span><span class="co">#&gt; The first 4 expressions are</span></span>
+<span><span class="co">#&gt; -P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V ...[truncated]</span></span>
+<span><span class="co">#&gt; -P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V ...[truncated]</span></span>
+<span><span class="co">#&gt; P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 ...[truncated]</span></span>
+<span><span class="co">#&gt; P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 ...[truncated]</span></span>
+<span><span class="co">#&gt; There are 0 possibly nontrivial constraints involving V3, 0 inequalities and 0 equalities.</span></span>
+<span><span class="va">r1cn</span></span>
+<span><span class="co">#&gt; MERA constraints on the dhvm: r1dag </span></span>
+<span><span class="co">#&gt; The model has districts (unobserved variables marked with [u]:</span></span>
+<span><span class="co">#&gt;      {V1} with c-degree 1, {V2, V4, U2[u]} with c-degree 1, {V3} with c-degree 1 </span></span>
+<span><span class="co">#&gt; The canonical partitioned model is available in x$dhvm_partitioned</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Constraints:</span></span>
+<span><span class="co">#&gt; ------------</span></span>
+<span><span class="co">#&gt; * Conditional independence relations:</span></span>
+<span><span class="co">#&gt; V1 ⟂ V3 | V2 </span></span>
+<span><span class="co">#&gt; * Equality and inequality constraints by district:</span></span>
+<span><span class="co">#&gt; There are 8 possibly nontrivial constraints involving V2_V4, 4 inequalities and 4 equalities.</span></span>
+<span><span class="co">#&gt; The first 4 expressions are</span></span>
+<span><span class="co">#&gt; -P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V ...[truncated]</span></span>
+<span><span class="co">#&gt; -P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V ...[truncated]</span></span>
+<span><span class="co">#&gt; P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 ...[truncated]</span></span>
+<span><span class="co">#&gt; P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 ...[truncated]</span></span>
+<span><span class="co">#&gt; There are 0 possibly nontrivial constraints involving V3, 0 inequalities and 0 equalities.</span></span>
+<span><span class="va">r2cn</span></span>
+<span><span class="co">#&gt; MERA constraints on the dhvm: r2dag </span></span>
+<span><span class="co">#&gt; The model has districts (unobserved variables marked with [u]:</span></span>
+<span><span class="co">#&gt;      {V1} with c-degree 1, {V2, V4, U2[u]} with c-degree 1, {V3} with c-degree 1 </span></span>
+<span><span class="co">#&gt; The canonical partitioned model is available in x$dhvm_partitioned</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Constraints:</span></span>
+<span><span class="co">#&gt; ------------</span></span>
+<span><span class="co">#&gt; * Conditional independence relations:</span></span>
+<span><span class="co">#&gt; V1 ⟂ V3 | V2 </span></span>
+<span><span class="co">#&gt; * Equality and inequality constraints by district:</span></span>
+<span><span class="co">#&gt; There are 16 possibly nontrivial constraints involving V2_V4, 12 inequalities and 4 equalities.</span></span>
+<span><span class="co">#&gt; The first 4 expressions are</span></span>
+<span><span class="co">#&gt; -P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 1|V ...[truncated]</span></span>
+<span><span class="co">#&gt; -P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V ...[truncated]</span></span>
+<span><span class="co">#&gt; P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) - P(V2 = 0|V1 ...[truncated]</span></span>
+<span><span class="co">#&gt; -P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V ...[truncated]</span></span>
+<span><span class="co">#&gt; There are 0 possibly nontrivial constraints involving V3, 0 inequalities and 0 equalities.</span></span></code></pre></div>
+<p>The constraints on the V3 district are trivial in all 3 DAGs but the
+ones on the district with V2, V4 are different in
+<code>r2dag</code>.</p>
+<p>Let’s see if we can distinguish these models. Here I am sampling a
+distribution from the <code>r1dag</code>, and seeing if the constraints
+derived from <code>r2dag</code> are ever violated.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="cn">NA</span>, nrow <span class="op">=</span> <span class="fl">500</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">r2hreps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="cn">NA</span>, nrow <span class="op">=</span> <span class="fl">500</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">r2cn</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="st">"V2_V4"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span></span>
-<span>  <span class="va">probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dag_sample_distribution.html">dag_sample_distribution</a></span><span class="op">(</span><span class="va">r1dag</span>, parmsamp <span class="op">=</span> \<span class="op">(</span><span class="va">k</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">k</span>, sd <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">probs1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">probs</span><span class="op">$</span><span class="va">V4</span>, <span class="va">probs</span><span class="op">$</span><span class="va">V2</span>, by <span class="op">=</span> <span class="st">"V1"</span><span class="op">)</span></span>
-<span>  <span class="va">probs1</span><span class="op">$</span><span class="va">prob</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">probs1</span>, <span class="va">probs.x</span> <span class="op">*</span> <span class="va">probs.y</span><span class="op">)</span></span>
-<span>  <span class="va">probs1</span> <span class="op">&lt;-</span> <span class="va">probs1</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">probs1</span>, <span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">V3</span>, <span class="va">V1</span>, <span class="va">V4</span>, <span class="va">V2</span><span class="op">)</span><span class="op">)</span>,<span class="op">]</span></span>
-<span></span>
-<span></span>
-<span>  <span class="va">res</span><span class="op">[</span><span class="va">i</span>,<span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">hrep_test</span><span class="op">(</span><span class="va">r2hreps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">probs1</span><span class="op">$</span><span class="va">prob</span>, which <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="va">probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span><span class="fu"><a href="../reference/dhvm_sample_distribution.html">dhvm_sample_distribution</a></span><span class="op">(</span><span class="va">r1dag</span>, parmsamp <span class="op">=</span> \<span class="op">(</span><span class="va">k</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">k</span>, sd <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="co">## get probabilities of the form P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0)</span></span>
+<span>  <span class="va">probs</span><span class="op">[</span>, <span class="va">prob.V1V2V3</span> <span class="op">:=</span> <span class="va">prob.V3_V2</span> <span class="op">*</span> <span class="va">prob.V2_V1</span> <span class="op">*</span> <span class="va">prob.V1</span><span class="op">]</span></span>
+<span>  <span class="va">probs</span><span class="op">[</span>, <span class="va">prob.V4_rest</span> <span class="op">:=</span> <span class="va">prob.joint</span> <span class="op">/</span> <span class="va">prob.V1V2V3</span><span class="op">]</span></span>
+<span>  <span class="va">probs</span><span class="op">[</span>, <span class="va">prob.test</span> <span class="op">:=</span> <span class="va">prob.V4_rest</span> <span class="op">*</span> <span class="va">prob.V2_V1</span><span class="op">]</span></span>
+<span>  <span class="co">## correct order</span></span>
+<span>  <span class="va">probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">r2cn</span><span class="op">$</span><span class="va">functional_relations</span><span class="op">$</span><span class="va">problevels</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">probs</span>, sort <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">res</span><span class="op">[</span><span class="va">i</span>,<span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">hrep_test</span><span class="op">(</span><span class="va">r2cn</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="st">"V2_V4"</span><span class="op">]</span><span class="op">]</span>, <span class="va">probs</span><span class="op">$</span><span class="va">prob.test</span>, which <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>             </span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">r2hreps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">r2rels</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">1</span><span class="op">]</span></span>
-<span><span class="co">#&gt; [1] "P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) &lt;= 1"                                                                                                  </span></span>
-<span><span class="co">#&gt; [2] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) &lt;= 1"                                                                                                  </span></span>
-<span><span class="co">#&gt; [3] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 1"</span></span>
-<span><span class="co">#&gt; [4] "P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 1"</span></span></code></pre></div>
-<p>These are 4 nontrivial inequality constraints that can tell us that a
+<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">r2cn</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="st">"V2_V4"</span><span class="op">]</span><span class="op">]</span>, </span>
+<span>             <span class="va">r2cn</span><span class="op">$</span><span class="va">functional_relations</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">1</span><span class="op">]</span></span>
+<span><span class="co">#&gt; [1] "-P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 1|V1 = 1)P(V4 = 0|V2 = 1,V1 = 1,V3 = 0) &lt;= 0"</span></span>
+<span><span class="co">#&gt; [2] "-P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) + P(V2 = 1|V1 = 1)P(V4 = 0|V2 = 1,V1 = 1,V3 = 1) &lt;= 0"</span></span>
+<span><span class="co">#&gt; [3] "P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 1|V1 = 1)P(V4 = 0|V2 = 1,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) &lt;= 0" </span></span>
+<span><span class="co">#&gt; [4] "-P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) - P(V2 = 1|V1 = 1)P(V4 = 0|V2 = 1,V1 = 1,V3 = 1) &lt;= 0"</span></span>
+<span><span class="co">#&gt; [5] "P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) &lt;= 1"                                                                                                   </span></span>
+<span><span class="co">#&gt; [6] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) &lt;= 1"                                                                                                   </span></span>
+<span><span class="co">#&gt; [7] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 1" </span></span>
+<span><span class="co">#&gt; [8] "P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 1"</span></span></code></pre></div>
+<p>These are 8 nontrivial inequality constraints that can tell us that a
 distribution sampled from model 1 does not come from model 2. The other
 direction does not work, if we sample from model 2, we cannot
 distinguish it from model 1.</p>
@@ -400,345 +379,184 @@ distinguish it from model 1.</p>
 <div class="section level2">
 <h2 id="incomplete-linear-example">Incomplete linear example<a class="anchor" aria-label="anchor" href="#incomplete-linear-example"></a>
 </h2>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">duarg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r.igraph.org/reference/graph_from_literal.html" class="external-link">graph_from_literal</a></span><span class="op">(</span><span class="va">A</span> <span class="op">-</span><span class="op">+</span> <span class="va">B</span> <span class="op">-</span><span class="op">+</span> <span class="va">C</span> <span class="op">-</span><span class="op">+</span> <span class="va">D</span>, <span class="va">A</span> <span class="op">-</span><span class="op">+</span> <span class="va">E</span> <span class="op">-</span><span class="op">+</span> <span class="va">C</span>, <span class="va">D</span> <span class="op">-</span><span class="op">+</span> <span class="cn">F</span>, <span class="va">U1</span> <span class="op">-</span><span class="op">+</span> <span class="va">A</span><span class="op">:</span><span class="va">C</span><span class="op">:</span><span class="va">E</span>, <span class="va">U2</span> <span class="op">-</span><span class="op">+</span> <span class="cn">F</span><span class="op">:</span><span class="va">D</span>, <span class="va">U3</span> <span class="op">-</span><span class="op">+</span> <span class="va">B</span><span class="op">:</span><span class="va">D</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/initialize_graph.html">initialize_graph</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">duarg</span>, vertex.color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://r.igraph.org/reference/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">duarg</span><span class="op">)</span><span class="op">$</span><span class="va">latent</span>, <span class="st">"grey70"</span>, <span class="st">"skyblue"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="examples_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="fu"><a href="../reference/dag_list_independences.html">dag_list_independences</a></span><span class="op">(</span><span class="va">duarg</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; [[1]]$indep</span></span>
-<span><span class="co">#&gt; [1] "B" "E"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[1]]$given</span></span>
-<span><span class="co">#&gt; [1] "A"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]</span></span>
-<span><span class="co">#&gt; [[2]]$indep</span></span>
-<span><span class="co">#&gt; [1] "D" "E"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]$given</span></span>
-<span><span class="co">#&gt; [1] "A" "B" "C"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[3]]</span></span>
-<span><span class="co">#&gt; [[3]]$indep</span></span>
-<span><span class="co">#&gt; [1] "E" "F"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[3]]$given</span></span>
-<span><span class="co">#&gt; [1] "A" "B" "C"</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">duargr</span> <span class="op">&lt;-</span> <span class="fu">dhvm</span><span class="op">(</span><span class="fu"><a href="https://caugi.org/reference/caugi.html" class="external-link">caugi</a></span><span class="op">(</span><span class="va">A</span> <span class="op">%--&gt;%</span> <span class="va">B</span><span class="op">+</span><span class="va">E</span>, <span class="va">B</span> <span class="op">%--&gt;%</span> <span class="va">C</span>, <span class="va">C</span> <span class="op">%--&gt;%</span> <span class="va">D</span>, <span class="va">D</span> <span class="op">%--&gt;%</span> <span class="cn">F</span>, <span class="va">E</span> <span class="op">%--&gt;%</span> <span class="va">C</span>,</span>
+<span> <span class="va">U1</span> <span class="op">%--&gt;%</span> <span class="va">B</span><span class="op">+</span><span class="va">D</span>, <span class="va">U2</span> <span class="op">%--&gt;%</span> <span class="va">A</span><span class="op">+</span><span class="va">C</span><span class="op">+</span><span class="va">E</span>, <span class="va">U3</span> <span class="op">%--&gt;%</span> <span class="va">D</span><span class="op">+</span><span class="cn">F</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://caugi.org/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">duargr</span><span class="op">)</span></span></code></pre></div>
+<p><img src="examples_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
 <p>In this DAG, we cannot apply our method directly because it has
 c-degree 2. Specifically, the district containing the variables B, D, F
-has two latents in it. To apply our method, we can merge these latents
-into a single one. The resulting constraints hold in the original DAG,
-but they are not necessarily complete.</p>
+has two unobserved variables in it. If we try to get the constraints, we
+get an error:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">duarg2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dag_transform_merge_latents.html">dag_transform_merge_latents</a></span><span class="op">(</span><span class="va">duarg</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">duarg2</span>, vertex.color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://r.igraph.org/reference/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">duarg2</span><span class="op">)</span><span class="op">$</span><span class="va">latent</span>, <span class="st">"grey70"</span>, <span class="st">"skyblue"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="examples_files/figure-html/unnamed-chunk-16-1.png" width="700"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/meraconstraints.html">meraconstraints</a></span><span class="op">(</span><span class="va">duargr</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error in dhvm_canonical_partition(dhvm): c-degree is greater than 1, cannot do the canonical partitioning. Check district(s): {B, D, F, U1[u], U3[u]}</span></span></code></pre></div>
+<p>To apply our method, we can merge these latents into a single one.
+The resulting constraints hold in the original DAG, but they are not
+necessarily complete.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">duarg2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dhvm_merge_latents.html">dhvm_merge_latents</a></span><span class="op">(</span><span class="va">duargr</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://caugi.org/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">duarg2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="examples_files/figure-html/unnamed-chunk-16-1.png" width="700"></p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">drels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dag_get_linear_relations.html">dag_get_linear_relations</a></span><span class="op">(</span><span class="va">duarg2</span><span class="op">)</span></span>
-<span><span class="va">dhreps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cf_relations_to_hrep.html">cf_relations_to_hrep</a></span><span class="op">(</span><span class="va">drels</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">nontriv</span> <span class="op">&lt;-</span> <span class="fu">prob_simplex_extremes</span><span class="op">(</span><span class="va">drels</span>, <span class="va">dhreps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/dag_get_districts.html">dag_get_districts</a></span><span class="op">(</span><span class="va">duarg2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; + 4/8 vertices, named, from ba2c846:</span></span>
-<span><span class="co">#&gt; [1] A  C  E  U1</span></span>
+<span><span class="fu"><a href="../reference/meraconstraints.html">meraconstraints</a></span><span class="op">(</span><span class="va">duarg2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; MERA constraints on the dhvm: duarg2 </span></span>
+<span><span class="co">#&gt; The model has districts (unobserved variables marked with [u]:</span></span>
+<span><span class="co">#&gt;      {A, C, E, U2[u]} with c-degree 1, {B, D, F, U1[u]} with c-degree 1 </span></span>
+<span><span class="co">#&gt; The canonical partitioned model is available in x$dhvm_partitioned</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]</span></span>
-<span><span class="co">#&gt; + 4/8 vertices, named, from ba2c846:</span></span>
-<span><span class="co">#&gt; [1] B  D  F  U2</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">nontriv</span>, <span class="va">sum</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; [1] 8</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]</span></span>
-<span><span class="co">#&gt; [1] 1118</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">dhreps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">drels</span><span class="op">$</span><span class="va">probstarform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="va">nontriv</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; [1] "-P*(A = 0,C = 0,E = 0|B = 0) - P*(A = 0,C = 1,E = 0|B = 0) + P*(A = 0,C = 0,E = 0|B = 1) &lt;= 0"                                                                                                                                                        </span></span>
-<span><span class="co">#&gt; [2] "-P*(A = 1,C = 0,E = 0|B = 0) - P*(A = 1,C = 1,E = 0|B = 0) + P*(A = 1,C = 0,E = 0|B = 1) &lt;= 0"                                                                                                                                                        </span></span>
-<span><span class="co">#&gt; [3] "-P*(A = 0,C = 0,E = 1|B = 0) - P*(A = 0,C = 1,E = 1|B = 0) + P*(A = 0,C = 0,E = 1|B = 1) &lt;= 0"                                                                                                                                                        </span></span>
-<span><span class="co">#&gt; [4] "P*(A = 0,C = 0,E = 0|B = 0) + P*(A = 1,C = 0,E = 0|B = 0) + P*(A = 0,C = 1,E = 0|B = 0) + P*(A = 1,C = 1,E = 0|B = 0) + P*(A = 0,C = 0,E = 1|B = 0) + P*(A = 0,C = 1,E = 1|B = 0) + P*(A = 1,C = 0,E = 1|B = 1) &lt;= 1"                                 </span></span>
-<span><span class="co">#&gt; [5] "P*(A = 0,C = 0,E = 0|B = 0) + P*(A = 0,C = 1,E = 0|B = 0) - P*(A = 0,C = 0,E = 0|B = 1) - P*(A = 0,C = 1,E = 0|B = 1)  =  0"                                                                                                                          </span></span>
-<span><span class="co">#&gt; [6] "P*(A = 1,C = 0,E = 0|B = 0) + P*(A = 1,C = 1,E = 0|B = 0) - P*(A = 1,C = 0,E = 0|B = 1) - P*(A = 1,C = 1,E = 0|B = 1)  =  0"                                                                                                                          </span></span>
-<span><span class="co">#&gt; [7] "P*(A = 0,C = 0,E = 1|B = 0) + P*(A = 0,C = 1,E = 1|B = 0) - P*(A = 0,C = 0,E = 1|B = 1) - P*(A = 0,C = 1,E = 1|B = 1)  =  0"                                                                                                                          </span></span>
-<span><span class="co">#&gt; [8] "-P*(A = 0,C = 0,E = 0|B = 0) - P*(A = 1,C = 0,E = 0|B = 0) - P*(A = 0,C = 1,E = 0|B = 0) - P*(A = 1,C = 1,E = 0|B = 0) - P*(A = 0,C = 0,E = 1|B = 0) - P*(A = 0,C = 1,E = 1|B = 0) - P*(A = 1,C = 0,E = 1|B = 1) - P*(A = 1,C = 1,E = 1|B = 1)  =  -1"</span></span>
-<span><span class="co">#hrep_to_text(dhreps$Hrep[[2]], drels$probform[[2]])[nontriv[[2]]]</span></span></code></pre></div>
+<span><span class="co">#&gt; Constraints:</span></span>
+<span><span class="co">#&gt; ------------</span></span>
+<span><span class="co">#&gt; * Conditional independence relations:</span></span>
+<span><span class="co">#&gt; B ⟂ E | A, c("D ⟂ E | A", "D ⟂ E | B", "D ⟂ E | C"), c("E ⟂ F | A", "E ⟂ F | B", "E ⟂ F | C") </span></span>
+<span><span class="co">#&gt; * Equality and inequality constraints by district:</span></span>
+<span><span class="co">#&gt; There are 8 possibly nontrivial constraints involving A_C_E, 4 inequalities and 4 equalities.</span></span>
+<span><span class="co">#&gt; The first 4 expressions are</span></span>
+<span><span class="co">#&gt; -P(A = 0)P(C = 0|A = 0,E = 0,B = 0)P(E = 0|A = 0) - P(A = 0) ...[truncated]</span></span>
+<span><span class="co">#&gt; -P(A = 1)P(C = 0|A = 1,E = 0,B = 0)P(E = 0|A = 1) - P(A = 1) ...[truncated]</span></span>
+<span><span class="co">#&gt; -P(A = 0)P(C = 0|A = 0,E = 1,B = 0)P(E = 1|A = 0) - P(A = 0) ...[truncated]</span></span>
+<span><span class="co">#&gt; P(A = 0)P(C = 0|A = 0,E = 0,B = 0)P(E = 0|A = 0) + P(A = 1)P ...[truncated]</span></span>
+<span><span class="co">#&gt; There are 1118 possibly nontrivial constraints involving B_D_F, 1107 inequalities and 11 equalities.</span></span>
+<span><span class="co">#&gt; The first 4 expressions are</span></span>
+<span><span class="co">#&gt; P(B = 0|A = 0)P(D = 0|B = 0,A = 0,C = 0)P(F = 0|B = 0,D = 0, ...[truncated]</span></span>
+<span><span class="co">#&gt; P(B = 0|A = 0)P(D = 0|B = 0,A = 0,C = 0)P(F = 0|B = 0,D = 0, ...[truncated]</span></span>
+<span><span class="co">#&gt; -P(B = 0|A = 0)P(D = 1|B = 0,A = 0,C = 0)P(F = 0|B = 0,D = 1 ...[truncated]</span></span>
+<span><span class="co">#&gt; -P(B = 0|A = 0)P(D = 1|B = 0,A = 0,C = 0)P(F = 0|B = 0,D = 1 ...[truncated]</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="front-door-model">Front door model<a class="anchor" aria-label="anchor" href="#front-door-model"></a>
 </h2>
 <p>The classic front door model has no observable constraints.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/initialize_graph.html">initialize_graph</a></span><span class="op">(</span><span class="fu"><a href="https://r.igraph.org/reference/graph_from_literal.html" class="external-link">graph_from_literal</a></span><span class="op">(</span><span class="va">A</span> <span class="op">-</span><span class="op">+</span> <span class="va">M</span> <span class="op">-</span><span class="op">+</span> <span class="va">Y</span>, <span class="va">U1</span> <span class="op">-</span><span class="op">+</span> <span class="va">A</span><span class="op">:</span><span class="va">Y</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/dag_list_independences.html">dag_list_independences</a></span><span class="op">(</span><span class="va">fd</span><span class="op">)</span></span>
-<span><span class="co">#&gt; list()</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fd</span>, vertex.color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://r.igraph.org/reference/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">fd</span><span class="op">)</span><span class="op">$</span><span class="va">latent</span>, <span class="st">"grey70"</span>, <span class="st">"skyblue"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="examples_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">fdrels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dag_get_linear_relations.html">dag_get_linear_relations</a></span><span class="op">(</span><span class="va">fd</span><span class="op">)</span></span>
-<span><span class="va">fdreps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cf_relations_to_hrep.html">cf_relations_to_hrep</a></span><span class="op">(</span><span class="va">fdrels</span><span class="op">)</span></span></code></pre></div>
-<p>The constraints we find in the 2nd district are all obviously
-trivial.</p>
+<code class="sourceCode R"><span><span class="va">fd</span> <span class="op">&lt;-</span> <span class="fu">dhvm</span><span class="op">(</span><span class="fu"><a href="https://caugi.org/reference/caugi.html" class="external-link">caugi</a></span><span class="op">(</span><span class="va">A</span> <span class="op">%--&gt;%</span> <span class="va">M</span> <span class="op">%--&gt;%</span> <span class="va">Y</span>, <span class="va">U1</span> <span class="op">%--&gt;%</span> <span class="va">A</span> <span class="op">+</span> <span class="va">Y</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://caugi.org/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fd</span><span class="op">)</span></span></code></pre></div>
+<p><img src="examples_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">fdreps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, prob <span class="op">=</span> <span class="va">fdrels</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "-P(M = 0|A = 1) &lt;= 0"                   </span></span>
-<span><span class="co">#&gt; [2] "-P(M = 0|A = 0) &lt;= 0"                   </span></span>
-<span><span class="co">#&gt; [3] "P(M = 0|A = 1) &lt;= 1"                    </span></span>
-<span><span class="co">#&gt; [4] "P(M = 0|A = 0) &lt;= 1"                    </span></span>
-<span><span class="co">#&gt; [5] "-P(M = 0|A = 0) - P(M = 1|A = 0)  =  -1"</span></span>
-<span><span class="co">#&gt; [6] "-P(M = 0|A = 1) - P(M = 1|A = 1)  =  -1"</span></span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="va">fdcn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/meraconstraints.html">meraconstraints</a></span><span class="op">(</span><span class="va">fd</span><span class="op">)</span></span>
+<span><span class="va">fdcn</span></span>
+<span><span class="co">#&gt; MERA constraints on the dhvm: fd </span></span>
+<span><span class="co">#&gt; The model has districts (unobserved variables marked with [u]:</span></span>
+<span><span class="co">#&gt;      {A, Y, U1[u]} with c-degree 1, {M} with c-degree 1 </span></span>
+<span><span class="co">#&gt; The canonical partitioned model is available in x$dhvm_partitioned</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Constraints:</span></span>
+<span><span class="co">#&gt; ------------</span></span>
+<span><span class="co">#&gt; There are no conditional independence relations.</span></span>
+<span><span class="co">#&gt; * Equality and inequality constraints by district:</span></span>
+<span><span class="co">#&gt; There are 4 possibly nontrivial constraints involving A_Y, 2 inequalities and 2 equalities.</span></span>
+<span><span class="co">#&gt; The first 4 expressions are</span></span>
+<span><span class="co">#&gt; -P(A = 0)P(Y = 0|A = 0,M = 0) - P(A = 0)P(Y = 1|A = 0,M = 0) ...[truncated]</span></span>
+<span><span class="co">#&gt; P(A = 0)P(Y = 0|A = 0,M = 0) + P(A = 0)P(Y = 1|A = 0,M = 0)  ...[truncated]</span></span>
+<span><span class="co">#&gt; P(A = 0)P(Y = 0|A = 0,M = 0) + P(A = 0)P(Y = 1|A = 0,M = 0)  ...[truncated]</span></span>
+<span><span class="co">#&gt; -P(A = 0)P(Y = 0|A = 0,M = 0) - P(A = 0)P(Y = 1|A = 0,M = 0) ...[truncated]</span></span>
+<span><span class="co">#&gt; There are 0 possibly nontrivial constraints involving M, 0 inequalities and 0 equalities.</span></span></code></pre></div>
+<p>Even though we report 4 possibly nontrivial constraints, they are all
+obviously trivial.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">fdcn</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, prob <span class="op">=</span> <span class="va">fdcn</span><span class="op">$</span><span class="va">functional_relations</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "-P(A = 0)P(Y = 0|A = 0,M = 1) &lt;= 0"                                                                                               </span></span>
+<span><span class="co">#&gt;  [2] "-P(A = 0)P(Y = 0|A = 0,M = 0) &lt;= 0"                                                                                               </span></span>
+<span><span class="co">#&gt;  [3] "-P(A = 0)P(Y = 0|A = 0,M = 0) - P(A = 0)P(Y = 1|A = 0,M = 0) + P(A = 0)P(Y = 0|A = 0,M = 1) &lt;= 0"                                 </span></span>
+<span><span class="co">#&gt;  [4] "-P(A = 0)P(Y = 1|A = 0,M = 0) &lt;= 0"                                                                                               </span></span>
+<span><span class="co">#&gt;  [5] "-P(A = 1)P(Y = 0|A = 1,M = 1) &lt;= 0"                                                                                               </span></span>
+<span><span class="co">#&gt;  [6] "-P(A = 1)P(Y = 0|A = 1,M = 0) &lt;= 0"                                                                                               </span></span>
+<span><span class="co">#&gt;  [7] "P(A = 0)P(Y = 0|A = 0,M = 0) + P(A = 0)P(Y = 1|A = 0,M = 0) + P(A = 1)P(Y = 0|A = 1,M = 1) &lt;= 1"                                  </span></span>
+<span><span class="co">#&gt;  [8] "P(A = 0)P(Y = 0|A = 0,M = 0) + P(A = 1)P(Y = 0|A = 1,M = 0) + P(A = 0)P(Y = 1|A = 0,M = 0) &lt;= 1"                                  </span></span>
+<span><span class="co">#&gt;  [9] "-P(A = 0)P(Y = 0|A = 0,M = 0) - P(A = 1)P(Y = 0|A = 1,M = 0) - P(A = 0)P(Y = 1|A = 0,M = 0) - P(A = 1)P(Y = 1|A = 1,M = 0)  =  -1"</span></span>
+<span><span class="co">#&gt; [10] "P(A = 0)P(Y = 0|A = 0,M = 0) + P(A = 0)P(Y = 1|A = 0,M = 0) - P(A = 0)P(Y = 0|A = 0,M = 1) - P(A = 0)P(Y = 1|A = 0,M = 1)  =  0"  </span></span>
+<span><span class="co">#&gt; [11] "-P(A = 0)P(Y = 0|A = 0,M = 0) - P(A = 0)P(Y = 1|A = 0,M = 0) - P(A = 1)P(Y = 0|A = 1,M = 1) - P(A = 1)P(Y = 1|A = 1,M = 1)  =  -1"</span></span></code></pre></div>
 <p>In the first district, we flag some of them as not definitely
 trivial. Why is that? Well, they can be violated if we observed a
 distribution where we intervened on M. This can be seen when we look at
 the constraints in terms of the P* probabilities.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pontriv</span> <span class="op">&lt;-</span> <span class="fu">prob_simplex_extremes</span><span class="op">(</span><span class="va">fdrels</span>, <span class="va">fdreps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">fdreps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, prob <span class="op">=</span> <span class="va">fdrels</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="va">pontriv</span><span class="op">]</span></span>
-<span><span class="co">#&gt; [1] "-P(A = 0)P(Y = 0|A = 0,M = 0) - P(A = 0)P(Y = 1|A = 0,M = 0) + P(A = 0)P(Y = 0|A = 0,M = 1) &lt;= 0"                                 </span></span>
-<span><span class="co">#&gt; [2] "P(A = 0)P(Y = 0|A = 0,M = 0) + P(A = 0)P(Y = 1|A = 0,M = 0) + P(A = 1)P(Y = 0|A = 1,M = 1) &lt;= 1"                                  </span></span>
-<span><span class="co">#&gt; [3] "P(A = 0)P(Y = 0|A = 0,M = 0) + P(A = 0)P(Y = 1|A = 0,M = 0) - P(A = 0)P(Y = 0|A = 0,M = 1) - P(A = 0)P(Y = 1|A = 0,M = 1)  =  0"  </span></span>
-<span><span class="co">#&gt; [4] "-P(A = 0)P(Y = 0|A = 0,M = 0) - P(A = 0)P(Y = 1|A = 0,M = 0) - P(A = 1)P(Y = 0|A = 1,M = 1) - P(A = 1)P(Y = 1|A = 1,M = 1)  =  -1"</span></span>
-<span><span class="co">## all trivial unless you can intervene on M</span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">fdreps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, prob <span class="op">=</span> <span class="va">fdrels</span><span class="op">$</span><span class="va">probstarform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="va">pontriv</span><span class="op">]</span></span>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## all trivial unless you can intervene on M</span></span>
+<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">fdcn</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, </span>
+<span>             prob <span class="op">=</span> <span class="va">fdcn</span><span class="op">$</span><span class="va">functional_relations</span><span class="op">$</span><span class="va">probstarform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span></span>
+<span>               <span class="va">fdcn</span><span class="op">$</span><span class="va">trivial_if_false</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span>               <span class="op">]</span></span>
 <span><span class="co">#&gt; [1] "-P*(A = 0,Y = 0|M = 0) - P*(A = 0,Y = 1|M = 0) + P*(A = 0,Y = 0|M = 1) &lt;= 0"                          </span></span>
 <span><span class="co">#&gt; [2] "P*(A = 0,Y = 0|M = 0) + P*(A = 0,Y = 1|M = 0) + P*(A = 1,Y = 0|M = 1) &lt;= 1"                           </span></span>
 <span><span class="co">#&gt; [3] "P*(A = 0,Y = 0|M = 0) + P*(A = 0,Y = 1|M = 0) - P*(A = 0,Y = 0|M = 1) - P*(A = 0,Y = 1|M = 1)  =  0"  </span></span>
 <span><span class="co">#&gt; [4] "-P*(A = 0,Y = 0|M = 0) - P*(A = 0,Y = 1|M = 0) - P*(A = 1,Y = 0|M = 1) - P*(A = 1,Y = 1|M = 1)  =  -1"</span></span></code></pre></div>
-<p>Some variations on the front door model.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fd2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/initialize_graph.html">initialize_graph</a></span><span class="op">(</span><span class="fu"><a href="https://r.igraph.org/reference/graph_from_literal.html" class="external-link">graph_from_literal</a></span><span class="op">(</span><span class="va">Z</span> <span class="op">-</span><span class="op">+</span> <span class="va">A</span> <span class="op">-</span><span class="op">+</span> <span class="va">M</span> <span class="op">-</span><span class="op">+</span> <span class="va">Y</span>, <span class="va">U1</span> <span class="op">-</span><span class="op">+</span> <span class="va">A</span><span class="op">:</span><span class="va">Y</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/dag_list_independences.html">dag_list_independences</a></span><span class="op">(</span><span class="va">fd2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; [[1]]$indep</span></span>
-<span><span class="co">#&gt; [1] "Z" "M"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[1]]$given</span></span>
-<span><span class="co">#&gt; [1] "A"</span></span>
-<span></span>
-<span><span class="va">fd2rels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dag_get_linear_relations.html">dag_get_linear_relations</a></span><span class="op">(</span><span class="va">fd2</span><span class="op">)</span></span>
-<span><span class="va">fd2reps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cf_relations_to_hrep.html">cf_relations_to_hrep</a></span><span class="op">(</span><span class="va">fd2rels</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">## not all trivial</span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">fd2reps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, prob <span class="op">=</span> <span class="va">fd2rels</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="fu">prob_simplex_extremes</span><span class="op">(</span><span class="va">fd2rels</span>, <span class="va">fd2reps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt;  [1] "P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) + P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) + P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 1"                                                                                         </span></span>
-<span><span class="co">#&gt;  [2] "P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 0) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) + P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 1"                                                                                         </span></span>
-<span><span class="co">#&gt;  [3] "P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) + P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 0) + P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 0) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) - P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 1"   </span></span>
-<span><span class="co">#&gt;  [4] "P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 0) + P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) + P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 1"                                                                                         </span></span>
-<span><span class="co">#&gt;  [5] "-P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) - P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) - P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 0"                                                                                        </span></span>
-<span><span class="co">#&gt;  [6] "-P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 0) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) - P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 0"                                                                                        </span></span>
-<span><span class="co">#&gt;  [7] "-P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) - P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 0) - P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 0) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) + P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 0"  </span></span>
-<span><span class="co">#&gt;  [8] "-P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 0) - P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) - P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 0"                                                                                        </span></span>
-<span><span class="co">#&gt;  [9] "-P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) - P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 0"                                                                                                                                   </span></span>
-<span><span class="co">#&gt; [10] "-P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) - P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 0) + P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) &lt;= 0"                                                                                                                                   </span></span>
-<span><span class="co">#&gt; [11] "-P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) - P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 0) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) &lt;= 0"                                                                                                                                   </span></span>
-<span><span class="co">#&gt; [12] "-P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) - P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 0"                                                                                                                                   </span></span>
-<span><span class="co">#&gt; [13] "P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) + P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) + P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) + P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 1"                                              </span></span>
-<span><span class="co">#&gt; [14] "P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) + P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 0) + P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) &lt;= 1"                                                                                                                                    </span></span>
-<span><span class="co">#&gt; [15] "P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) + P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 0) + P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) &lt;= 1"                                                                                                                                    </span></span>
-<span><span class="co">#&gt; [16] "P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) + P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 0) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) - P(A = 1|Z = 1)P(Y = 0|A = 1,Z = 1,M = 0)  =  0"                                                                                        </span></span>
-<span><span class="co">#&gt; [17] "-P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) - P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 0) - P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) - P(A = 1|Z = 1)P(Y = 1|A = 1,Z = 1,M = 0)  =  -1"                                                                                      </span></span>
-<span><span class="co">#&gt; [18] "P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) + P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 0) - P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) - P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 1)  =  0"                                                                                        </span></span>
-<span><span class="co">#&gt; [19] "-P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) - P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 0) - P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) - P(A = 1|Z = 0)P(Y = 1|A = 1,Z = 0,M = 1)  =  -1"                                                                                      </span></span>
-<span><span class="co">#&gt; [20] "P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) + P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) - P(A = 1|Z = 1)P(Y = 0|A = 1,Z = 1,M = 1)  =  0"                                                                                        </span></span>
-<span><span class="co">#&gt; [21] "P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) + P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) - P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 1)  =  0"                                                                                        </span></span>
-<span><span class="co">#&gt; [22] "-P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) - P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) - P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) - P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) - P(A = 1|Z = 1)P(Y = 1|A = 1,Z = 1,M = 1)  =  -1"</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">fd2reps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, prob <span class="op">=</span> <span class="va">fd2rels</span><span class="op">$</span><span class="va">probstarform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="fu">prob_simplex_extremes</span><span class="op">(</span><span class="va">fd2rels</span>, <span class="va">fd2reps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt;  [1] "P*(A = 0,Y = 0|Z = 0,M = 0) + P*(A = 0,Y = 1|Z = 1,M = 0) + P*(A = 1,Y = 0|Z = 0,M = 1) - P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 1"                                                               </span></span>
-<span><span class="co">#&gt;  [2] "P*(A = 0,Y = 1|Z = 0,M = 0) + P*(A = 0,Y = 0|Z = 1,M = 0) + P*(A = 1,Y = 0|Z = 0,M = 1) - P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 1"                                                               </span></span>
-<span><span class="co">#&gt;  [3] "P*(A = 0,Y = 0|Z = 0,M = 0) + P*(A = 1,Y = 0|Z = 0,M = 0) + P*(A = 0,Y = 1|Z = 0,M = 0) - P*(A = 0,Y = 0|Z = 1,M = 0) - P*(A = 0,Y = 0|Z = 0,M = 1) + P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 1"   </span></span>
-<span><span class="co">#&gt;  [4] "P*(A = 1,Y = 0|Z = 0,M = 0) + P*(A = 0,Y = 1|Z = 1,M = 0) + P*(A = 0,Y = 0|Z = 0,M = 1) - P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 1"                                                               </span></span>
-<span><span class="co">#&gt;  [5] "-P*(A = 0,Y = 0|Z = 0,M = 0) - P*(A = 0,Y = 1|Z = 1,M = 0) - P*(A = 1,Y = 0|Z = 0,M = 1) + P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 0"                                                              </span></span>
-<span><span class="co">#&gt;  [6] "-P*(A = 0,Y = 1|Z = 0,M = 0) - P*(A = 0,Y = 0|Z = 1,M = 0) - P*(A = 1,Y = 0|Z = 0,M = 1) + P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 0"                                                              </span></span>
-<span><span class="co">#&gt;  [7] "-P*(A = 0,Y = 0|Z = 0,M = 0) - P*(A = 1,Y = 0|Z = 0,M = 0) - P*(A = 0,Y = 1|Z = 0,M = 0) + P*(A = 0,Y = 0|Z = 1,M = 0) + P*(A = 0,Y = 0|Z = 0,M = 1) - P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 0"  </span></span>
-<span><span class="co">#&gt;  [8] "-P*(A = 1,Y = 0|Z = 0,M = 0) - P*(A = 0,Y = 1|Z = 1,M = 0) - P*(A = 0,Y = 0|Z = 0,M = 1) + P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 0"                                                              </span></span>
-<span><span class="co">#&gt;  [9] "-P*(A = 0,Y = 0|Z = 1,M = 0) - P*(A = 0,Y = 1|Z = 1,M = 0) + P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 0"                                                                                            </span></span>
-<span><span class="co">#&gt; [10] "-P*(A = 0,Y = 0|Z = 0,M = 0) - P*(A = 0,Y = 1|Z = 0,M = 0) + P*(A = 0,Y = 0|Z = 0,M = 1) &lt;= 0"                                                                                            </span></span>
-<span><span class="co">#&gt; [11] "-P*(A = 0,Y = 0|Z = 0,M = 0) - P*(A = 1,Y = 0|Z = 0,M = 0) + P*(A = 0,Y = 0|Z = 1,M = 0) &lt;= 0"                                                                                            </span></span>
-<span><span class="co">#&gt; [12] "-P*(A = 0,Y = 0|Z = 0,M = 1) - P*(A = 1,Y = 0|Z = 0,M = 1) + P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 0"                                                                                            </span></span>
-<span><span class="co">#&gt; [13] "P*(A = 0,Y = 0|Z = 1,M = 0) + P*(A = 0,Y = 1|Z = 1,M = 0) + P*(A = 0,Y = 0|Z = 0,M = 1) + P*(A = 1,Y = 0|Z = 0,M = 1) - P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 1"                                 </span></span>
-<span><span class="co">#&gt; [14] "P*(A = 0,Y = 0|Z = 0,M = 0) + P*(A = 0,Y = 1|Z = 0,M = 0) + P*(A = 1,Y = 0|Z = 0,M = 1) &lt;= 1"                                                                                             </span></span>
-<span><span class="co">#&gt; [15] "P*(A = 0,Y = 0|Z = 0,M = 0) + P*(A = 1,Y = 0|Z = 0,M = 0) + P*(A = 0,Y = 1|Z = 1,M = 0) &lt;= 1"                                                                                             </span></span>
-<span><span class="co">#&gt; [16] "P*(A = 0,Y = 0|Z = 0,M = 0) + P*(A = 1,Y = 0|Z = 0,M = 0) - P*(A = 0,Y = 0|Z = 1,M = 0) - P*(A = 1,Y = 0|Z = 1,M = 0)  =  0"                                                              </span></span>
-<span><span class="co">#&gt; [17] "-P*(A = 0,Y = 0|Z = 0,M = 0) - P*(A = 1,Y = 0|Z = 0,M = 0) - P*(A = 0,Y = 1|Z = 1,M = 0) - P*(A = 1,Y = 1|Z = 1,M = 0)  =  -1"                                                            </span></span>
-<span><span class="co">#&gt; [18] "P*(A = 0,Y = 0|Z = 0,M = 0) + P*(A = 0,Y = 1|Z = 0,M = 0) - P*(A = 0,Y = 0|Z = 0,M = 1) - P*(A = 0,Y = 1|Z = 0,M = 1)  =  0"                                                              </span></span>
-<span><span class="co">#&gt; [19] "-P*(A = 0,Y = 0|Z = 0,M = 0) - P*(A = 0,Y = 1|Z = 0,M = 0) - P*(A = 1,Y = 0|Z = 0,M = 1) - P*(A = 1,Y = 1|Z = 0,M = 1)  =  -1"                                                            </span></span>
-<span><span class="co">#&gt; [20] "P*(A = 0,Y = 0|Z = 0,M = 1) + P*(A = 1,Y = 0|Z = 0,M = 1) - P*(A = 0,Y = 0|Z = 1,M = 1) - P*(A = 1,Y = 0|Z = 1,M = 1)  =  0"                                                              </span></span>
-<span><span class="co">#&gt; [21] "P*(A = 0,Y = 0|Z = 1,M = 0) + P*(A = 0,Y = 1|Z = 1,M = 0) - P*(A = 0,Y = 0|Z = 1,M = 1) - P*(A = 0,Y = 1|Z = 1,M = 1)  =  0"                                                              </span></span>
-<span><span class="co">#&gt; [22] "-P*(A = 0,Y = 0|Z = 1,M = 0) - P*(A = 0,Y = 1|Z = 1,M = 0) - P*(A = 0,Y = 0|Z = 0,M = 1) - P*(A = 1,Y = 0|Z = 0,M = 1) + P*(A = 0,Y = 0|Z = 1,M = 1) - P*(A = 1,Y = 1|Z = 1,M = 1)  =  -1"</span></span>
-<span></span>
-<span><span class="co">## all trivial</span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">fd2reps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, prob <span class="op">=</span> <span class="va">fd2rels</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "-P(M = 0|A = 1) &lt;= 0"                   </span></span>
-<span><span class="co">#&gt; [2] "-P(M = 0|A = 0) &lt;= 0"                   </span></span>
-<span><span class="co">#&gt; [3] "P(M = 0|A = 1) &lt;= 1"                    </span></span>
-<span><span class="co">#&gt; [4] "P(M = 0|A = 0) &lt;= 1"                    </span></span>
-<span><span class="co">#&gt; [5] "-P(M = 0|A = 0) - P(M = 1|A = 0)  =  -1"</span></span>
-<span><span class="co">#&gt; [6] "-P(M = 0|A = 1) - P(M = 1|A = 1)  =  -1"</span></span></code></pre></div>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fd2c</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/initialize_graph.html">initialize_graph</a></span><span class="op">(</span><span class="fu"><a href="https://r.igraph.org/reference/graph_from_literal.html" class="external-link">graph_from_literal</a></span><span class="op">(</span><span class="va">Z</span> <span class="op">-</span><span class="op">+</span> <span class="va">A</span> <span class="op">-</span><span class="op">+</span> <span class="va">M</span> <span class="op">-</span><span class="op">+</span> <span class="va">Y</span>,  <span class="va">U1</span> <span class="op">-</span><span class="op">+</span> <span class="va">A</span><span class="op">:</span><span class="va">Y</span>, <span class="va">U2</span> <span class="op">-</span><span class="op">+</span> <span class="va">Z</span><span class="op">:</span><span class="va">M</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/dag_list_independences.html">dag_list_independences</a></span><span class="op">(</span><span class="va">fd2c</span><span class="op">)</span></span>
-<span><span class="co">#&gt; list()</span></span>
-<span></span>
-<span></span>
-<span><span class="va">fd2crels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dag_get_linear_relations.html">dag_get_linear_relations</a></span><span class="op">(</span><span class="va">fd2c</span><span class="op">)</span></span>
-<span><span class="va">fd2creps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cf_relations_to_hrep.html">cf_relations_to_hrep</a></span><span class="op">(</span><span class="va">fd2crels</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">## not all trivial</span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">fd2creps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, prob <span class="op">=</span> <span class="va">fd2crels</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="fu">prob_simplex_extremes</span><span class="op">(</span><span class="va">fd2crels</span>, <span class="va">fd2creps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; [1] "-P(Z = 0)P(M = 0|Z = 0,A = 0) - P(Z = 0)P(M = 1|Z = 0,A = 0) + P(Z = 0)P(M = 0|Z = 0,A = 1) &lt;= 0"                                 </span></span>
-<span><span class="co">#&gt; [2] "P(Z = 0)P(M = 0|Z = 0,A = 0) + P(Z = 0)P(M = 1|Z = 0,A = 0) + P(Z = 1)P(M = 0|Z = 1,A = 1) &lt;= 1"                                  </span></span>
-<span><span class="co">#&gt; [3] "P(Z = 0)P(M = 0|Z = 0,A = 0) + P(Z = 0)P(M = 1|Z = 0,A = 0) - P(Z = 0)P(M = 0|Z = 0,A = 1) - P(Z = 0)P(M = 1|Z = 0,A = 1)  =  0"  </span></span>
-<span><span class="co">#&gt; [4] "-P(Z = 0)P(M = 0|Z = 0,A = 0) - P(Z = 0)P(M = 1|Z = 0,A = 0) - P(Z = 1)P(M = 0|Z = 1,A = 1) - P(Z = 1)P(M = 1|Z = 1,A = 1)  =  -1"</span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">fd2creps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, prob <span class="op">=</span> <span class="va">fd2crels</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="fu">prob_simplex_extremes</span><span class="op">(</span><span class="va">fd2crels</span>, <span class="va">fd2creps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">)</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt;  [1] "P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) + P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) + P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 1"                                                                                         </span></span>
-<span><span class="co">#&gt;  [2] "P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 0) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) + P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 1"                                                                                         </span></span>
-<span><span class="co">#&gt;  [3] "P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) + P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 0) + P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 0) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) - P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 1"   </span></span>
-<span><span class="co">#&gt;  [4] "P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 0) + P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) + P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 1"                                                                                         </span></span>
-<span><span class="co">#&gt;  [5] "-P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) - P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) - P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 0"                                                                                        </span></span>
-<span><span class="co">#&gt;  [6] "-P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 0) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) - P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 0"                                                                                        </span></span>
-<span><span class="co">#&gt;  [7] "-P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) - P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 0) - P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 0) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) + P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 0"  </span></span>
-<span><span class="co">#&gt;  [8] "-P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 0) - P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) - P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 0"                                                                                        </span></span>
-<span><span class="co">#&gt;  [9] "-P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) - P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 0"                                                                                                                                   </span></span>
-<span><span class="co">#&gt; [10] "-P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) - P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 0) + P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) &lt;= 0"                                                                                                                                   </span></span>
-<span><span class="co">#&gt; [11] "-P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) - P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 0) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) &lt;= 0"                                                                                                                                   </span></span>
-<span><span class="co">#&gt; [12] "-P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) - P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 0"                                                                                                                                   </span></span>
-<span><span class="co">#&gt; [13] "P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) + P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) + P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) + P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) &lt;= 1"                                              </span></span>
-<span><span class="co">#&gt; [14] "P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) + P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 0) + P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) &lt;= 1"                                                                                                                                    </span></span>
-<span><span class="co">#&gt; [15] "P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) + P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 0) + P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) &lt;= 1"                                                                                                                                    </span></span>
-<span><span class="co">#&gt; [16] "P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) + P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 0) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) - P(A = 1|Z = 1)P(Y = 0|A = 1,Z = 1,M = 0)  =  0"                                                                                        </span></span>
-<span><span class="co">#&gt; [17] "-P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) - P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 0) - P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) - P(A = 1|Z = 1)P(Y = 1|A = 1,Z = 1,M = 0)  =  -1"                                                                                      </span></span>
-<span><span class="co">#&gt; [18] "P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) + P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 0) - P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) - P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 1)  =  0"                                                                                        </span></span>
-<span><span class="co">#&gt; [19] "-P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 0) - P(A = 0|Z = 0)P(Y = 1|A = 0,Z = 0,M = 0) - P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) - P(A = 1|Z = 0)P(Y = 1|A = 1,Z = 0,M = 1)  =  -1"                                                                                      </span></span>
-<span><span class="co">#&gt; [20] "P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) + P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) - P(A = 1|Z = 1)P(Y = 0|A = 1,Z = 1,M = 1)  =  0"                                                                                        </span></span>
-<span><span class="co">#&gt; [21] "P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) + P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) - P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) - P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 1)  =  0"                                                                                        </span></span>
-<span><span class="co">#&gt; [22] "-P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 0) - P(A = 0|Z = 1)P(Y = 1|A = 0,Z = 1,M = 0) - P(A = 0|Z = 0)P(Y = 0|A = 0,Z = 0,M = 1) - P(A = 1|Z = 0)P(Y = 0|A = 1,Z = 0,M = 1) + P(A = 0|Z = 1)P(Y = 0|A = 0,Z = 1,M = 1) - P(A = 1|Z = 1)P(Y = 1|A = 1,Z = 1,M = 1)  =  -1"</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">fd2creps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, prob <span class="op">=</span> <span class="va">fd2crels</span><span class="op">$</span><span class="va">probstarform</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="fu">prob_simplex_extremes</span><span class="op">(</span><span class="va">fd2crels</span>, <span class="va">fd2creps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">)</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt;  [1] "P*(A = 0,Y = 0|Z = 0,M = 0) + P*(A = 0,Y = 1|Z = 1,M = 0) + P*(A = 1,Y = 0|Z = 0,M = 1) - P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 1"                                                               </span></span>
-<span><span class="co">#&gt;  [2] "P*(A = 0,Y = 1|Z = 0,M = 0) + P*(A = 0,Y = 0|Z = 1,M = 0) + P*(A = 1,Y = 0|Z = 0,M = 1) - P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 1"                                                               </span></span>
-<span><span class="co">#&gt;  [3] "P*(A = 0,Y = 0|Z = 0,M = 0) + P*(A = 1,Y = 0|Z = 0,M = 0) + P*(A = 0,Y = 1|Z = 0,M = 0) - P*(A = 0,Y = 0|Z = 1,M = 0) - P*(A = 0,Y = 0|Z = 0,M = 1) + P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 1"   </span></span>
-<span><span class="co">#&gt;  [4] "P*(A = 1,Y = 0|Z = 0,M = 0) + P*(A = 0,Y = 1|Z = 1,M = 0) + P*(A = 0,Y = 0|Z = 0,M = 1) - P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 1"                                                               </span></span>
-<span><span class="co">#&gt;  [5] "-P*(A = 0,Y = 0|Z = 0,M = 0) - P*(A = 0,Y = 1|Z = 1,M = 0) - P*(A = 1,Y = 0|Z = 0,M = 1) + P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 0"                                                              </span></span>
-<span><span class="co">#&gt;  [6] "-P*(A = 0,Y = 1|Z = 0,M = 0) - P*(A = 0,Y = 0|Z = 1,M = 0) - P*(A = 1,Y = 0|Z = 0,M = 1) + P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 0"                                                              </span></span>
-<span><span class="co">#&gt;  [7] "-P*(A = 0,Y = 0|Z = 0,M = 0) - P*(A = 1,Y = 0|Z = 0,M = 0) - P*(A = 0,Y = 1|Z = 0,M = 0) + P*(A = 0,Y = 0|Z = 1,M = 0) + P*(A = 0,Y = 0|Z = 0,M = 1) - P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 0"  </span></span>
-<span><span class="co">#&gt;  [8] "-P*(A = 1,Y = 0|Z = 0,M = 0) - P*(A = 0,Y = 1|Z = 1,M = 0) - P*(A = 0,Y = 0|Z = 0,M = 1) + P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 0"                                                              </span></span>
-<span><span class="co">#&gt;  [9] "-P*(A = 0,Y = 0|Z = 1,M = 0) - P*(A = 0,Y = 1|Z = 1,M = 0) + P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 0"                                                                                            </span></span>
-<span><span class="co">#&gt; [10] "-P*(A = 0,Y = 0|Z = 0,M = 0) - P*(A = 0,Y = 1|Z = 0,M = 0) + P*(A = 0,Y = 0|Z = 0,M = 1) &lt;= 0"                                                                                            </span></span>
-<span><span class="co">#&gt; [11] "-P*(A = 0,Y = 0|Z = 0,M = 0) - P*(A = 1,Y = 0|Z = 0,M = 0) + P*(A = 0,Y = 0|Z = 1,M = 0) &lt;= 0"                                                                                            </span></span>
-<span><span class="co">#&gt; [12] "-P*(A = 0,Y = 0|Z = 0,M = 1) - P*(A = 1,Y = 0|Z = 0,M = 1) + P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 0"                                                                                            </span></span>
-<span><span class="co">#&gt; [13] "P*(A = 0,Y = 0|Z = 1,M = 0) + P*(A = 0,Y = 1|Z = 1,M = 0) + P*(A = 0,Y = 0|Z = 0,M = 1) + P*(A = 1,Y = 0|Z = 0,M = 1) - P*(A = 0,Y = 0|Z = 1,M = 1) &lt;= 1"                                 </span></span>
-<span><span class="co">#&gt; [14] "P*(A = 0,Y = 0|Z = 0,M = 0) + P*(A = 0,Y = 1|Z = 0,M = 0) + P*(A = 1,Y = 0|Z = 0,M = 1) &lt;= 1"                                                                                             </span></span>
-<span><span class="co">#&gt; [15] "P*(A = 0,Y = 0|Z = 0,M = 0) + P*(A = 1,Y = 0|Z = 0,M = 0) + P*(A = 0,Y = 1|Z = 1,M = 0) &lt;= 1"                                                                                             </span></span>
-<span><span class="co">#&gt; [16] "P*(A = 0,Y = 0|Z = 0,M = 0) + P*(A = 1,Y = 0|Z = 0,M = 0) - P*(A = 0,Y = 0|Z = 1,M = 0) - P*(A = 1,Y = 0|Z = 1,M = 0)  =  0"                                                              </span></span>
-<span><span class="co">#&gt; [17] "-P*(A = 0,Y = 0|Z = 0,M = 0) - P*(A = 1,Y = 0|Z = 0,M = 0) - P*(A = 0,Y = 1|Z = 1,M = 0) - P*(A = 1,Y = 1|Z = 1,M = 0)  =  -1"                                                            </span></span>
-<span><span class="co">#&gt; [18] "P*(A = 0,Y = 0|Z = 0,M = 0) + P*(A = 0,Y = 1|Z = 0,M = 0) - P*(A = 0,Y = 0|Z = 0,M = 1) - P*(A = 0,Y = 1|Z = 0,M = 1)  =  0"                                                              </span></span>
-<span><span class="co">#&gt; [19] "-P*(A = 0,Y = 0|Z = 0,M = 0) - P*(A = 0,Y = 1|Z = 0,M = 0) - P*(A = 1,Y = 0|Z = 0,M = 1) - P*(A = 1,Y = 1|Z = 0,M = 1)  =  -1"                                                            </span></span>
-<span><span class="co">#&gt; [20] "P*(A = 0,Y = 0|Z = 0,M = 1) + P*(A = 1,Y = 0|Z = 0,M = 1) - P*(A = 0,Y = 0|Z = 1,M = 1) - P*(A = 1,Y = 0|Z = 1,M = 1)  =  0"                                                              </span></span>
-<span><span class="co">#&gt; [21] "P*(A = 0,Y = 0|Z = 1,M = 0) + P*(A = 0,Y = 1|Z = 1,M = 0) - P*(A = 0,Y = 0|Z = 1,M = 1) - P*(A = 0,Y = 1|Z = 1,M = 1)  =  0"                                                              </span></span>
-<span><span class="co">#&gt; [22] "-P*(A = 0,Y = 0|Z = 1,M = 0) - P*(A = 0,Y = 1|Z = 1,M = 0) - P*(A = 0,Y = 0|Z = 0,M = 1) - P*(A = 1,Y = 0|Z = 0,M = 1) + P*(A = 0,Y = 0|Z = 1,M = 1) - P*(A = 1,Y = 1|Z = 1,M = 1)  =  -1"</span></span>
-<span></span>
-<span><span class="co">## all trivial</span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">fd2creps</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, prob <span class="op">=</span> <span class="va">fd2crels</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "-P(Z = 0)P(M = 0|Z = 0,A = 1) &lt;= 0"                                                                                               </span></span>
-<span><span class="co">#&gt;  [2] "-P(Z = 0)P(M = 0|Z = 0,A = 0) &lt;= 0"                                                                                               </span></span>
-<span><span class="co">#&gt;  [3] "-P(Z = 0)P(M = 0|Z = 0,A = 0) - P(Z = 0)P(M = 1|Z = 0,A = 0) + P(Z = 0)P(M = 0|Z = 0,A = 1) &lt;= 0"                                 </span></span>
-<span><span class="co">#&gt;  [4] "-P(Z = 0)P(M = 1|Z = 0,A = 0) &lt;= 0"                                                                                               </span></span>
-<span><span class="co">#&gt;  [5] "-P(Z = 1)P(M = 0|Z = 1,A = 1) &lt;= 0"                                                                                               </span></span>
-<span><span class="co">#&gt;  [6] "-P(Z = 1)P(M = 0|Z = 1,A = 0) &lt;= 0"                                                                                               </span></span>
-<span><span class="co">#&gt;  [7] "P(Z = 0)P(M = 0|Z = 0,A = 0) + P(Z = 0)P(M = 1|Z = 0,A = 0) + P(Z = 1)P(M = 0|Z = 1,A = 1) &lt;= 1"                                  </span></span>
-<span><span class="co">#&gt;  [8] "P(Z = 0)P(M = 0|Z = 0,A = 0) + P(Z = 1)P(M = 0|Z = 1,A = 0) + P(Z = 0)P(M = 1|Z = 0,A = 0) &lt;= 1"                                  </span></span>
-<span><span class="co">#&gt;  [9] "-P(Z = 0)P(M = 0|Z = 0,A = 0) - P(Z = 1)P(M = 0|Z = 1,A = 0) - P(Z = 0)P(M = 1|Z = 0,A = 0) - P(Z = 1)P(M = 1|Z = 1,A = 0)  =  -1"</span></span>
-<span><span class="co">#&gt; [10] "P(Z = 0)P(M = 0|Z = 0,A = 0) + P(Z = 0)P(M = 1|Z = 0,A = 0) - P(Z = 0)P(M = 0|Z = 0,A = 1) - P(Z = 0)P(M = 1|Z = 0,A = 1)  =  0"  </span></span>
-<span><span class="co">#&gt; [11] "-P(Z = 0)P(M = 0|Z = 0,A = 0) - P(Z = 0)P(M = 1|Z = 0,A = 0) - P(Z = 1)P(M = 0|Z = 1,A = 1) - P(Z = 1)P(M = 1|Z = 1,A = 1)  =  -1"</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="more-difficult-example">More difficult example<a class="anchor" aria-label="anchor" href="#more-difficult-example"></a>
 </h2>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">d1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/initialize_graph.html">initialize_graph</a></span><span class="op">(</span><span class="fu"><a href="https://r.igraph.org/reference/graph_from_literal.html" class="external-link">graph_from_literal</a></span><span class="op">(</span><span class="va">V1</span> <span class="op">-</span><span class="op">+</span> <span class="va">V2</span>, <span class="va">V2</span> <span class="op">-</span><span class="op">+</span> <span class="va">V3</span>, <span class="va">V3</span> <span class="op">-</span><span class="op">+</span> <span class="va">V4</span>, <span class="va">U1</span> <span class="op">-</span><span class="op">+</span> <span class="va">V1</span><span class="op">:</span><span class="va">V3</span>, <span class="va">U2</span> <span class="op">-</span><span class="op">+</span> <span class="va">V2</span><span class="op">:</span><span class="va">V4</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">d1</span>, vertex.color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://r.igraph.org/reference/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">d1</span><span class="op">)</span><span class="op">$</span><span class="va">latent</span>, <span class="st">"grey70"</span>, <span class="st">"skyblue"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="examples_files/figure-html/unnamed-chunk-22-1.png" width="700"></p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">d1</span> <span class="op">&lt;-</span> <span class="fu">dhvm</span><span class="op">(</span><span class="fu"><a href="https://caugi.org/reference/caugi.html" class="external-link">caugi</a></span><span class="op">(</span><span class="va">V1</span> <span class="op">%--&gt;%</span> <span class="va">V2</span>, <span class="va">V2</span> <span class="op">%--&gt;%</span> <span class="va">V3</span>, <span class="va">V3</span> <span class="op">%--&gt;%</span> <span class="va">V4</span>, <span class="va">U1</span> <span class="op">%--&gt;%</span> <span class="va">V1</span><span class="op">+</span> <span class="va">V3</span>, <span class="va">U2</span> <span class="op">%--&gt;%</span> <span class="va">V2</span> <span class="op">+</span> <span class="va">V4</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://caugi.org/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">d1</span><span class="op">)</span></span></code></pre></div>
+<p><img src="examples_files/figure-html/unnamed-chunk-20-1.png" width="700"></p>
 <p>This has no conditional independences:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/dag_list_independences.html">dag_list_independences</a></span><span class="op">(</span><span class="va">d1</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/dhvm_list_independences.html">dhvm_list_independences</a></span><span class="op">(</span><span class="va">d1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; list()</span></span></code></pre></div>
-<p>It does however have a nontrivial inequality constraint that we can
+<p>It does however have possibly nontrivial constraints that we can
 find.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">d1rels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dag_get_linear_relations.html">dag_get_linear_relations</a></span><span class="op">(</span><span class="va">d1</span><span class="op">)</span></span>
-<span><span class="va">hrepd1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cf_relations_to_hrep.html">cf_relations_to_hrep</a></span><span class="op">(</span><span class="va">d1rels</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">pontriv</span> <span class="op">&lt;-</span> <span class="fu">prob_simplex_extremes</span><span class="op">(</span><span class="va">d1rels</span>, <span class="va">hrepd1</span><span class="op">$</span><span class="va">Hrep</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">hrepd1</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="va">d1rels</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="va">pontriv</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt;  [1] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 1"                                                                                                     </span></span>
-<span><span class="co">#&gt;  [2] "P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 1"                                                                                                     </span></span>
-<span><span class="co">#&gt;  [3] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 1"   </span></span>
-<span><span class="co">#&gt;  [4] "P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 1"                                                                                                     </span></span>
-<span><span class="co">#&gt;  [5] "-P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 0"                                                                                                    </span></span>
-<span><span class="co">#&gt;  [6] "-P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 0"                                                                                                    </span></span>
-<span><span class="co">#&gt;  [7] "-P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 0"  </span></span>
-<span><span class="co">#&gt;  [8] "-P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 0"                                                                                                    </span></span>
-<span><span class="co">#&gt;  [9] "-P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 0"                                                                                                                                                     </span></span>
-<span><span class="co">#&gt; [10] "-P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) &lt;= 0"                                                                                                                                                     </span></span>
-<span><span class="co">#&gt; [11] "-P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) &lt;= 0"                                                                                                                                                     </span></span>
-<span><span class="co">#&gt; [12] "-P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 0"                                                                                                                                                     </span></span>
-<span><span class="co">#&gt; [13] "P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) + P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 1"                                                    </span></span>
-<span><span class="co">#&gt; [14] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) &lt;= 1"                                                                                                                                                      </span></span>
-<span><span class="co">#&gt; [15] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) &lt;= 1"                                                                                                                                                      </span></span>
-<span><span class="co">#&gt; [16] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 1|V1 = 1)P(V4 = 0|V2 = 1,V1 = 1,V3 = 0)  =  0"                                                                                                    </span></span>
-<span><span class="co">#&gt; [17] "-P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 1|V1 = 1)P(V4 = 1|V2 = 1,V1 = 1,V3 = 0)  =  -1"                                                                                                  </span></span>
-<span><span class="co">#&gt; [18] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) - P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 1)  =  0"                                                                                                    </span></span>
-<span><span class="co">#&gt; [19] "-P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) - P(V2 = 1|V1 = 0)P(V4 = 1|V2 = 1,V1 = 0,V3 = 1)  =  -1"                                                                                                  </span></span>
-<span><span class="co">#&gt; [20] "P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) + P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) - P(V2 = 1|V1 = 1)P(V4 = 0|V2 = 1,V1 = 1,V3 = 1)  =  0"                                                                                                    </span></span>
-<span><span class="co">#&gt; [21] "P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 1)  =  0"                                                                                                    </span></span>
-<span><span class="co">#&gt; [22] "-P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) - P(V2 = 1|V1 = 1)P(V4 = 1|V2 = 1,V1 = 1,V3 = 1)  =  -1"</span></span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">d1cn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/meraconstraints.html">meraconstraints</a></span><span class="op">(</span><span class="va">d1</span><span class="op">)</span></span>
+<span><span class="va">d1cn</span></span>
+<span><span class="co">#&gt; MERA constraints on the dhvm: d1 </span></span>
+<span><span class="co">#&gt; The model has districts (unobserved variables marked with [u]:</span></span>
+<span><span class="co">#&gt;      {V1, V3, U1[u]} with c-degree 1, {V2, V4, U2[u]} with c-degree 1 </span></span>
+<span><span class="co">#&gt; The canonical partitioned model is available in x$dhvm_partitioned</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Constraints:</span></span>
+<span><span class="co">#&gt; ------------</span></span>
+<span><span class="co">#&gt; There are no conditional independence relations.</span></span>
+<span><span class="co">#&gt; * Equality and inequality constraints by district:</span></span>
+<span><span class="co">#&gt; There are 4 possibly nontrivial constraints involving V1_V3, 2 inequalities and 2 equalities.</span></span>
+<span><span class="co">#&gt; The first 4 expressions are</span></span>
+<span><span class="co">#&gt; -P(V1 = 0)P(V3 = 0|V1 = 0,V2 = 0) - P(V1 = 0)P(V3 = 1|V1 = 0 ...[truncated]</span></span>
+<span><span class="co">#&gt; P(V1 = 0)P(V3 = 0|V1 = 0,V2 = 0) + P(V1 = 0)P(V3 = 1|V1 = 0, ...[truncated]</span></span>
+<span><span class="co">#&gt; P(V1 = 0)P(V3 = 0|V1 = 0,V2 = 0) + P(V1 = 0)P(V3 = 1|V1 = 0, ...[truncated]</span></span>
+<span><span class="co">#&gt; -P(V1 = 0)P(V3 = 0|V1 = 0,V2 = 0) - P(V1 = 0)P(V3 = 1|V1 = 0 ...[truncated]</span></span>
+<span><span class="co">#&gt; There are 22 possibly nontrivial constraints involving V2_V4, 15 inequalities and 7 equalities.</span></span>
+<span><span class="co">#&gt; The first 4 expressions are</span></span>
+<span><span class="co">#&gt; P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 ...[truncated]</span></span>
+<span><span class="co">#&gt; P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 ...[truncated]</span></span>
+<span><span class="co">#&gt; P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 1|V1 ...[truncated]</span></span>
+<span><span class="co">#&gt; P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) + P(V2 = 0|V1 ...[truncated]</span></span></code></pre></div>
 <p>Let’s sample some probability distributions without any restrictions
 as see if anything is violated.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dun</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/initialize_graph.html">initialize_graph</a></span><span class="op">(</span><span class="fu"><a href="https://r.igraph.org/reference/graph_from_literal.html" class="external-link">graph_from_literal</a></span><span class="op">(</span><span class="va">V1</span> <span class="op">-</span><span class="op">+</span> <span class="va">V2</span><span class="op">:</span><span class="va">V4</span><span class="op">:</span><span class="va">V3</span>, <span class="va">V2</span> <span class="op">-</span><span class="op">+</span> <span class="va">V3</span><span class="op">:</span><span class="va">V4</span>, <span class="va">V3</span> <span class="op">-</span><span class="op">+</span> <span class="va">V4</span>, <span class="va">U1</span> <span class="op">-</span><span class="op">+</span> <span class="va">V1</span><span class="op">:</span><span class="va">V2</span><span class="op">:</span><span class="va">V3</span><span class="op">:</span><span class="va">V4</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dun</span><span class="op">)</span></span></code></pre></div>
-<p><img src="examples_files/figure-html/unnamed-chunk-25-1.png" width="700"></p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="cn">NA</span>, nrow <span class="op">=</span> <span class="fl">500</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">hrepd1</span><span class="op">$</span><span class="va">Hrep</span>, <span class="va">nrow</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="cn">NA</span>, nrow <span class="op">=</span> <span class="fl">500</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">d1cn</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span>, <span class="va">nrow</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">baseprob</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>V1 <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, V2 <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, V3 <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, V4 <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span></span>
-<span>  <span class="va">probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dag_sample_distribution.html">dag_sample_distribution</a></span><span class="op">(</span><span class="va">dun</span>, parmsamp <span class="op">=</span> \<span class="op">(</span><span class="va">k</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">k</span>, sd <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">probs1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">probs</span><span class="op">$</span><span class="va">V3</span>, <span class="va">probs</span><span class="op">$</span><span class="va">V1</span>, by <span class="op">=</span> <span class="st">"V1"</span><span class="op">)</span></span>
-<span>  <span class="va">probs1</span><span class="op">$</span><span class="va">prob</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">probs1</span>, <span class="va">probs.x</span> <span class="op">*</span> <span class="va">probs.y</span><span class="op">)</span></span>
-<span>  <span class="va">probs1</span> <span class="op">&lt;-</span> <span class="va">probs1</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">probs1</span>, <span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">V2</span>, <span class="va">V3</span>, <span class="va">V1</span><span class="op">)</span><span class="op">)</span>,<span class="op">]</span></span>
+<span>  <span class="va">probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span><span class="va">baseprob</span>, prob.joint <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">baseprob</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">probs</span><span class="op">[</span>, <span class="va">prob.V1V2V3</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">prob.joint</span><span class="op">)</span>, by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">V1</span>, <span class="va">V2</span>, <span class="va">V3</span><span class="op">)</span><span class="op">]</span></span>
+<span>  <span class="va">probs</span><span class="op">[</span>, <span class="va">prob.V1V2</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">prob.joint</span><span class="op">)</span>, by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">V1</span>, <span class="va">V2</span><span class="op">)</span><span class="op">]</span></span>
+<span>  <span class="va">probs</span><span class="op">[</span>, <span class="va">prob.V1</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">prob.joint</span><span class="op">)</span>, by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">V1</span><span class="op">)</span><span class="op">]</span></span>
+<span>  </span>
+<span>  <span class="va">probs</span><span class="op">[</span>, <span class="va">prob.test1</span> <span class="op">:=</span> <span class="va">prob.V1</span> <span class="op">*</span> <span class="va">prob.V1V2V3</span> <span class="op">/</span> <span class="va">prob.V1V2</span><span class="op">]</span></span>
+<span>  <span class="va">probs</span><span class="op">[</span>, <span class="va">prob.test2</span> <span class="op">:=</span> <span class="va">prob.V1V2</span> <span class="op">/</span> <span class="va">prob.V1</span> <span class="op">*</span> <span class="va">prob.joint</span> <span class="op">/</span> <span class="va">prob.V1V2V3</span><span class="op">]</span></span>
 <span></span>
-<span>  <span class="va">probs2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">probs</span><span class="op">$</span><span class="va">V4</span>, <span class="va">probs</span><span class="op">$</span><span class="va">V2</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"V1"</span>, <span class="st">"V2"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">probs2</span><span class="op">$</span><span class="va">prob</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">probs2</span>, <span class="va">probs.x</span> <span class="op">*</span> <span class="va">probs.y</span><span class="op">)</span></span>
-<span>  <span class="va">probs2</span> <span class="op">&lt;-</span> <span class="va">probs2</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">probs2</span>, <span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">V3</span>, <span class="va">V1</span>, <span class="va">V4</span>, <span class="va">V2</span><span class="op">)</span><span class="op">)</span>,<span class="op">]</span></span>
-<span></span>
-<span>  <span class="va">res</span><span class="op">[</span><span class="va">i</span>,<span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu">hrep_test</span><span class="op">(</span><span class="va">hrepd1</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">probs1</span><span class="op">$</span><span class="va">prob</span>, which <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, </span>
-<span>               <span class="fu">hrep_test</span><span class="op">(</span><span class="va">hrepd1</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="va">probs2</span><span class="op">$</span><span class="va">prob</span>, which <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">res</span><span class="op">[</span><span class="va">i</span>,<span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu">hrep_test</span><span class="op">(</span><span class="va">d1cn</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, </span>
+<span>                         <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">d1cn</span><span class="op">$</span><span class="va">functional_relations</span><span class="op">$</span><span class="va">problevels</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,  </span>
+<span>                               <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">probs</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">V1</span>, <span class="va">V3</span>, <span class="va">V2</span>, <span class="va">prob.test1</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>, sort <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">prob.test1</span>, which <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, </span>
+<span>               <span class="fu">hrep_test</span><span class="op">(</span><span class="va">d1cn</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">d1cn</span><span class="op">$</span><span class="va">functional_relations</span><span class="op">$</span><span class="va">problevels</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>,  </span>
+<span>                               <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">probs</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">V1</span>, <span class="va">V3</span>, <span class="va">V2</span>, <span class="va">V4</span>, <span class="va">prob.test2</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>, sort <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">prob.test2</span>, which <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">hrepd1</span><span class="op">$</span><span class="va">Hrep</span>, <span class="va">nrow</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 11 32</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">d1cn</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span>, <span class="va">nrow</span><span class="op">)</span></span>
+<span><span class="co">#&gt; V1_V3 V2_V4 </span></span>
+<span><span class="co">#&gt;    11    32</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] 15 17 20 21 22 23 26 28 29 34 37 38 41 43</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] 14 15 17 18 20 21 22 23 26 28 29 34 37 38 41 43</span></span></code></pre></div>
 <p>So none of the first set of constraints on probabilities of the form
-<code>r</code>d1rels$probform[[1]][[1]]` are nontrivial, but the
-following ones are:</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">hrepd1</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="va">d1rels</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">11</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;</span> <span class="fl">1</span><span class="op">)</span><span class="op">]</span>, sep <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span></span>
+P(V1 = 0)P(V3 = 0|V1 = 0,V2 = 0) are nontrivial, but the following ones
+are:</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">d1cn</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="va">d1cn</span><span class="op">$</span><span class="va">functional_relations</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">11</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="op">]</span>, sep <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 1</span></span>
 <span><span class="co">#&gt; P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 1</span></span>
 <span><span class="co">#&gt; P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 1</span></span>
+<span><span class="co">#&gt; P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 1</span></span>
 <span><span class="co">#&gt; -P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 1|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 0</span></span>
 <span><span class="co">#&gt; -P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 1) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 0</span></span>
 <span><span class="co">#&gt; -P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) - P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 1) - P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 1) &lt;= 0</span></span>

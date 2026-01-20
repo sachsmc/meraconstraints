@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Derive Observable Probabilistic Constraints Implied by Causal Models • meraconstraints</title>
+<title>Derive Observable Probabilistic Constraints Implied by Structural Models • meraconstraints</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Derive Observable Probabilistic Constraints Implied by Causal Models">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Derive Observable Probabilistic Constraints Implied by Structural Models">
 <meta name="description" content="Hidden variable graphical models can sometimes imply constraints on the observable distribution that are more complex than simple conditional independence relations. These observable constraints can allow for falsification of assumptions of the model that would otherwise be untestable due to the unobserved variables and can be used to constrain estimation procedures to improve efficiency. In models with categorical observed variables, we develop a systematic method for deriving the complete set of observable constraints.">
 <meta property="og:description" content="Hidden variable graphical models can sometimes imply constraints on the observable distribution that are more complex than simple conditional independence relations. These observable constraints can allow for falsification of assumptions of the model that would otherwise be untestable due to the unobserved variables and can be used to constrain estimation procedures to improve efficiency. In models with categorical observed variables, we develop a systematic method for deriving the complete set of observable constraints.">
 </head>
@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">meraconstraints</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,6 +43,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/sachsmc/meraconstraints/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -54,8 +55,9 @@
 <h2 id="deriving-complete-constraints-in-hidden-variable-models">Deriving Complete Constraints in Hidden Variable Models<a class="anchor" aria-label="anchor" href="#deriving-complete-constraints-in-hidden-variable-models"></a>
 </h2>
 <p>Hidden variable graphical models can sometimes imply constraints on the observable distribution that are more complex than simple conditional independence relations. These observable constraints can allow for falsification of assumptions of the model that would otherwise be untestable due to the unobserved variables and can be used to constrain estimation procedures to improve efficiency. Knowing the complete set of observable constraints is thus ideal, but this can be difficult to determine in many settings. In models with categorical observed variables and a joint distribution that is completely characterized by linear relations to the unobservable response function variables, we develop a systematic method for deriving the complete set of observable constraints. This package implements that method and provides some examples in the vignette.</p>
-<p>This is the companion R package to a paper soon to appear on Arxiv.</p>
+<p>This is the companion R package to the following paper: <a href="https://arxiv.org/pdf/2601.11242" class="external-link uri">https://arxiv.org/pdf/2601.11242</a>.</p>
 <p>This package is in early development. The documentation is incomplete, and the API is subject to change.</p>
+<p>Our package <code>meraconstraints</code> depends on <code>caugi</code> to create the graphical models and do some operations. <code>caugi</code> is very fast, user friendly, and supports mixed graphs. Read more about <code>caugi</code> here: <a href="https://caugi.org" class="external-link uri">https://caugi.org</a> or on GitHub here <a href="https://github.com/frederikfabriciusbjerre/caugi/" class="external-link uri">https://github.com/frederikfabriciusbjerre/caugi/</a>.</p>
 <div class="section level3">
 <h3 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h3>
@@ -69,7 +71,15 @@
 <p>See vignette.</p>
 </div>
 </div>
-  </main><aside class="col-md-3"><div class="license">
+  </main><aside class="col-md-3"><div class="links">
+<h2 data-toc-skip>Links</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/sachsmc/meraconstraints/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/sachsmc/meraconstraints/issues/" class="external-link">Report a bug</a></li>
+</ul>
+</div>
+
+<div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>

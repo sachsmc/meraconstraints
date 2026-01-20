@@ -180,6 +180,6 @@ test_that("Known constraints are recovered", {
   ## c degree 2 should give an error
 
   ivdv2 <- dhvm(caugi(Z %-->% X %-->% Y, U %-->% X + Y, U2 %-->% Z + X))
-  expect_error(dhvm_meraconstraints(ivdv2))
+  expect_error(meraconstraints(ivdv2))
 
  })

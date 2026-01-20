@@ -41,15 +41,13 @@ print(ivdag)
 2. Get the constraints
 
 ```{r}
-ivmera <- dhvm_meraconstraints(ivdag)
+ivmera <- meraconstraints(ivdag)
 ```
 
 3. Print and try to understand them. 
 
 ```{r}
 ivmera
-paste(ivmera$functional_relations$probform[[1]][1], "=", 
-      paste(ivmera$functional_relations$relation[[1]][[1]], collapse = " + "))
 ```
 
 
@@ -88,9 +86,6 @@ sprob <- function(k) {
 
 res <- matrix(NA, nrow = 200, ncol = 14)
 for(i in 1:nrow(res)) {
-  # ptable$pv <- NA
-  # ptable$pv[c(1:4)] <- sprob(4)
-  # ptable$pv[c(5:8)] <- sprob(4)
   ptable$joint <- sprob(8)
   ptable[, pXZ := sum(joint), by = .(X, Z)]
   ptable[, pXY := sum(joint), by = .(X, Y)]
@@ -114,12 +109,8 @@ plot(ivdag2)
 In this example we get some regular independences, and 2 sets of the 4 IV inequalities. 
 
 ```{r}
-ivmera2 <- dhvm_meraconstraints(ivdag2)
-
-ivmera2$independences
-hrep_to_text(ivmera2$polytope$Hrep[[1]], ivmera2$functional_relations$probform[[1]])[ivmera2$trivial_if_false[[1]]]
-hrep_to_text(ivmera2$polytope$Hrep[[2]], ivmera2$functional_relations$probform[[2]])[ivmera2$trivial_if_false[[2]]]
-
+ivmera2 <- meraconstraints(ivdag2)
+ivmera2
 ```
 
 ## Robin's nested examples
@@ -139,89 +130,41 @@ plot(r2dag)
 
 
 ```{r}
-dag_list_independences(r0dag)
-dag_list_independences(r1dag)
-dag_list_independences(r2dag)
+r0cn <- meraconstraints(r0dag)
+r1cn <- meraconstraints(r1dag)
+r2cn <- meraconstraints(r2dag)
 
-
-r0rels <- dag_get_linear_relations(r0dag)
-r0hreps <- cf_relations_to_hrep(r0rels)
-
-r1rels <- dag_get_linear_relations(r1dag)
-r1hreps <- cf_relations_to_hrep(r1rels)
-
-r2rels <- dag_get_linear_relations(r2dag)
-r2hreps <- cf_relations_to_hrep(r2rels)
-
-hrep_to_text(r1hreps$Hrep[[2]], r1rels$probform[[2]]) ## trivial
-hrep_to_text(r2hreps$Hrep[[2]], r2rels$probform[[2]]) ## trivial
-
-hrep_to_text(r0hreps$Hrep[[1]], r0rels$probform[[1]])[prob_simplex_extremes(r0rels, r0hreps$Hrep)[[1]]]
-hrep_to_text(r1hreps$Hrep[[1]], r1rels$probform[[1]])[prob_simplex_extremes(r1rels, r1hreps$Hrep)[[1]]]
-hrep_to_text(r2hreps$Hrep[[1]], r2rels$probform[[1]])[prob_simplex_extremes(r2rels, r2hreps$Hrep)[[1]]]
-
+r0cn
+r1cn
+r2cn
 ```
 
-The constraints on the 2nd district are trivial in both DAGs but the ones on the 1st district are different. 
+The constraints on the V3 district are trivial in all 3 DAGs but the ones on the district with V2, V4 are different in `r2dag`. 
 
+Let's see if we can distinguish these models. Here I am sampling a distribution from the `r1dag`, and seeing if the constraints derived from `r2dag` are ever violated.
 
-Let's see if we can distinguish these two models. Here I am sampling a distribution from the first DAG, and seeing if the constraints derived from the 2nd DAG are ever violated.
 ```{r}
 
-res <- matrix(NA, nrow = 500, ncol = nrow(r2hreps$Hrep[[1]]))
+res <- matrix(NA, nrow = 500, ncol = nrow(r2cn$polytope$Hrep[["V2_V4"]]))
 for(i in 1:nrow(res)) {
 
-  probs <- dag_sample_distribution(r1dag, parmsamp = \(k) rnorm(k, sd = 5))
-  probs1 <- merge(probs$V4, probs$V2, by = "V1")
-  probs1$prob <- with(probs1, probs.x * probs.y)
-  probs1 <- probs1[with(probs1, order(V3, V1, V4, V2)),]
-
-
-  res[i,] <- hrep_test(r2hreps$Hrep[[1]], probs1$prob, which = TRUE)
+  probs <- data.table(dhvm_sample_distribution(r1dag, parmsamp = \(k) rnorm(k, sd = 5)))
+  ## get probabilities of the form P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0)
+  probs[, prob.V1V2V3 := prob.V3_V2 * prob.V2_V1 * prob.V1]
+  probs[, prob.V4_rest := prob.joint / prob.V1V2V3]
+  probs[, prob.test := prob.V4_rest * prob.V2_V1]
+  ## correct order
+  probs <- merge(r2cn$functional_relations$problevels[[1]], probs, sort = FALSE)
+  
+  res[i,] <- hrep_test(r2cn$polytope$Hrep[["V2_V4"]], probs$prob.test, which = TRUE)
              
 }
 
-hrep_to_text(r2hreps$Hrep[[1]], r2rels$probform[[1]])[colMeans(res) < 1]
+hrep_to_text(r2cn$polytope$Hrep[["V2_V4"]], 
+             r2cn$functional_relations$probform[[1]])[colMeans(res) < 1]
 ```
 
-These are 4 nontrivial inequality constraints that can tell us that a distribution sampled from model 1 does not come from model 2. The other direction does not work, if we sample from model 2, we cannot distinguish it from model 1. 
-
-
-Can the equality constraints be violated in R1? 
-
-```{r}
-rbdag <- graph_from_literal(V1 %-->% V2 +- V3 %-->% V4, V1 %-->% V4, V2 %-->% V4) |> initialize_graph()
-
-chk <- matrix(NA, nrow = 1000, ncol = 22) 
-for(i in 1:nrow(chk)) {
-sb <- dag_sample_distribution(rbdag)
-sb1 <- merge(sb$V4, sb$V2, by = c("V1","V2", "V3"), all = TRUE)
-sb1$probs <- with(sb1, probs.x * probs.y)
-sb1$probs.x <- NULL
-sb1$probs.y <- NULL
-sbj <- merge(merge(sb1, 
-            sb$V1, by = "V1"), 
-      sb$V3, by = "V3")
-
-sbj$prob.j <- diff(sort(c(0, 1, runif(nrow(sbj) - 1)))) #with(sbj, probs.x * probs.y * probs)
-
-# P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) 
-
-sbj <- data.table(sbj)
-sbj[, p123 := sum(prob.j), by = .(V1, V2, V3)]
-sbj[, p12 := sum(prob.j), by = .(V1, V2)]
-sbj[, p1 := sum(prob.j), by = .(V1)]
-
-sbj[, pstar := (prob.j / p123) * (p12 / p1)]
-
-prob.test <- sbj[order(V3, V1, V4, V2),]$pstar
-
-chk[i,] <- hrep_test(r1hreps$Hrep[[1]][prob_simplex_extremes(r1rels, r1hreps$Hrep)[[1]], ], prob.test, which = TRUE)[, 1]
-
-}
-
-colMeans(chk)
-```
+These are 8 nontrivial inequality constraints that can tell us that a distribution sampled from model 1 does not come from model 2. The other direction does not work, if we sample from model 2, we cannot distinguish it from model 1. 
 
 
 
@@ -230,29 +173,25 @@ colMeans(chk)
 
 
 ```{r}
-duarg <- graph_from_literal(A %-->% B %-->% C %-->% D, A %-->% E %-->% C, D %-->% F, U1 %-->% A:C:E, U2 %-->% F:D, U3 %-->% B:D) |> 
-  initialize_graph()
-plot(duarg, vertex.color = ifelse(V(duarg)$latent, "grey70", "skyblue"))
-
-dag_list_independences(duarg)
+duargr <- dhvm(caugi(A %-->% B+E, B %-->% C, C %-->% D, D %-->% F, E %-->% C,
+ U1 %-->% B+D, U2 %-->% A+C+E, U3 %-->% D+F))
+plot(duargr)
 ```
 
-In this DAG, we cannot apply our method directly because it has c-degree 2. Specifically, the district containing the variables B, D, F has two latents in it. To apply our method, we can merge these latents into a single one. The resulting constraints hold in the original DAG, but they are not necessarily complete. 
+In this DAG, we cannot apply our method directly because it has c-degree 2. Specifically, the district containing the variables B, D, F has two unobserved variables in it. If we try to get the constraints, we get an error: 
 
 ```{r}
-duarg2 <- dag_transform_merge_latents(duarg)
-plot(duarg2, vertex.color = ifelse(V(duarg2)$latent, "grey70", "skyblue"))
+#| error: true
+meraconstraints(duargr)
+```
 
-drels <- dag_get_linear_relations(duarg2)
-dhreps <- cf_relations_to_hrep(drels)
+To apply our method, we can merge these latents into a single one. The resulting constraints hold in the original DAG, but they are not necessarily complete. 
 
-nontriv <- prob_simplex_extremes(drels, dhreps$Hrep)
+```{r}
+duarg2 <- dhvm_merge_latents(duargr)
+plot(duarg2)
 
-dag_get_districts(duarg2)
-lapply(nontriv, sum)
-
-hrep_to_text(dhreps$Hrep[[1]], drels$probstarform[[1]])[nontriv[[1]]]
-#hrep_to_text(dhreps$Hrep[[2]], drels$probform[[2]])[nontriv[[2]]]
+meraconstraints(duarg2)
 ```
 
 
@@ -262,123 +201,85 @@ hrep_to_text(dhreps$Hrep[[1]], drels$probstarform[[1]])[nontriv[[1]]]
 The classic front door model has no observable constraints. 
 
 ```{r}
-fd <- initialize_graph(graph_from_literal(A %-->% M %-->% Y, U1 %-->% A:Y))
-dag_list_independences(fd)
-plot(fd, vertex.color = ifelse(V(fd)$latent, "grey70", "skyblue"))
+fd <- dhvm(caugi(A %-->% M %-->% Y, U1 %-->% A + Y))
+plot(fd)
 
-fdrels <- dag_get_linear_relations(fd)
-fdreps <- cf_relations_to_hrep(fdrels)
+fdcn <- meraconstraints(fd)
+fdcn
 ```
 
-The constraints we find in the 2nd district are all obviously trivial. 
+Even though we report 4 possibly nontrivial constraints, they are all obviously trivial. 
+
 ```{r}
-hrep_to_text(fdreps$Hrep[[2]], prob = fdrels$probform[[2]])
+hrep_to_text(fdcn$polytope$Hrep[[1]], prob = fdcn$functional_relations$probform[[1]])
 ```
 
 In the first district, we flag some of them as not definitely trivial. Why is that? Well, they can be violated if we observed a distribution where we intervened on M. This can be seen when we look at the constraints in terms of the P* probabilities. 
 
 ```{r}
-pontriv <- prob_simplex_extremes(fdrels, fdreps$Hrep)[[1]]
-
-hrep_to_text(fdreps$Hrep[[1]], prob = fdrels$probform[[1]])[pontriv]
 ## all trivial unless you can intervene on M
-hrep_to_text(fdreps$Hrep[[1]], prob = fdrels$probstarform[[1]])[pontriv]
+hrep_to_text(fdcn$polytope$Hrep[[1]], 
+             prob = fdcn$functional_relations$probstarform[[1]])[
+               fdcn$trivial_if_false[[1]]
+               ]
 
 ```
 
-Some variations on the front door model. 
-
-```{r}
-fd2 <- initialize_graph(graph_from_literal(Z %-->% A %-->% M %-->% Y, U1 %-->% A:Y))
-dag_list_independences(fd2)
-
-fd2rels <- dag_get_linear_relations(fd2)
-fd2reps <- cf_relations_to_hrep(fd2rels)
-
-## not all trivial
-hrep_to_text(fd2reps$Hrep[[1]], prob = fd2rels$probform[[1]])[prob_simplex_extremes(fd2rels, fd2reps$Hrep)[[1]]]
-
-hrep_to_text(fd2reps$Hrep[[1]], prob = fd2rels$probstarform[[1]])[prob_simplex_extremes(fd2rels, fd2reps$Hrep)[[1]]]
-
-## all trivial
-hrep_to_text(fd2reps$Hrep[[2]], prob = fd2rels$probform[[2]])
-```
-
-
-```{r}
-fd2c <- initialize_graph(graph_from_literal(Z %-->% A %-->% M %-->% Y,  U1 %-->% A:Y, U2 %-->% Z:M))
-dag_list_independences(fd2c)
-
-
-fd2crels <- dag_get_linear_relations(fd2c)
-fd2creps <- cf_relations_to_hrep(fd2crels)
-
-## not all trivial
-hrep_to_text(fd2creps$Hrep[[1]], prob = fd2crels$probform[[1]])[prob_simplex_extremes(fd2crels, fd2creps$Hrep)[[1]]]
-hrep_to_text(fd2creps$Hrep[[2]], prob = fd2crels$probform[[2]])[prob_simplex_extremes(fd2crels, fd2creps$Hrep)[[2]]]
-
-hrep_to_text(fd2creps$Hrep[[2]], prob = fd2crels$probstarform[[2]])[prob_simplex_extremes(fd2crels, fd2creps$Hrep)[[2]]]
-
-## all trivial
-hrep_to_text(fd2creps$Hrep[[1]], prob = fd2crels$probform[[1]])
-```
 
 
 ## More difficult example
 
 
 ```{r}
-d1 <- initialize_graph(graph_from_literal(V1 %-->% V2, V2 %-->% V3, V3 %-->% V4, U1 %-->% V1:V3, U2 %-->% V2:V4))
-plot(d1, vertex.color = ifelse(V(d1)$latent, "grey70", "skyblue"))
+d1 <- dhvm(caugi(V1 %-->% V2, V2 %-->% V3, V3 %-->% V4, U1 %-->% V1+ V3, U2 %-->% V2 + V4))
+plot(d1)
 ```
 
 This has no conditional independences: 
 ```{r}
-dag_list_independences(d1)
+dhvm_list_independences(d1)
 ```
 
-It does however have a nontrivial inequality constraint that we can find. 
+It does however have possibly nontrivial constraints that we can find. 
 
 ```{r}
-d1rels <- dag_get_linear_relations(d1)
-hrepd1 <- cf_relations_to_hrep(d1rels)
-
-pontriv <- prob_simplex_extremes(d1rels, hrepd1$Hrep)
-hrep_to_text(hrepd1$Hrep[[2]], d1rels$probform[[2]])[pontriv[[2]]]
+d1cn <- meraconstraints(d1)
+d1cn
 ```
 
 Let's sample some probability distributions without any restrictions as see if anything is violated. 
 
 
 ```{r}
-dun <- initialize_graph(graph_from_literal(V1 %-->% V2:V4:V3, V2 %-->% V3:V4, V3 %-->% V4, U1 %-->% V1:V2:V3:V4))
-plot(dun)
-
-
-res <- matrix(NA, nrow = 500, ncol = sum(sapply(hrepd1$Hrep, nrow)))
+res <- matrix(NA, nrow = 500, ncol = sum(sapply(d1cn$polytope$Hrep, nrow)))
+baseprob <- expand.grid(V1 = 0:1, V2 = 0:1, V3 = 0:1, V4 = 0:1)
 for(i in 1:nrow(res)) {
 
-  probs <- dag_sample_distribution(dun, parmsamp = \(k) rnorm(k, sd = 5))
-  probs1 <- merge(probs$V3, probs$V1, by = "V1")
-  probs1$prob <- with(probs1, probs.x * probs.y)
-  probs1 <- probs1[with(probs1, order(V2, V3, V1)),]
+  probs <- data.table(baseprob, prob.joint = diff(sort(c(0, 1, runif(nrow(baseprob) - 1)))))
+  probs[, prob.V1V2V3 := sum(prob.joint), by = .(V1, V2, V3)]
+  probs[, prob.V1V2 := sum(prob.joint), by = .(V1, V2)]
+  probs[, prob.V1 := sum(prob.joint), by = .(V1)]
+  
+  probs[, prob.test1 := prob.V1 * prob.V1V2V3 / prob.V1V2]
+  probs[, prob.test2 := prob.V1V2 / prob.V1 * prob.joint / prob.V1V2V3]
 
-  probs2 <- merge(probs$V4, probs$V2, by = c("V1", "V2"))
-  probs2$prob <- with(probs2, probs.x * probs.y)
-  probs2 <- probs2[with(probs2, order(V3, V1, V4, V2)),]
-
-  res[i,] <- c(hrep_test(hrepd1$Hrep[[1]], probs1$prob, which = TRUE), 
-               hrep_test(hrepd1$Hrep[[2]], probs2$prob, which = TRUE))
+  res[i,] <- c(hrep_test(d1cn$polytope$Hrep[[1]], 
+                         merge(d1cn$functional_relations$problevels[[1]],  
+                               unique(probs[, .(V1, V3, V2, prob.test1)]), sort = FALSE)$prob.test1, which = TRUE), 
+               hrep_test(d1cn$polytope$Hrep[[2]], merge(d1cn$functional_relations$problevels[[2]],  
+                               unique(probs[, .(V1, V3, V2, V4, prob.test2)]), sort = FALSE)$prob.test2, which = TRUE))
 }
 
-sapply(hrepd1$Hrep, nrow)
+sapply(d1cn$polytope$Hrep, nrow)
 which(colMeans(res) < 1)
 ```
 
-So none of the first set of constraints on probabilities of the form `r `d1rels$probform[[1]][[1]]` are nontrivial, but the following ones are: 
+So none of the first set of constraints on probabilities of the form `r d1cn$functional_relations$probform[[1]][[1]]` are nontrivial, but the following ones are: 
 
 ```{r}
-cat(hrep_to_text(hrepd1$Hrep[[2]], d1rels$probform[[2]])[which(colMeans(res)[-c(1:11)] < 1)], sep = "\n")
+cat(hrep_to_text(d1cn$polytope$Hrep[[2]], d1cn$functional_relations$probform[[2]])[
+  which(colMeans(res)[-c(1:11)] < 1)
+  ], sep = "\n")
 ```
 
 Some of these are inequality constraints, which were previously unknown. 

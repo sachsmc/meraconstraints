@@ -26,7 +26,8 @@ License: MIT + file LICENSE
 Imports:
     caugi,
     rcdd,
-    glue
+    glue, 
+    data.table
 Suggests: 
     knitr,
     rmarkdown,

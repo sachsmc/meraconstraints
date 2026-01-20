@@ -17,6 +17,6 @@ Get all independence relationships in a DAG, among the observed variables
 }
 \examples{
 dag <- dhvm(caugi(V1 \%-->\% V2 \%-->\% V3 \%-->\% V4, U \%-->\% V2 + V4))
-dag_list_independences(dag)
+dhvm_list_independences(dag)
 
 }

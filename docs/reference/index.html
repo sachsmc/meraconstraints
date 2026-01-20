@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">meraconstraints</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,6 +22,7 @@
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/sachsmc/meraconstraints/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -46,106 +47,64 @@
 
       <dl><dt>
 
-          <code><a href="cf_relations_to_hrep.html">cf_relations_to_hrep()</a></code>
+          <code><a href="dhvm_c_degree.html">dhvm_c_degree()</a></code>
 
         </dt>
-        <dd>Convert counterfactual relations to the H-representation of a polytope</dd>
+        <dd>Get the c-degree of a dhvm</dd>
       </dl><dl><dt>
 
-          <code><a href="d_separate_sets.html">d_separate_sets()</a></code>
+          <code><a href="dhvm_canonical_partition.html">dhvm_canonical_partition()</a></code>
 
         </dt>
-        <dd>D separation</dd>
+        <dd>Transform a regular dag into canonical partitions and add response function tables</dd>
       </dl><dl><dt>
 
-          <code><a href="d_separates.html">d_separates()</a></code>
-
-        </dt>
-        <dd>D separation</dd>
-      </dl><dl><dt>
-
-          <code><a href="dag_get_cf_tables.html">dag_get_cf_tables()</a></code>
+          <code><a href="dhvm_cf_tables.html">dhvm_cf_tables()</a></code>
 
         </dt>
         <dd>Get table of response patterns matching a set of observables</dd>
       </dl><dl><dt>
 
-          <code><a href="dag_get_cf_tables2.html">dag_get_cf_tables2()</a></code>
-
-        </dt>
-        <dd>For testing</dd>
-      </dl><dl><dt>
-
-          <code><a href="dag_get_dependencies.html">dag_get_dependencies()</a></code>
-
-        </dt>
-        <dd>Get the nodes that the given node depends on</dd>
-      </dl><dl><dt>
-
-          <code><a href="dag_get_district_params.html">dag_get_district_params()</a></code>
+          <code><a href="dhvm_district_params.html">dhvm_district_params()</a></code>
 
         </dt>
         <dd>Get linear probabilities according to district factorization</dd>
       </dl><dl><dt>
 
-          <code><a href="dag_get_districts.html">dag_get_districts()</a></code>
+          <code><a href="dhvm_districts.html">dhvm_districts()</a></code>
 
         </dt>
-        <dd>Partition into districts</dd>
+        <dd>Get the districts of a dhvm</dd>
       </dl><dl><dt>
 
-          <code><a href="dag_get_linear_relations.html">dag_get_linear_relations()</a></code>
+          <code><a href="dhvm_linear_relations.html">dhvm_linear_relations()</a></code>
 
         </dt>
         <dd>Get relations between probabilities and response variables</dd>
       </dl><dl><dt>
 
-          <code><a href="dag_list_independences.html">dag_list_independences()</a></code>
+          <code><a href="dhvm_list_independences.html">dhvm_list_independences()</a></code>
 
         </dt>
         <dd>List all conditional independence relations</dd>
       </dl><dl><dt>
 
-          <code><a href="dag_order.html">dag_order()</a></code>
-
-        </dt>
-        <dd>Get all topological orders of observed vertices</dd>
-      </dl><dl><dt>
-
-          <code><a href="dag_sample_distribution.html">dag_sample_distribution()</a></code>
-
-        </dt>
-        <dd>Sample a distribution from a causal model</dd>
-      </dl><dl><dt>
-
-          <code><a href="dag_transform_canonical_partition.html">dag_transform_canonical_partition()</a></code>
-
-        </dt>
-        <dd>Transform a regular dag into canonical partitions</dd>
-      </dl><dl><dt>
-
-          <code><a href="dag_transform_latent_project.html">dag_transform_latent_project()</a></code>
-
-        </dt>
-        <dd>Latent projection for use with causaleffect</dd>
-      </dl><dl><dt>
-
-          <code><a href="dag_transform_merge_latents.html">dag_transform_merge_latents()</a></code>
+          <code><a href="dhvm_merge_latents.html">dhvm_merge_latents()</a></code>
 
         </dt>
         <dd>Merge latent variables within districts</dd>
       </dl><dl><dt>
 
-          <code><a href="dag_transform_response_functions.html">dag_transform_response_functions()</a></code>
+          <code><a href="dhvm_relations_to_polytope.html">dhvm_relations_to_polytope()</a></code>
 
         </dt>
-        <dd>Add response functions to a canonical partitioned dag</dd>
+        <dd>Convert counterfactual relations to the H-representation of a polytope</dd>
       </dl><dl><dt>
 
-          <code><a href="descendants.html">descendants()</a></code>
+          <code><a href="dhvm_sample_distribution.html">dhvm_sample_distribution()</a></code>
 
         </dt>
-        <dd>Find all descendants of a set in graph</dd>
+        <dd>Sample a distribution from a causal model</dd>
       </dl><dl><dt>
 
           <code><a href="hrep_to_text.html">hrep_to_text()</a></code>
@@ -154,10 +113,10 @@
         <dd>Parse Hrep and remove redundancies</dd>
       </dl><dl><dt>
 
-          <code><a href="initialize_graph.html">initialize_graph()</a></code>
+          <code><a href="hreps_are_equal.html">hreps_are_equal()</a></code>
 
         </dt>
-        <dd>Add attributes to an igraph</dd>
+        <dd>Check if two Hreps are the same</dd>
       </dl><dl><dt>
 
           <code><a href="make_prob_names.html">make_prob_names()</a></code>
@@ -166,10 +125,16 @@
         <dd>From a probability form as a list create text</dd>
       </dl><dl><dt>
 
-          <code><a href="upmerge.html">upmerge()</a></code>
+          <code><a href="meraconstraints.html">meraconstraints()</a></code>
 
         </dt>
-        <dd>Get response patterns by recursive substitution</dd>
+        <dd>Get constraints implied by a discrete hidden variables model</dd>
+      </dl><dl><dt>
+
+          <code><a href="print.meraconstraints.html">print(<i>&lt;meraconstraints&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print a meraconstraints object</dd>
       </dl></div>
   </main></div>
 
