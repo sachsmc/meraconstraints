@@ -25,11 +25,11 @@ dhvm_list_independences <- function(dag) {
     }
 
     Zset <- setdiff(obs, pairs[, j])
-        # check for d-separation given everything
+    # check for d-separation given everything
     #maxset_chk <- d_separate_sets(pairs[1,j], pairs[2,j], Zset, dag)
     # find the minimal set
       breakout <- FALSE
-      for(zi in 1:length(Zset)) {
+      for(zi in seq_along(Zset)) {
         czin <- combn(Zset, zi, simplify = FALSE)
         for(k in 1:length(czin)) {
 

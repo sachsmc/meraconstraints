@@ -1,8 +1,8 @@
 Package: meraconstraints
 Type: Package
 Title: Derive Observable Probabilistic Constraints Implied by Structural Models
-Version: 0.2.0
-Date: 2026-01-19
+Version: 0.2.1
+Date: 2026-01-21
 Author: Authors@R: 
     c(person(given = "Michael C",
              family = "Sachs",

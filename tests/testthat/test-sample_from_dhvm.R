@@ -12,7 +12,7 @@ test_that("Sampling is done correctly", {
   expect_equal(sum(d2sam$prob.joint), 1)
   ## iv constraints satisfied
 
-  ivconst <- dhvm_meraconstraints(ivdag)
+  ivconst <- meraconstraints(ivdag)
   ivsam$prob.test <- ivsam$prob.Y_X * ivsam$prob.X_Z
   ivsam <- merge(ivconst$functional_relations$problevels[[1]], ivsam, sort = FALSE)
 

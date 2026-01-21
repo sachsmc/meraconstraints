@@ -182,4 +182,11 @@ test_that("Known constraints are recovered", {
   ivdv2 <- dhvm(caugi(Z %-->% X %-->% Y, U %-->% X + Y, U2 %-->% Z + X))
   expect_error(meraconstraints(ivdv2))
 
+
+  ## simple 2 online
+
+  twol <- dhvm(caugi(U %-->% X + Y))
+  expect_true(length(dhvm_list_independences(twol)) == 0)
+  expect_true(sum(unlist(meraconstraints(twol)$trivial_if_false)) == 0)
+
  })

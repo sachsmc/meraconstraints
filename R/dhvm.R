@@ -1,7 +1,24 @@
 #' @import caugi
 NULL
 
+#' Create a Discrete Hidden Variables Model (dhvm)
+#'
+#' A DAG over some unobserved variables and some observed variables, where
+#' all the observed variables are categorical, and the unobserved variables
+#' have no restriction.
+#'
+#' @param caugi_graph A caugi DAG
+#' @param latent.pattern A regular expression that is used to identify latent variables
+#' @param latent.variable A character vector indicating which variables are latent. If not NULL, then `latent.pattern` is ignored
+#' @param nvals A named numeric vector specifying the number of categories for each of the observed variables. If not specified, then 2 categories are assumed
 #' @export
+#' @returns An object of class `dhvm`, which is a list with the caugi object, and a data.frame with the node information
+#' @examples
+#' ivd1 <- dhvm(caugi(Z %-->% X %-->% Y, U %-->% X + Y))
+#' ivd2 <- dhvm(caugi(Z %-->% X %-->% Y, U %-->% X + Y), latent.variables = "U")
+#' ivd3 <- dhvm(caugi(Z %-->% X %-->% Y, U %-->% X + Y), nvals = c(Z = 3))
+#'
+
 dhvm <- function(caugi_graph, latent.pattern = "^U",
                                              latent.variables = NULL, nvals = NULL) {
 
@@ -10,7 +27,7 @@ dhvm <- function(caugi_graph, latent.pattern = "^U",
 
                         if(!is.null(latent.variables)) {
                           mnm <- match(latent.variables, names(nodes_latent))
-                          if(any(is.na(nmn))) stop("Cannot find variable(s): ", latent.variables[is.na(mnm)] )
+                          if(any(is.na(mnm))) stop("Cannot find variable(s): ", latent.variables[is.na(mnm)] )
                           nodes_latent[mnm] <- TRUE
                         } else {
                           Unodes <- grep(latent.pattern, nodes(caugi_graph)$name)
