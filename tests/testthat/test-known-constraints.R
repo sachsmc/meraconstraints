@@ -17,7 +17,7 @@ test_that("Known constraints are recovered", {
   ivd <- dhvm(caugi(Z %-->% X %-->% Y, U %-->% X + Y))
   ivrels2 <- dhvm_linear_relations(ivd)
   hrepiv2 <- dhvm_relations_to_polytope(ivrels2)
-  expect_equal(hrepiv2$Hrep[[1]], ivhrep)
+  expect_true(hreps_are_equal(hrepiv2$Hrep[[1]], ivhrep))
 
   ## sequential IV
 

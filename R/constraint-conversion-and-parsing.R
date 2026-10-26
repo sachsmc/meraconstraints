@@ -27,9 +27,8 @@ dhvm_relations_to_polytope <- function(relations) {
 
 
 
-    vreps[[j]] <- rcdd::makeV(points = t(Rmat))
-
-    #vrep <- rcdd::redundant(vrep)$output
+    #vreps[[j]] <- rcdd::makeV(points = t(Rmat))
+    vreps[[j]] <- rcdd::makeV(points = unique(t(Rmat)))
     hrep2 <- rcdd::scdd(vreps[[j]], representation = "V")
     foos[[j]] <- rcdd::q2d(hrep2$output)
   }
