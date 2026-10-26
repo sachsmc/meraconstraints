@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">meraconstraints</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,6 +37,14 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.0" id="meraconstraints-030">meraconstraints 0.3.0<a class="anchor" aria-label="anchor" href="#meraconstraints-030"></a></h2>
+<ul><li>All per-district lists are now named by their district members (e.g. <code>"X_Y"</code>): the elements of <code><a href="../reference/dhvm_district_params.html">dhvm_district_params()</a></code>, the <code>relation</code>, <code>probform</code>, <code>probstarform</code> and <code>problevels</code> elements of <code><a href="../reference/dhvm_linear_relations.html">dhvm_linear_relations()</a></code>, the <code>Vrep</code> and <code>Hrep</code> elements of <code><a href="../reference/dhvm_relations_to_polytope.html">dhvm_relations_to_polytope()</a></code>, and the results of <code><a href="../reference/prob_simplex_screen.html">prob_simplex_screen()</a></code> and <code><a href="../reference/prob_simplex_extremes.html">prob_simplex_extremes()</a></code>. Previously only the components of <code><a href="../reference/meraconstraints.html">meraconstraints()</a></code> output were named, so <code>functional_relations$problevels[["X_Y"]]</code> returned <code>NULL</code>.</li>
+<li>
+<code>combinations()</code> is no longer exported.</li>
+<li>screening of potentially nontrivial constraints improved (thanks to anonymous reviewer)</li>
+<li>dedupe columns of V-rep</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.1" id="meraconstraints-021">meraconstraints 0.2.1<a class="anchor" aria-label="anchor" href="#meraconstraints-021"></a></h2>
 <ul><li>Bugfix in check independence when there are only 2 variables.</li>
 </ul></div>
@@ -49,11 +57,11 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Michael C Sachs.</p>
+  <p>Developed by Michael C Sachs, Erin E Gabriel, Robin J Evans, Arvid Sjölander.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>
