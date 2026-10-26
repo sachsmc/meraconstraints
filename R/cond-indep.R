@@ -2,7 +2,7 @@
 #'
 #' Get all independence relationships in a DAG, among the observed variables
 #'
-#' @param dhvm A object of class `dhvm` i.e., a caugi dag with node attributes "latent"
+#' @param dag A object of class `dhvm` i.e., a caugi dag with node attributes "latent"
 #' @returns A list, each element representing an independence, given 0 or more other variables
 #' @export
 #' @examples

@@ -3,7 +3,6 @@
 S3method(plot,dhvm)
 S3method(print,dhvm)
 S3method(print,meraconstraints)
-export(combinations)
 export(dhvm)
 export(dhvm_c_degree)
 export(dhvm_canonical_partition)
@@ -24,3 +23,14 @@ export(prob_simplex_extremes)
 export(prob_simplex_screen)
 import(caugi)
 import(data.table)
+importFrom(stats,
+  as.formula,
+  model.matrix,
+  rnorm,
+  runif,
+  setNames
+)
+importFrom(utils,
+  combn,
+  head
+)

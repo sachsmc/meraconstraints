@@ -162,7 +162,7 @@ test_that("Known constraints are recovered", {
   fdc <- dhvm(caugi(A %-->% M %-->% Y, U %-->% A + Y))
   fdrels <- dhvm_linear_relations(fdc)
   fdhs <- dhvm_relations_to_polytope(fdrels)
-  expect_equal(sapply(prob_simplex_extremes(fdrels, fdhs$Hrep), sum), c(4, 0))
+  expect_equal(sapply(prob_simplex_extremes(fdrels, fdhs$Hrep), sum), c(A_Y = 4, M = 0))
 
   fdhreps <- list(structure(c(0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0,
                    0, 0, 1, 1, -1, 0, -1, 0, 1, 1, 0, 0, 0, -1, -1, 1, -1, 1, 0,

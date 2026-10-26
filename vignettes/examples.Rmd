@@ -154,14 +154,14 @@ for(i in 1:nrow(res)) {
   probs[, prob.V4_rest := prob.joint / prob.V1V2V3]
   probs[, prob.test := prob.V4_rest * prob.V2_V1]
   ## correct order
-  probs <- merge(r2cn$functional_relations$problevels[[1]], probs, sort = FALSE)
+  probs <- merge(r2cn$functional_relations$problevels[["V2_V4"]], probs, sort = FALSE)
   
   res[i,] <- hrep_test(r2cn$polytope$Hrep[["V2_V4"]], probs$prob.test, which = TRUE)
              
 }
 
 hrep_to_text(r2cn$polytope$Hrep[["V2_V4"]], 
-             r2cn$functional_relations$probform[[1]])[colMeans(res) < 1]
+             r2cn$functional_relations$probform[["V2_V4"]])[colMeans(res) < 1]
 ```
 
 These are 8 nontrivial inequality constraints that can tell us that a distribution sampled from model 1 does not come from model 2. The other direction does not work, if we sample from model 2, we cannot distinguish it from model 1. 

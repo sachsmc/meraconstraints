@@ -1,6 +1,6 @@
 #' Convert counterfactual relations to the H-representation of a polytope
 #'
-#' @param relations A list of relations for the corresponding probability forms as returned by [dag_get_linear_relations()]
+#' @param relations A list of relations for the corresponding probability forms as returned by [dhvm_linear_relations()]
 #' @returns A list with the v-representation and the h-representation objects, one for each district, see \link[rcdd]{scdd}
 #' @export
 
@@ -33,6 +33,7 @@ dhvm_relations_to_polytope <- function(relations) {
     foos[[j]] <- rcdd::q2d(hrep2$output)
   }
 
+  names(vreps) <- names(foos) <- names(prob)
   list(Vrep = vreps, Hrep = foos)
 
 }
@@ -42,7 +43,6 @@ dhvm_relations_to_polytope <- function(relations) {
 #'
 #' @param hrep H-representation
 #' @param prob Character vector of probabilities
-#' @param sets List of sets of probabilities that sum to 1
 #' @export
 #' @returns A character vector
 
@@ -85,6 +85,21 @@ hrep_to_text <- function(hrep, prob) {
 }
 
 
+#' Test whether probabilities satisfy an H-representation
+#'
+#' Checks whether a vector of probabilities satisfies each of the linear
+#' equality and inequality constraints in an H-representation, as returned in
+#' the `polytope$Hrep` element of [meraconstraints()] or by
+#' [dhvm_relations_to_polytope()].
+#'
+#' @param Hrep An H-representation matrix, see \link[rcdd]{scdd}
+#' @param probform Numeric vector of probabilities, in the same order as the
+#'   columns of `Hrep` (excluding the first two)
+#' @param tol Numeric tolerance for the checks
+#' @param which Logical. If `TRUE`, return the result of each constraint
+#'   separately, otherwise return whether all constraints are satisfied
+#' @returns If `which = FALSE`, a logical vector of length 1. If `which = TRUE`,
+#'   a logical matrix with one row per constraint.
 #' @export
 
 hrep_test <- function(Hrep, probform, tol = 1e-10, which = FALSE) {
@@ -201,6 +216,19 @@ prob_simplex_extremes0 <- function(drels, hreps) {
 
 
 
+#' Identify constraints that are nontrivial at deterministic distributions
+#'
+#' Enumerates all deterministic (0/1) counterfactual distributions in each
+#' district and checks which constraints are violated by at least one of them.
+#' Constraints that are never violated are trivially implied by the
+#' probability simplex. See [prob_simplex_screen()] for a faster equivalent.
+#'
+#' @param drels A list of relations as returned by [dhvm_linear_relations()]
+#' @param hreps A list of H-representations, one for each district, as in the
+#'   `Hrep` element returned by [dhvm_relations_to_polytope()]
+#' @returns A list of logical vectors, one for each district, with one element
+#'   per constraint that is `TRUE` if the constraint is possibly nontrivial and
+#'   `FALSE` if it is implied by the probability simplex
 #' @export
 prob_simplex_extremes <- function(drels, hreps) {
 
@@ -245,9 +273,20 @@ prob_simplex_extremes <- function(drels, hreps) {
     checks[[i]] <- colMeans(check) < 1
   }
 
+  names(checks) <- names(hreps)
   checks
 }
 
+#' Screen constraints that are implied by the probability simplex
+#'
+#' For each constraint, computes its maximum and minimum over the product of
+#' probability simplices (one per level of the intervened variables) and
+#' checks whether it can be violated. Constraints that cannot be violated are
+#' trivially implied by the probability simplex.
+#'
+#' @inheritParams prob_simplex_extremes
+#' @param tol Numeric tolerance for the checks
+#' @inherit prob_simplex_extremes return
 #' @export
 prob_simplex_screen <- function(drels, hreps, tol = 1e-8) {
 
@@ -279,11 +318,17 @@ prob_simplex_screen <- function(drels, hreps, tol = 1e-8) {
                           abs(hi - b) > tol | abs(lo - b) > tol,  # equality violated somewhere
                           hi > b + tol)                           # inequality violated somewhere
   }
+  names(checks) <- names(hreps)
   checks
 }
 
 
-#' @export
+#' Enumerate all combinations of levels
+#'
+#' @param p Integer vector giving the number of levels of each variable
+#' @returns A matrix with `prod(p)` rows and `length(p)` columns, containing all
+#'   combinations of the 0-based levels
+#' @noRd
 combinations <- function(p) {
 
   tot = prod(p)

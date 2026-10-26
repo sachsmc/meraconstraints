@@ -3,7 +3,7 @@ NULL
 
 #' Sample a distribution from a causal model
 #'
-#' @param dag A causal model possibly with latent variables, currently only supports binary observed variables
+#' @param dhvm A causal model possibly with latent variables, currently only supports binary observed variables
 #' @param parmsamp A function that takes a integer as the single argument, and returns the parameters used in the linear predictors
 #' @param nsamp_latent The number of random draws to take from each unobserved variable
 #' @export

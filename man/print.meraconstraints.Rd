@@ -9,7 +9,11 @@
 \arguments{
 \item{x}{As returned by [meraconstraints()]}
 
-\item{...}{Used later}
+\item{max_constraints}{Maximum number of constraints to print for each district}
+
+\item{width}{Maximum width of each printed constraint, longer ones are truncated}
+
+\item{...}{Not used}
 }
 \value{
 x invisibly

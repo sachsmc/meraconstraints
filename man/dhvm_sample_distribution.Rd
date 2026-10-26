@@ -11,11 +11,11 @@ dhvm_sample_distribution(
 )
 }
 \arguments{
+\item{dhvm}{A causal model possibly with latent variables, currently only supports binary observed variables}
+
 \item{parmsamp}{A function that takes a integer as the single argument, and returns the parameters used in the linear predictors}
 
 \item{nsamp_latent}{The number of random draws to take from each unobserved variable}
-
-\item{dag}{A causal model possibly with latent variables, currently only supports binary observed variables}
 }
 \value{
 A data frame where each row represents a distinct observation vector plus the joint probability

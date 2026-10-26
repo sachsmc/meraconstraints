@@ -10,8 +10,6 @@ hrep_to_text(hrep, prob)
 \item{hrep}{H-representation}
 
 \item{prob}{Character vector of probabilities}
-
-\item{sets}{List of sets of probabilities that sum to 1}
 }
 \value{
 A character vector

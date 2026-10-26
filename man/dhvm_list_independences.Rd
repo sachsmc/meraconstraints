@@ -7,7 +7,7 @@
 dhvm_list_independences(dag)
 }
 \arguments{
-\item{dhvm}{A object of class `dhvm` i.e., a caugi dag with node attributes "latent"}
+\item{dag}{A object of class `dhvm` i.e., a caugi dag with node attributes "latent"}
 }
 \value{
 A list, each element representing an independence, given 0 or more other variables

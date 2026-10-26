@@ -1,5 +1,9 @@
 #' @import caugi
+#' @importFrom stats as.formula model.matrix rnorm runif setNames
+#' @importFrom utils combn head
 NULL
+
+utils::globalVariables(c("latent", "name", "prob.joint", "..pa"))
 
 #' Create a Discrete Hidden Variables Model (dhvm)
 #'
@@ -9,7 +13,7 @@ NULL
 #'
 #' @param caugi_graph A caugi DAG
 #' @param latent.pattern A regular expression that is used to identify latent variables
-#' @param latent.variable A character vector indicating which variables are latent. If not NULL, then `latent.pattern` is ignored
+#' @param latent.variables A character vector indicating which variables are latent. If not NULL, then `latent.pattern` is ignored
 #' @param nvals A named numeric vector specifying the number of categories for each of the observed variables. If not specified, then 2 categories are assumed
 #' @export
 #' @returns An object of class `dhvm`, which is a list with the caugi object, and a data.frame with the node information

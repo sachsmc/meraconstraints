@@ -7,7 +7,7 @@
 dhvm_relations_to_polytope(relations)
 }
 \arguments{
-\item{relations}{A list of relations for the corresponding probability forms as returned by [dag_get_linear_relations()]}
+\item{relations}{A list of relations for the corresponding probability forms as returned by [dhvm_linear_relations()]}
 }
 \value{
 A list with the v-representation and the h-representation objects, one for each district, see \link[rcdd]{scdd}

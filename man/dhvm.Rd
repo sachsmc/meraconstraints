@@ -11,9 +11,9 @@ dhvm(caugi_graph, latent.pattern = "^U", latent.variables = NULL, nvals = NULL)
 
 \item{latent.pattern}{A regular expression that is used to identify latent variables}
 
-\item{nvals}{A named numeric vector specifying the number of categories for each of the observed variables. If not specified, then 2 categories are assumed}
+\item{latent.variables}{A character vector indicating which variables are latent. If not NULL, then `latent.pattern` is ignored}
 
-\item{latent.variable}{A character vector indicating which variables are latent. If not NULL, then `latent.pattern` is ignored}
+\item{nvals}{A named numeric vector specifying the number of categories for each of the observed variables. If not specified, then 2 categories are assumed}
 }
 \value{
 An object of class `dhvm`, which is a list with the caugi object, and a data.frame with the node information

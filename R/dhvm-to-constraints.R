@@ -179,6 +179,9 @@ dhvm_district_params <- function(dhvm) {
     poterms <- poterms[-remove]
   }
 
+  ## name every per-district element by its district members, e.g. "X_Y"
+  names(vterms) <- names(res) <- names(distrs) <- names(resterms) <- names(poterms) <-
+    vapply(poterms, \(x) paste(x$out, collapse = "_"), character(1))
 
   list(vterms = vterms,
        pforms = res, distrs = distrs,
@@ -282,6 +285,9 @@ dhvm_linear_relations <- function(dhvm) {
 
   }
 
+  names(relation) <- names(prob.fancy) <- names(prob.star) <- names(problevels) <-
+    names(dparms$pforms)
+
   structure(list(relation = relation,
                  probform = prob.fancy,
                  probstarform = prob.star,
@@ -314,9 +320,6 @@ meraconstraints <- function(dhvm) {
   cpart <- dhrels$dhvm_partitioned
   dhrels$dhvm_partitioned <- NULL
 
-  names(dhtope$Vrep) <- names(dhtope$Hrep) <- names(trivial_if_false) <-
-    sapply(dhrels$district_parms$poterms, \(x) paste(x$out, collapse = "_"))
-
   structure(list(
     model_name = deparse1(substitute(dhvm)),
     district_info = c_degs,
@@ -340,7 +343,9 @@ trunc_text <- function(x, width) {
 #' Print a meraconstraints object
 #'
 #' @param x As returned by [meraconstraints()]
-#' @param ... Used later
+#' @param max_constraints Maximum number of constraints to print for each district
+#' @param width Maximum width of each printed constraint, longer ones are truncated
+#' @param ... Not used
 #' @returns x invisibly
 #' @export
 print.meraconstraints <- function(x, max_constraints = 4, width = getOption("width"), ...) {
