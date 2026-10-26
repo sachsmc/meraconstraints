@@ -309,7 +309,7 @@ meraconstraints <- function(dhvm) {
   dhrels <- dhvm_linear_relations(dhvm)
   indeps <- dhvm_list_independences(dhvm)
   dhtope <- dhvm_relations_to_polytope(dhrels)
-  trivial_if_false <- prob_simplex_extremes(dhrels, dhtope$Hrep)
+  trivial_if_false <- prob_simplex_screen(dhrels, dhtope$Hrep)
 
   cpart <- dhrels$dhvm_partitioned
   dhrels$dhvm_partitioned <- NULL

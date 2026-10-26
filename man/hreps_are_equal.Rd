@@ -29,7 +29,7 @@ ivhrep <- structure(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0,
 
 ivd <- dhvm(caugi(Z \%-->\% X \%-->\% Y, U \%-->\% X + Y))
 ivrels2 <- dhvm_linear_relations(ivd)
-hrepiv2 <- cf_relations_to_hrep(ivrels2)
+hrepiv2 <- dhvm_relations_to_polytope(ivrels2)
 hreps_are_equal(hrepiv2$Hrep[[1]], ivhrep)
 
 

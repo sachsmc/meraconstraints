@@ -125,7 +125,7 @@ hrep_test <- function(Hrep, probform, tol = 1e-10, which = FALSE) {
 #'
 #' ivd <- dhvm(caugi(Z %-->% X %-->% Y, U %-->% X + Y))
 #' ivrels2 <- dhvm_linear_relations(ivd)
-#' hrepiv2 <- cf_relations_to_hrep(ivrels2)
+#' hrepiv2 <- dhvm_relations_to_polytope(ivrels2)
 #' hreps_are_equal(hrepiv2$Hrep[[1]], ivhrep)
 #'
 #'
@@ -245,6 +245,40 @@ prob_simplex_extremes <- function(drels, hreps) {
     checks[[i]] <- colMeans(check) < 1
   }
 
+  checks
+}
+
+#' @export
+prob_simplex_screen <- function(drels, hreps, tol = 1e-8) {
+
+  checks <- vector(mode = "list", length = length(hreps))
+  for (i in seq_along(hreps)) {
+
+    hrep <- hreps[[i]]
+
+    if (length(drels$district_parms$poterms[[i]]$do) == 0) {
+      checks[[i]] <- rep(FALSE, nrow(hrep))
+      next
+    }
+    ctabin <- split(drels$problevels[[i]],
+                    drels$problevels[[i]][, drels$district_parms$poterms[[i]]$do])
+    blocks <- lapply(ctabin, \(cin) do.call(paste, c(as.list(cin), sep = ".")))
+    pnames <- names(unlist(drels$probform[[i]]))
+    blockidx <- lapply(blocks, match, pnames)
+
+    A  <- -hrep[, -(1:2), drop = FALSE]
+    b  <- hrep[, 2]
+    eq <- hrep[, 1] == 1
+
+    blockmax <- do.call(cbind, lapply(blockidx, \(ix) apply(A[, ix, drop = FALSE], 1, max)))
+    blockmin <- do.call(cbind, lapply(blockidx, \(ix) apply(A[, ix, drop = FALSE], 1, min)))
+    hi <- rowSums(blockmax)
+    lo <- rowSums(blockmin)
+
+    checks[[i]] <- ifelse(eq,
+                          abs(hi - b) > tol | abs(lo - b) > tol,  # equality violated somewhere
+                          hi > b + tol)                           # inequality violated somewhere
+  }
   checks
 }
 
