@@ -36,7 +36,8 @@ dhvm_canonical_partition <- function(dag) {
 
   })
 
-  newcg <- caugi::remove_nodes(dag$caugi_graph, name = subset(dag$nodes_data, latent == TRUE)$name) |>
+  newcg <- caugi::remove_nodes(dag$caugi_graph,
+                               name = subset(dag$nodes_data, latent == TRUE)$name) |>
     caugi::add_edges(from = newvs, edge = rep("-->", length(vs)), to = vs) |>
     mutate_caugi("PDAG")
 
@@ -44,7 +45,8 @@ dhvm_canonical_partition <- function(dag) {
     chu <- children(dag$caugi_graph, nodes = u)
     addud <- combn(paste0("R_", chu), 2)
     newcg <- caugi::add_edges(newcg, from = addud[1, ],
-                              edge = rep("---", ncol(addud)), to = addud[2, ], inplace = TRUE)
+                              edge = rep("---", ncol(addud)),
+                              to = addud[2, ])
   }
 
   newcg <- build(newcg)
@@ -137,11 +139,18 @@ dhvm_district_params <- function(dhvm) {
       next
     }
 
-    ## product of each variable given it's parents
+    ## product over district members of P(V_1i | C_i), where C_i is the minimal
+    ## conditioning set: the earlier members of the district together with the
+    ## external observed parents of V_1i and of every earlier member
+    ## (Proposition 1 of the paper; Tian and Pearl, 2002).
 
     padistudist <- union(dvars[[i]], intervenset)
     prodterm <- lapply(dvars[[i]], \(di) {
-      setdiff(intersect(padistudist, dord[1:which(di == dord)]), di)
+      upto    <- dvars[[i]][match(dvars[[i]], dord) <= match(di, dord)]
+      earlier <- setdiff(upto, di)
+      extpa   <- intersect(intervenset,
+                           unique(unlist(lapply(upto, \(dv) obs_parents(dhvm, dv)))))
+      intersect(padistudist, c(earlier, extpa))
     })
 
     names(prodterm) <- dvars[[i]]
