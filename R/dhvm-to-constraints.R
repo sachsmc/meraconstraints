@@ -20,7 +20,7 @@ dhvm_canonical_partition <- function(dag) {
   ## check for multiple latents
 
   thiscdeg <- dhvm_c_degree(dag)
-  if(!all(thiscdeg == 1)) {
+  if(any(thiscdeg > 1)) {
     stop("c-degree is greater than 1, cannot do the canonical partitioning. Check district(s): ",
          names(thiscdeg[thiscdeg > 1])
     )

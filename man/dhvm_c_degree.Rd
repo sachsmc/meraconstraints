@@ -13,7 +13,8 @@ dhvm_c_degree(dhvm)
 An integer vector
 }
 \description{
-The c-degree is the maximum of 1 and the numbers of latent variables in each district
+The c-degree of a district is the number of latent variables in it. A district
+without latent variables (a single observed variable) has c-degree 0.
 }
 \examples{
 dhvm_c_degree(dhvm(caugi(U1 \%-->\% X + Y, U2 \%-->\% Z + X)))

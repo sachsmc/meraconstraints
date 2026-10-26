@@ -131,7 +131,8 @@ dhvm_districts <- function(dhvm) {
 
 #' Get the c-degree of a dhvm
 #'
-#' The c-degree is the maximum of 1 and the numbers of latent variables in each district
+#' The c-degree of a district is the number of latent variables in it. A district
+#' without latent variables (a single observed variable) has c-degree 0.
 #'
 #' @param dhvm A object of class dhvm
 #' @returns An integer vector
@@ -153,7 +154,7 @@ dhvm_c_degree <- function(dhvm) {
 
     unobs_dist <- sort(intersect(ccomps[[i]], unobs))
     obs_dist <- sort(setdiff(ccomps[[i]], unobs))
-    cdegs[[i]] <- max(1, length(unobs_dist))
+    cdegs[[i]] <- length(unobs_dist)
     nmstmp[i] <- paste0("{", paste(c(obs_dist,
                         if(length(unobs_dist) == 0) NULL else paste0(unobs_dist, "[u]")), collapse = ", "), "}")
 
