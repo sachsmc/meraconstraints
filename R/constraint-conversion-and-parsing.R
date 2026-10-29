@@ -1,7 +1,9 @@
 #' Convert counterfactual relations to the H-representation of a polytope
 #'
 #' @param relations A list of relations for the corresponding probability forms as returned by [dhvm_linear_relations()]
-#' @returns A list with the v-representation and the h-representation objects, one for each district, see \link[rcdd]{scdd}
+#' @returns A list with the v-representation and the h-representation objects, one for each district, see \link[rcdd]{scdd}.
+#'   `Hrep` holds the h-representations in floating point, and `HrepQ` the same
+#'   h-representations in exact rational arithmetic, as returned by cdd.
 #' @export
 
 
@@ -10,7 +12,7 @@ dhvm_relations_to_polytope <- function(relations) {
 
   prob <- relations$probform
   relation <- relations$relation
-  foos <- vreps <- vector(mode = "list", length = length(prob))
+  foos <- qfoos <- vreps <- vector(mode = "list", length = length(prob))
   for(j in 1:length(prob)) {
     rvarprobs <- unique(unlist(relation[[j]]))
     Rmat <- matrix("0", nrow = length(unlist(prob[[j]])), ncol = length(rvarprobs))
@@ -30,11 +32,12 @@ dhvm_relations_to_polytope <- function(relations) {
     #vreps[[j]] <- rcdd::makeV(points = t(Rmat))
     vreps[[j]] <- rcdd::makeV(points = unique(t(Rmat)))
     hrep2 <- rcdd::scdd(vreps[[j]], representation = "V")
+    qfoos[[j]] <- hrep2$output
     foos[[j]] <- rcdd::q2d(hrep2$output)
   }
 
-  names(vreps) <- names(foos) <- names(prob)
-  list(Vrep = vreps, Hrep = foos)
+  names(vreps) <- names(foos) <- names(qfoos) <- names(prob)
+  list(Vrep = vreps, Hrep = foos, HrepQ = qfoos)
 
 }
 

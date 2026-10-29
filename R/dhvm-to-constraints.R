@@ -302,7 +302,10 @@ dhvm_linear_relations <- function(dhvm) {
 #' Get constraints implied by a discrete hidden variables model
 #'
 #' @param dhvm An object of class `dhvm`, see [dhvm()]
-#' @returns An object of class `meraconstraints`, with some methods.
+#' @returns An object of class `meraconstraints`, with some methods. Its
+#'   element `nontrivial` marks the nontrivial constraints of each district,
+#'   as returned by [nontrivial_screen()]. `trivial_if_false` is the same list,
+#'   kept for compatibility with earlier versions.
 #' @export
 #' @examples
 #' ivd <- dhvm(caugi(Z %-->% X %-->% Y, U %-->% X + Y))
@@ -315,7 +318,7 @@ meraconstraints <- function(dhvm) {
   dhrels <- dhvm_linear_relations(dhvm)
   indeps <- dhvm_list_independences(dhvm)
   dhtope <- dhvm_relations_to_polytope(dhrels)
-  trivial_if_false <- prob_simplex_screen(dhrels, dhtope$Hrep)
+  nontrivial <- nontrivial_screen(dhvm, dhrels, dhtope)
 
   cpart <- dhrels$dhvm_partitioned
   dhrels$dhvm_partitioned <- NULL
@@ -327,7 +330,8 @@ meraconstraints <- function(dhvm) {
     functional_relations = dhrels,
     independences = indeps,
     polytope = dhtope,
-    trivial_if_false = trivial_if_false
+    nontrivial = nontrivial,
+    trivial_if_false = nontrivial
   ), class = "meraconstraints")
 
 }
@@ -366,12 +370,12 @@ print.meraconstraints <- function(x, max_constraints = 4, width = getOption("wid
   cat("* Equality and inequality constraints by district:\n")
   for(i in 1:length(x$polytope$Hrep)) {
     dnm <- names(x$polytope$Hrep)[i]
-    thisHrep <- x$polytope$Hrep[[i]][x$trivial_if_false[[i]], ]
+    thisHrep <- x$polytope$Hrep[[i]][x$nontrivial[[i]], , drop = FALSE]
     n_ineq <- sum(thisHrep[, 1] == 0)
     n_eq <- sum(thisHrep[, 1] == 1)
 
-    cat("There are ", nrow(thisHrep), " possibly nontrivial constraints involving ", dnm, ", ", n_ineq,
-        " inequalities and ", n_eq, " equalities.\n", sep = "")
+    cat("There are ", nrow(thisHrep), " nontrivial constraints involving ", dnm, ", ", n_ineq,
+        " inequalities and ", n_eq, " linearly independent equalities.\n", sep = "")
     if(nrow(thisHrep) > 0) {
       cat("The first", max_constraints, "expressions are\n")
       cat(trunc_text(hrep_to_text(thisHrep, x$functional_relations$probform[[i]])[1:min(nrow(thisHrep), max_constraints)],

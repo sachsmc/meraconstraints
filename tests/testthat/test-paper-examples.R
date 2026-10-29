@@ -3,7 +3,7 @@
 constraint_counts <- function(cn) {
   lapply(seq_along(cn$polytope$Hrep), \(j) {
     H <- cn$polytope$Hrep[[j]]
-    fl <- cn$trivial_if_false[[j]]
+    fl <- cn$nontrivial[[j]]
     c(ineq = sum(H[, 1] == 0), eq = sum(H[, 1] == 1),
       fl_ineq = sum(fl & H[, 1] == 0), fl_eq = sum(fl & H[, 1] == 1))
   })
@@ -47,11 +47,18 @@ test_that("constraint counts match Table 1", {
 
   right <- meraconstraints(dhvm(caugi(V1 %-->% V2 %-->% V3 %-->% V4, V2 %-->% V4, U2 %-->% V2 + V4)))
   expect_equal(constraint_counts(right),
-               list(c(ineq = 24, eq = 6, fl_ineq = 12, fl_eq = 4),
+               list(c(ineq = 24, eq = 6, fl_ineq = 8, fl_eq = 0),
                     c(ineq = 4, eq = 2, fl_ineq = 0, fl_eq = 0)))
 
   xab <- meraconstraints(dhvm(caugi(X %-->% A, Y %-->% B, U %-->% A + B)))
-  expect_equal(constraint_counts(xab)[[1]], c(ineq = 24, eq = 8, fl_ineq = 15, fl_eq = 7))
+  expect_equal(constraint_counts(xab)[[1]], c(ineq = 24, eq = 8, fl_ineq = 8, fl_eq = 0))
+
+  f7 <- dhvm(caugi(V1 %-->% V2 + V6, V2 %-->% V3, V3 %-->% V4, V4 %-->% V5, V6 %-->% V3,
+                   U1 %-->% V2 + V4, U2 %-->% V1 + V3 + V6, U3 %-->% V4 + V5))
+  f7m <- meraconstraints(dhvm_merge_latents(f7))
+  expect_equal(constraint_counts(f7m),
+               list(c(ineq = 16, eq = 5, fl_ineq = 0, fl_eq = 0),
+                    c(ineq = 1128, eq = 12, fl_ineq = 1096, fl_eq = 6)))
 
 })
 
@@ -69,15 +76,18 @@ test_that("sequential IV gives two copies of the IV constraints (Figure 2)", {
 
 })
 
-test_that("front door flagged constraints (Figure 4)", {
+test_that("front door has no nontrivial constraints (Figure 4)", {
 
   fd <- meraconstraints(dhvm(caugi(A %-->% M %-->% Y, U1 %-->% A + Y)))
   expect_equal(names(fd$polytope$Hrep), c("A_Y", "M"))
-  expect_equal(constraint_counts(fd)[[1]], c(ineq = 8, eq = 3, fl_ineq = 2, fl_eq = 2))
-  expect_equal(sum(fd$trivial_if_false$M), 0)
+  expect_equal(constraint_counts(fd)[[1]], c(ineq = 8, eq = 3, fl_ineq = 0, fl_eq = 0))
+  expect_equal(sum(fd$nontrivial$M), 0)
+  expect_identical(fd$trivial_if_false, fd$nontrivial)
 
+  ## the screen that ignores the equality constraints flags 4 of them
+  old <- prob_simplex_screen(fd$functional_relations, fd$polytope$Hrep)
   txt <- hrep_to_text(fd$polytope$Hrep[[1]], fd$functional_relations$probstarform[[1]])
-  expect_setequal(txt[fd$trivial_if_false[[1]]], c(
+  expect_setequal(txt[old[[1]]], c(
     "-P*(A = 0,Y = 0|M = 0) - P*(A = 0,Y = 1|M = 0) + P*(A = 0,Y = 0|M = 1) <= 0",
     "P*(A = 0,Y = 0|M = 0) + P*(A = 0,Y = 1|M = 0) + P*(A = 1,Y = 0|M = 1) <= 1",
     "P*(A = 0,Y = 0|M = 0) + P*(A = 0,Y = 1|M = 0) - P*(A = 0,Y = 0|M = 1) - P*(A = 0,Y = 1|M = 1)  =  0",
@@ -86,7 +96,7 @@ test_that("front door flagged constraints (Figure 4)", {
 
 })
 
-test_that("closed-form screening agrees with enumeration (Proposition 4)", {
+test_that("closed-form simplex screening agrees with enumeration", {
 
   models <- list(
     dhvm(caugi(Z %-->% X, X %-->% Y, U %-->% X + Y)),
@@ -110,7 +120,7 @@ test_that("nested Markov equivalent graphs are distinguished (Figure 5)", {
   right <- dhvm(caugi(V1 %-->% V2 %-->% V3 %-->% V4, V2 %-->% V4, U2 %-->% V2 + V4))
   cn_left  <- meraconstraints(left)
   cn_right <- meraconstraints(right)
-  expect_equal(constraint_counts(cn_left)[[1]], c(ineq = 16, eq = 6, fl_ineq = 4, fl_eq = 4))
+  expect_equal(constraint_counts(cn_left)[[1]], c(ineq = 16, eq = 6, fl_ineq = 0, fl_eq = 0))
 
   ## P*(V2, V4 | V1, V3) = P(V2 | V1) P(V4 | V1, V2, V3)
   pstar <- function(probs, cn) {

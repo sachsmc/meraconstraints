@@ -22,4 +22,6 @@ Enumerates all deterministic (0/1) counterfactual distributions in each
 district and checks which constraints are violated by at least one of them.
 Constraints that are never violated are trivially implied by the
 probability simplex. See [prob_simplex_screen()] for a faster equivalent.
+Superseded by [nontrivial_screen()], which also takes the equality
+constraints into account and flags exactly the nontrivial constraints.
 }

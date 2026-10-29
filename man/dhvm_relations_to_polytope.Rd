@@ -10,7 +10,9 @@ dhvm_relations_to_polytope(relations)
 \item{relations}{A list of relations for the corresponding probability forms as returned by [dhvm_linear_relations()]}
 }
 \value{
-A list with the v-representation and the h-representation objects, one for each district, see \link[rcdd]{scdd}
+A list with the v-representation and the h-representation objects, one for each district, see \link[rcdd]{scdd}.
+  `Hrep` holds the h-representations in floating point, and `HrepQ` the same
+  h-representations in exact rational arithmetic, as returned by cdd.
 }
 \description{
 Convert counterfactual relations to the H-representation of a polytope

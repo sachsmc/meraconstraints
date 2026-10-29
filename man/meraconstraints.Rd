@@ -10,7 +10,10 @@ meraconstraints(dhvm)
 \item{dhvm}{An object of class `dhvm`, see [dhvm()]}
 }
 \value{
-An object of class `meraconstraints`, with some methods.
+An object of class `meraconstraints`, with some methods. Its
+  element `nontrivial` marks the nontrivial constraints of each district,
+  as returned by [nontrivial_screen()]. `trivial_if_false` is the same list,
+  kept for compatibility with earlier versions.
 }
 \description{
 Get constraints implied by a discrete hidden variables model

@@ -4,6 +4,8 @@
 #' district and checks which constraints are violated by at least one of them.
 #' Constraints that are never violated are trivially implied by the
 #' probability simplex. See [prob_simplex_screen()] for a faster equivalent.
+#' Superseded by [nontrivial_screen()], which also takes the equality
+#' constraints into account and flags exactly the nontrivial constraints.
 #'
 #' @param drels A list of relations as returned by [dhvm_linear_relations()]
 #' @param hreps A list of H-representations, one for each district, as in the
@@ -65,6 +67,11 @@ prob_simplex_extremes <- function(drels, hreps) {
 #' probability simplices (one per level of the intervened variables) and
 #' checks whether it can be violated. Constraints that cannot be violated are
 #' trivially implied by the probability simplex.
+#'
+#' This is a necessary condition for nontriviality only: a flagged constraint
+#' may still be trivial, and whether it is flagged depends on how the row is
+#' written. [nontrivial_screen()] gives the exact answer and is used by
+#' [meraconstraints()].
 #'
 #' @inheritParams prob_simplex_extremes
 #' @param tol Numeric tolerance for the checks

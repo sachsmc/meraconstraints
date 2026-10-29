@@ -58,9 +58,9 @@ hrep_to_text(ivmera$polytope$Hrep[[1]], ivmera$functional_relations$probform[[1]
 hrep_to_text(ivmera$polytope$Hrep[[1]], ivmera$functional_relations$probstarform[[1]])
 ```
 
-6. Identify and exclude the definitely trivial constraints.
+6. Identify the nontrivial constraints. The other 8 inequalities are nonnegativity constraints, and the 2 equalities say that the probabilities sum to one.
 ```{r}
-hrep_to_text(ivmera$polytope$Hrep[[1]], ivmera$functional_relations$probform[[1]])[ivmera$trivial_if_false[[1]]]
+hrep_to_text(ivmera$polytope$Hrep[[1]], ivmera$functional_relations$probform[[1]])[ivmera$nontrivial[[1]]]
 ```
 
 Those are the familiar IV inequalities.
@@ -208,21 +208,22 @@ fdcn <- meraconstraints(fd)
 fdcn
 ```
 
-Even though we report 4 possibly nontrivial constraints, they are all obviously trivial. 
+None of the constraints are nontrivial. In terms of the P* probabilities, some of them look as if they could be violated:
+
+```{r}
+hrep_to_text(fdcn$polytope$Hrep[[1]], prob = fdcn$functional_relations$probstarform[[1]])
+```
+
+But each inequality is a nonnegativity constraint once the equality constraints are added to it, and the one equality beyond normalization says that the distribution of A under do(M) does not depend on M. In observed probabilities, that is P(A = a) = P(A = a).
 
 ```{r}
 hrep_to_text(fdcn$polytope$Hrep[[1]], prob = fdcn$functional_relations$probform[[1]])
 ```
 
-In the first district, we flag some of them as not definitely trivial. Why is that? Well, they can be violated if we observed a distribution where we intervened on M. This can be seen when we look at the constraints in terms of the P* probabilities. 
+The cruder screen `prob_simplex_screen()`, which ignores the equality constraints, flags 4 of them:
 
 ```{r}
-## all trivial unless you can intervene on M
-hrep_to_text(fdcn$polytope$Hrep[[1]], 
-             prob = fdcn$functional_relations$probstarform[[1]])[
-               fdcn$trivial_if_false[[1]]
-               ]
-
+sapply(prob_simplex_screen(fdcn$functional_relations, fdcn$polytope$Hrep), sum)
 ```
 
 
@@ -240,7 +241,7 @@ This has no conditional independences:
 dhvm_list_independences(d1)
 ```
 
-It does however have possibly nontrivial constraints that we can find. 
+It does however have nontrivial constraints that we can find.
 
 ```{r}
 d1cn <- meraconstraints(d1)

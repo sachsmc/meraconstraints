@@ -25,3 +25,9 @@ probability simplices (one per level of the intervened variables) and
 checks whether it can be violated. Constraints that cannot be violated are
 trivially implied by the probability simplex.
 }
+\details{
+This is a necessary condition for nontriviality only: a flagged constraint
+may still be trivial, and whether it is flagged depends on how the row is
+written. [nontrivial_screen()] gives the exact answer and is used by
+[meraconstraints()].
+}
