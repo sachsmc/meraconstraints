@@ -99,19 +99,6 @@ plot.dhvm <- function(x,
 }
 
 
-obs_parents <- function(dhvm, node) {
-
-  patmp <- parents(dhvm$caugi_graph, nodes = node)
-  intersect(patmp, subset(dhvm$nodes_data, latent == FALSE)$name)
-
-}
-
-nvals <- function(dhvm, node) {
-
-  subset(dhvm$nodes_data, name == node)$nvals
-
-}
-
 
 #' Get the districts of a dhvm
 #'
@@ -160,7 +147,8 @@ dhvm_c_degree <- function(dhvm) {
     obs_dist <- sort(setdiff(ccomps[[i]], unobs))
     cdegs[[i]] <- length(unobs_dist)
     nmstmp[i] <- paste0("{", paste(c(obs_dist,
-                        if(length(unobs_dist) == 0) NULL else paste0(unobs_dist, "[u]")), collapse = ", "), "}")
+                        if(length(unobs_dist) == 0) NULL else paste0(unobs_dist, "[u]")),
+                        collapse = ", "), "}")
 
   }
 

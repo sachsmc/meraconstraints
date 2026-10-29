@@ -47,3 +47,32 @@ combinations <- function(p) {
 
 }
 
+
+#' Truncate a string for printing
+#'
+#' @param x A character string
+#' @param width Number of characters to truncate to
+#' @returns A truncated string
+#' @noRd
+trunc_text <- function(x, width) {
+
+  x2 <- substr(x, 1, width - 20)
+  x2[nchar(x) > width - 20] <- paste(x2[nchar(x) > width - 20], "...[truncated]")
+  x2
+
+}
+
+
+obs_parents <- function(dhvm, node) {
+
+  patmp <- parents(dhvm$caugi_graph, nodes = node)
+  intersect(patmp, subset(dhvm$nodes_data, latent == FALSE)$name)
+
+}
+
+nvals <- function(dhvm, node) {
+
+  subset(dhvm$nodes_data, name == node)$nvals
+
+}
+

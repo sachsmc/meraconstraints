@@ -332,13 +332,6 @@ meraconstraints <- function(dhvm) {
 
 }
 
-trunc_text <- function(x, width) {
-
-  x2 <- substr(x, 1, width - 20)
-  x2[nchar(x) > width - 20] <- paste(x2[nchar(x) > width - 20], "...[truncated]")
-  x2
-
-}
 
 #' Print a meraconstraints object
 #'
