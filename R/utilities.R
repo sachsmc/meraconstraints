@@ -25,3 +25,25 @@ make_prob_names <- function(form, values, letter = "P") {
   do.call(sprintf, c(nameplace, as.list(values[, unlist(form), drop = FALSE])))
 
 }
+
+
+
+#' Enumerate all combinations of levels
+#'
+#' @param p Integer vector giving the number of levels of each variable
+#' @returns A matrix with `prod(p)` rows and `length(p)` columns, containing all
+#'   combinations of the 0-based levels
+#' @noRd
+combinations <- function(p) {
+
+  tot = prod(p)
+  cp = cumprod(p)
+  retval = rep.int(0, tot * length(p))
+  dim(retval) = c(tot, length(p))
+  for (i in seq_along(p)) {
+    retval[, i] <- rep(seq_len(p[i]) - 1, each = cp[i]/p[i])
+  }
+  retval
+
+}
+
