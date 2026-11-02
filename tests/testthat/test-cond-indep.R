@@ -11,9 +11,13 @@ test_that("conditional independence", {
   dag2 <- dhvm(caugi(A %-->% C, B %-->% C, C %-->% D))
   cd2 <- dhvm_list_independences(dag2)
 
-  expect_true(setequal(cd2[[1]]$indep, c("A", "B")) & is.null(cd2[[1]]$given) &
-    setequal(cd2[[2]]$indep, c("A", "D")) & setequal(cd2[[2]]$given, "C") &
-    setequal(cd2[[3]]$indep, c("B", "D")) & setequal(cd2[[3]]$given, "C") )
+  ## A _||_ B, and D _||_ (A, B) | C in chained form
+  expect_true(setequal(cd2[[1]]$indep, c("A", "B")) & is.null(cd2[[1]]$given))
+  sets2 <- attr(cd2, "sets")
+  expect_true(any(vapply(sets2, \(s) s$indep[[1]] == "D" && setequal(s$indep[[2]], c("A", "B")) &&
+                           setequal(s$given, "C"), logical(1))))
+  expect_true(all(vapply(cd2, \(ii) d_separated(dag2$caugi_graph, X = ii$indep[1], Y = ii$indep[2],
+                                                Z = ii$given), logical(1))))
 
 
   dag3 <- dhvm(caugi(V1 %-->% V2, V2 %-->% V3, V3 %-->% V4, U1 %-->% V1+V3, U2 %-->% V2+V4))

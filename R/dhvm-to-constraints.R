@@ -361,7 +361,7 @@ print.meraconstraints <- function(x, max_constraints = 4, width = getOption("wid
   } else {
     cat("* Conditional independence relations:\n")
     indeptext <- paste0(sapply(x$independences, \(ii) {
-      paste0(paste0(ii$indep, collapse = " \u27C2 "), " | ", ii$given)
+      paste0(paste0(ii$indep, collapse = " \u27C2 "), " | ", paste(ii$given, collapse = ", "))
     }), collapse = ", ")
 
     cat(indeptext, "\n")

@@ -10,10 +10,15 @@ dhvm_list_independences(dag)
 \item{dag}{A object of class `dhvm` i.e., a caugi dag with node attributes "latent"}
 }
 \value{
-A list, each element representing an independence, given 0 or more other variables
+A list, each element representing an independence of two variables, given 0 or
+  more other variables. Together, the elements are equivalent to the statements for sets
+  of variables, which are in the attribute `"sets"`.
 }
 \description{
-Get all independence relationships in a DAG, among the observed variables
+Get the conditional independence relations among the observed variables that are
+implied by a DAG, as the ordered local Markov statements for every ancestral set
+(Richardson, 2003). Every implied d-separation over disjoint sets follows from these
+by the semi-graphoid rules.
 }
 \examples{
 dag <- dhvm(caugi(V1 \%-->\% V2 \%-->\% V3 \%-->\% V4, U \%-->\% V2 + V4))

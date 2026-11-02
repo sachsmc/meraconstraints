@@ -70,9 +70,11 @@ test_that("sequential IV gives two copies of the IV constraints (Figure 2)", {
   expect_equal(constraint_counts(sq),
                rep(list(c(ineq = 12, eq = 2, fl_ineq = 4, fl_eq = 0)), 2))
 
-  indeps <- lapply(sq$independences, \(ii) c(sort(ii$indep), ii$given))
-  expect_setequal(indeps, list(c("V1", "V4", "V3"), c("V1", "V5", "V3"),
-                               c("V2", "V4", "V3"), c("V2", "V5", "V3")))
+  ## V4 _||_ (V1, V2) | V3 and V5 _||_ (V1, V2) | V3, V4, which give (V1, V2) _||_ (V4, V5) | V3
+  sets <- attr(sq$independences, "sets")
+  expect_length(sets, 2)
+  expect_true(all(vapply(sets, \(s) setequal(s$indep[[2]], c("V1", "V2")), logical(1))))
+  expect_true(setequal(sets[[1]]$given, "V3") && setequal(sets[[2]]$given, c("V3", "V4")))
 
 })
 
