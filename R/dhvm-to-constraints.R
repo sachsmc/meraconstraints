@@ -142,7 +142,7 @@ dhvm_district_params <- function(dhvm) {
     ## product over district members of P(V_1i | C_i), where C_i is the minimal
     ## conditioning set: the earlier members of the district together with the
     ## external observed parents of V_1i and of every earlier member
-    ## (Proposition 1 of the paper; Tian and Pearl, 2002).
+    ## (Proposition 3 of the paper; Tian and Pearl, 2002).
 
     padistudist <- union(dvars[[i]], intervenset)
     prodterm <- lapply(dvars[[i]], \(di) {

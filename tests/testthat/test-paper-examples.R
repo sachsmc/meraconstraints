@@ -9,7 +9,7 @@ constraint_counts <- function(cn) {
   })
 }
 
-test_that("conditioning sets are minimal (Proposition 1)", {
+test_that("conditioning sets are minimal (Proposition 3)", {
 
   rg <- dhvm(caugi(Z %-->% X, X %-->% Y, W %-->% Y, H %-->% X + Y), latent.pattern = "^H")
   cs <- dhvm_district_params(rg)$plist[[1]]
