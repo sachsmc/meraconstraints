@@ -1,6 +1,6 @@
 #' Identify nontrivial constraints
 #'
-#' Exact screen of the constraints of each district (Proposition 6 of the
+#' Exact screen of the constraints of each district (Proposition 4 of the
 #' paper). An equality constraint is trivial if it holds for every strictly
 #' positive distribution that satisfies the conditional independencies implied
 #' by the graph. These are the linear combinations of the normalization

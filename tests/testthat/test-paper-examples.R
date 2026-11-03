@@ -9,7 +9,7 @@ constraint_counts <- function(cn) {
   })
 }
 
-test_that("conditioning sets are minimal (Proposition 3)", {
+test_that("conditioning sets are minimal (Proposition 1)", {
 
   rg <- dhvm(caugi(Z %-->% X, X %-->% Y, W %-->% Y, H %-->% X + Y), latent.pattern = "^H")
   cs <- dhvm_district_params(rg)$plist[[1]]
@@ -62,7 +62,7 @@ test_that("constraint counts match Table 1", {
 
 })
 
-test_that("sequential IV gives two copies of the IV constraints (Figure 3)", {
+test_that("sequential IV gives two copies of the IV constraints (Figure 2)", {
 
   sq <- meraconstraints(dhvm(caugi(V1 %-->% V2 %-->% V3 %-->% V4 %-->% V5,
                                    U1 %-->% V2 + V3, U2 %-->% V4 + V5)))
@@ -116,7 +116,7 @@ test_that("closed-form simplex screening agrees with enumeration", {
 
 })
 
-test_that("nested Markov equivalent graphs are distinguished (Figure 5)", {
+test_that("nested Markov equivalent graphs are distinguished (Figure 4)", {
 
   left  <- dhvm(caugi(V1 %-->% V2 %-->% V3 %-->% V4, V1 %-->% V4, U2 %-->% V2 + V4))
   right <- dhvm(caugi(V1 %-->% V2 %-->% V3 %-->% V4, V2 %-->% V4, U2 %-->% V2 + V4))

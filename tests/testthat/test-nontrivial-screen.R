@@ -1,4 +1,4 @@
-## Exact screen of nontrivial constraints (Proposition 6 of the paper)
+## Exact screen of nontrivial constraints (Proposition 4 of the paper)
 
 screen_model <- function(g) {
   rels <- dhvm_linear_relations(g)
