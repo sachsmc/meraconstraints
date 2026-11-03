@@ -18,7 +18,7 @@ test_that("conditioning sets are minimal (Proposition 3)", {
 
 })
 
-test_that("districts and c-degrees (Figures 1, 7 and 8)", {
+test_that("districts and c-degrees (Figures 1 and 7, and Section 5)", {
 
   g1 <- dhvm(caugi(A %-->% B + E, B %-->% C, C %-->% D, D %-->% F, E %-->% C, G %-->% F,
                    U1 %-->% B + D, U2 %-->% A + E + C, U3 %-->% F + D))
@@ -62,7 +62,7 @@ test_that("constraint counts match Table 1", {
 
 })
 
-test_that("sequential IV gives two copies of the IV constraints (Figure 2)", {
+test_that("sequential IV gives two copies of the IV constraints (Figure 3)", {
 
   sq <- meraconstraints(dhvm(caugi(V1 %-->% V2 %-->% V3 %-->% V4 %-->% V5,
                                    U1 %-->% V2 + V3, U2 %-->% V4 + V5)))
@@ -78,7 +78,7 @@ test_that("sequential IV gives two copies of the IV constraints (Figure 2)", {
 
 })
 
-test_that("front door has no nontrivial constraints (Figure 4)", {
+test_that("front door has no nontrivial constraints (Section 3.3)", {
 
   fd <- meraconstraints(dhvm(caugi(A %-->% M %-->% Y, U1 %-->% A + Y)))
   expect_equal(names(fd$polytope$Hrep), c("A_Y", "M"))
@@ -168,7 +168,7 @@ test_that("Pearl and Bonet inequalities are not sufficient with a ternary instru
 
 })
 
-test_that("triangle graph has no nontrivial constraints after merging (Figure 8)", {
+test_that("triangle graph has no nontrivial constraints after merging (Section 5)", {
 
   tri <- dhvm(caugi(U1 %-->% V1 + V3, U2 %-->% V1 + V2, U3 %-->% V2 + V3))
   cn <- meraconstraints(dhvm_merge_latents(tri))
