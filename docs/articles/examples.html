@@ -94,7 +94,7 @@ in grey.</li>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ivdag</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A Discrete Hidden Variables Model (dhvm)</span></span>
 <span><span class="co">#&gt; * graph data: </span></span>
-<span><span class="co">#&gt; &lt;caugi object; 4 nodes, 4 edges; simple: TRUE; session=0x00000262334dacb0&gt;</span></span>
+<span><span class="co">#&gt; &lt;caugi object; 4 nodes, 4 edges; simple: TRUE; session=0x00000202808deda0&gt;</span></span>
 <span><span class="co">#&gt;   graph_class: DAG</span></span>
 <span><span class="co">#&gt;   nodes: Z, X, U, Y</span></span>
 <span><span class="co">#&gt;   edges: U--&gt;X, U--&gt;Y, X--&gt;Y, Z--&gt;X</span></span>
@@ -124,7 +124,7 @@ in grey.</li>
 <span><span class="co">#&gt; ------------</span></span>
 <span><span class="co">#&gt; There are no conditional independence relations.</span></span>
 <span><span class="co">#&gt; * Equality and inequality constraints by district:</span></span>
-<span><span class="co">#&gt; There are 4 possibly nontrivial constraints involving X_Y, 4 inequalities and 0 equalities.</span></span>
+<span><span class="co">#&gt; There are 4 nontrivial constraints involving X_Y, 4 inequalities and 0 linearly independent equalities.</span></span>
 <span><span class="co">#&gt; The first 4 expressions are</span></span>
 <span><span class="co">#&gt; -P(X = 0|Z = 0)P(Y = 0|X = 0,Z = 0) - P(X = 1|Z = 0)P(Y = 0| ...[truncated]</span></span>
 <span><span class="co">#&gt; P(X = 1|Z = 0)P(Y = 0|X = 1,Z = 0) - P(X = 0|Z = 1)P(Y = 0|X ...[truncated]</span></span>
@@ -168,10 +168,12 @@ notation P* in the paper.</li>
 <span><span class="co">#&gt; [13] "-P*(X = 0,Y = 0|Z = 0) - P*(X = 1,Y = 0|Z = 0) - P*(X = 0,Y = 1|Z = 0) - P*(X = 1,Y = 1|Z = 0)  =  -1"</span></span>
 <span><span class="co">#&gt; [14] "-P*(X = 0,Y = 0|Z = 1) - P*(X = 1,Y = 0|Z = 1) - P*(X = 0,Y = 1|Z = 1) - P*(X = 1,Y = 1|Z = 1)  =  -1"</span></span></code></pre></div>
 <ol start="6" style="list-style-type: decimal">
-<li>Identify and exclude the definitely trivial constraints.</li>
+<li>Identify the nontrivial constraints. The other 8 inequalities are
+nonnegativity constraints, and the 2 equalities say that the
+probabilities sum to one.</li>
 </ol>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">ivmera</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">ivmera</span><span class="op">$</span><span class="va">functional_relations</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="va">ivmera</span><span class="op">$</span><span class="va">trivial_if_false</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">ivmera</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">ivmera</span><span class="op">$</span><span class="va">functional_relations</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="va">ivmera</span><span class="op">$</span><span class="va">nontrivial</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="co">#&gt; [1] "-P(X = 0|Z = 0)P(Y = 0|X = 0,Z = 0) - P(X = 1|Z = 0)P(Y = 0|X = 1,Z = 0) - P(X = 0|Z = 0)P(Y = 1|X = 0,Z = 0) + P(X = 1|Z = 1)P(Y = 0|X = 1,Z = 1) &lt;= 0"</span></span>
 <span><span class="co">#&gt; [2] "P(X = 1|Z = 0)P(Y = 0|X = 1,Z = 0) - P(X = 0|Z = 1)P(Y = 0|X = 0,Z = 1) - P(X = 1|Z = 1)P(Y = 0|X = 1,Z = 1) - P(X = 0|Z = 1)P(Y = 1|X = 0,Z = 1) &lt;= 0" </span></span>
 <span><span class="co">#&gt; [3] "P(X = 0|Z = 0)P(Y = 1|X = 0,Z = 0) + P(X = 0|Z = 1)P(Y = 0|X = 0,Z = 1) &lt;= 1"                                                                           </span></span>
@@ -248,15 +250,15 @@ about 5% of the time.</p>
 <span><span class="co">#&gt; Constraints:</span></span>
 <span><span class="co">#&gt; ------------</span></span>
 <span><span class="co">#&gt; * Conditional independence relations:</span></span>
-<span><span class="co">#&gt; V1 ⟂ V4 | V3, V1 ⟂ V5 | V3, V2 ⟂ V4 | V3, V2 ⟂ V5 | V3 </span></span>
+<span><span class="co">#&gt; V4 ⟂ V1 | V3, V4 ⟂ V2 | V3, V1, V5 ⟂ V1 | V3, V4, V5 ⟂ V2 | V3, V4, V1 </span></span>
 <span><span class="co">#&gt; * Equality and inequality constraints by district:</span></span>
-<span><span class="co">#&gt; There are 4 possibly nontrivial constraints involving V2_V3, 4 inequalities and 0 equalities.</span></span>
+<span><span class="co">#&gt; There are 4 nontrivial constraints involving V2_V3, 4 inequalities and 0 linearly independent equalities.</span></span>
 <span><span class="co">#&gt; The first 4 expressions are</span></span>
 <span><span class="co">#&gt; -P(V2 = 0|V1 = 0)P(V3 = 0|V2 = 0,V1 = 0) - P(V2 = 1|V1 = 0)P ...[truncated]</span></span>
 <span><span class="co">#&gt; P(V2 = 1|V1 = 0)P(V3 = 0|V2 = 1,V1 = 0) - P(V2 = 0|V1 = 1)P( ...[truncated]</span></span>
 <span><span class="co">#&gt; P(V2 = 0|V1 = 0)P(V3 = 1|V2 = 0,V1 = 0) + P(V2 = 0|V1 = 1)P( ...[truncated]</span></span>
 <span><span class="co">#&gt; P(V2 = 0|V1 = 0)P(V3 = 0|V2 = 0,V1 = 0) + P(V2 = 0|V1 = 1)P( ...[truncated]</span></span>
-<span><span class="co">#&gt; There are 4 possibly nontrivial constraints involving V4_V5, 4 inequalities and 0 equalities.</span></span>
+<span><span class="co">#&gt; There are 4 nontrivial constraints involving V4_V5, 4 inequalities and 0 linearly independent equalities.</span></span>
 <span><span class="co">#&gt; The first 4 expressions are</span></span>
 <span><span class="co">#&gt; -P(V4 = 0|V3 = 0)P(V5 = 0|V4 = 0,V3 = 0) - P(V4 = 1|V3 = 0)P ...[truncated]</span></span>
 <span><span class="co">#&gt; P(V4 = 1|V3 = 0)P(V5 = 0|V4 = 1,V3 = 0) - P(V4 = 0|V3 = 1)P( ...[truncated]</span></span>
@@ -294,15 +296,10 @@ about 5% of the time.</p>
 <span><span class="co">#&gt; Constraints:</span></span>
 <span><span class="co">#&gt; ------------</span></span>
 <span><span class="co">#&gt; * Conditional independence relations:</span></span>
-<span><span class="co">#&gt; V1 ⟂ V3 | V2 </span></span>
+<span><span class="co">#&gt; V3 ⟂ V1 | V2 </span></span>
 <span><span class="co">#&gt; * Equality and inequality constraints by district:</span></span>
-<span><span class="co">#&gt; There are 8 possibly nontrivial constraints involving V2_V4, 4 inequalities and 4 equalities.</span></span>
-<span><span class="co">#&gt; The first 4 expressions are</span></span>
-<span><span class="co">#&gt; -P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V ...[truncated]</span></span>
-<span><span class="co">#&gt; -P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V ...[truncated]</span></span>
-<span><span class="co">#&gt; P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 ...[truncated]</span></span>
-<span><span class="co">#&gt; P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 ...[truncated]</span></span>
-<span><span class="co">#&gt; There are 0 possibly nontrivial constraints involving V3, 0 inequalities and 0 equalities.</span></span>
+<span><span class="co">#&gt; There are 0 nontrivial constraints involving V2_V4, 0 inequalities and 0 linearly independent equalities.</span></span>
+<span><span class="co">#&gt; There are 0 nontrivial constraints involving V3, 0 inequalities and 0 linearly independent equalities.</span></span>
 <span><span class="va">r1cn</span></span>
 <span><span class="co">#&gt; MERA constraints on the dhvm: r1dag </span></span>
 <span><span class="co">#&gt; The model has districts (unobserved variables marked with [u]:</span></span>
@@ -312,15 +309,10 @@ about 5% of the time.</p>
 <span><span class="co">#&gt; Constraints:</span></span>
 <span><span class="co">#&gt; ------------</span></span>
 <span><span class="co">#&gt; * Conditional independence relations:</span></span>
-<span><span class="co">#&gt; V1 ⟂ V3 | V2 </span></span>
+<span><span class="co">#&gt; V3 ⟂ V1 | V2 </span></span>
 <span><span class="co">#&gt; * Equality and inequality constraints by district:</span></span>
-<span><span class="co">#&gt; There are 8 possibly nontrivial constraints involving V2_V4, 4 inequalities and 4 equalities.</span></span>
-<span><span class="co">#&gt; The first 4 expressions are</span></span>
-<span><span class="co">#&gt; -P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V ...[truncated]</span></span>
-<span><span class="co">#&gt; -P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V ...[truncated]</span></span>
-<span><span class="co">#&gt; P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) + P(V2 = 0|V1 ...[truncated]</span></span>
-<span><span class="co">#&gt; P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 ...[truncated]</span></span>
-<span><span class="co">#&gt; There are 0 possibly nontrivial constraints involving V3, 0 inequalities and 0 equalities.</span></span>
+<span><span class="co">#&gt; There are 0 nontrivial constraints involving V2_V4, 0 inequalities and 0 linearly independent equalities.</span></span>
+<span><span class="co">#&gt; There are 0 nontrivial constraints involving V3, 0 inequalities and 0 linearly independent equalities.</span></span>
 <span><span class="va">r2cn</span></span>
 <span><span class="co">#&gt; MERA constraints on the dhvm: r2dag </span></span>
 <span><span class="co">#&gt; The model has districts (unobserved variables marked with [u]:</span></span>
@@ -330,15 +322,15 @@ about 5% of the time.</p>
 <span><span class="co">#&gt; Constraints:</span></span>
 <span><span class="co">#&gt; ------------</span></span>
 <span><span class="co">#&gt; * Conditional independence relations:</span></span>
-<span><span class="co">#&gt; V1 ⟂ V3 | V2 </span></span>
+<span><span class="co">#&gt; V3 ⟂ V1 | V2 </span></span>
 <span><span class="co">#&gt; * Equality and inequality constraints by district:</span></span>
-<span><span class="co">#&gt; There are 16 possibly nontrivial constraints involving V2_V4, 12 inequalities and 4 equalities.</span></span>
+<span><span class="co">#&gt; There are 8 nontrivial constraints involving V2_V4, 8 inequalities and 0 linearly independent equalities.</span></span>
 <span><span class="co">#&gt; The first 4 expressions are</span></span>
 <span><span class="co">#&gt; -P(V2 = 0|V1 = 1)P(V4 = 0|V2 = 0,V1 = 1,V3 = 0) - P(V2 = 0|V ...[truncated]</span></span>
 <span><span class="co">#&gt; P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) - P(V2 = 0|V1 ...[truncated]</span></span>
 <span><span class="co">#&gt; -P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 0|V ...[truncated]</span></span>
 <span><span class="co">#&gt; -P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) - P(V2 = 1|V ...[truncated]</span></span>
-<span><span class="co">#&gt; There are 0 possibly nontrivial constraints involving V3, 0 inequalities and 0 equalities.</span></span></code></pre></div>
+<span><span class="co">#&gt; There are 0 nontrivial constraints involving V3, 0 inequalities and 0 linearly independent equalities.</span></span></code></pre></div>
 <p>The constraints on the V3 district are trivial in all 3 DAGs but the
 ones on the district with V2, V4 are different in
 <code>r2dag</code>.</p>
@@ -410,15 +402,10 @@ necessarily complete.</p>
 <span><span class="co">#&gt; Constraints:</span></span>
 <span><span class="co">#&gt; ------------</span></span>
 <span><span class="co">#&gt; * Conditional independence relations:</span></span>
-<span><span class="co">#&gt; B ⟂ E | A, c("D ⟂ E | A", "D ⟂ E | B", "D ⟂ E | C"), c("E ⟂ F | A", "E ⟂ F | B", "E ⟂ F | C") </span></span>
+<span><span class="co">#&gt; B ⟂ E | A, D ⟂ E | A, B, C, F ⟂ E | A, B, C, D </span></span>
 <span><span class="co">#&gt; * Equality and inequality constraints by district:</span></span>
-<span><span class="co">#&gt; There are 8 possibly nontrivial constraints involving A_C_E, 4 inequalities and 4 equalities.</span></span>
-<span><span class="co">#&gt; The first 4 expressions are</span></span>
-<span><span class="co">#&gt; -P(A = 0)P(C = 0|A = 0,E = 0,B = 0)P(E = 0|A = 0) - P(A = 0) ...[truncated]</span></span>
-<span><span class="co">#&gt; -P(A = 1)P(C = 0|A = 1,E = 0,B = 0)P(E = 0|A = 1) - P(A = 1) ...[truncated]</span></span>
-<span><span class="co">#&gt; -P(A = 0)P(C = 0|A = 0,E = 1,B = 0)P(E = 1|A = 0) - P(A = 0) ...[truncated]</span></span>
-<span><span class="co">#&gt; P(A = 0)P(C = 0|A = 0,E = 0,B = 0)P(E = 0|A = 0) + P(A = 1)P ...[truncated]</span></span>
-<span><span class="co">#&gt; There are 1118 possibly nontrivial constraints involving B_D_F, 1107 inequalities and 11 equalities.</span></span>
+<span><span class="co">#&gt; There are 0 nontrivial constraints involving A_C_E, 0 inequalities and 0 linearly independent equalities.</span></span>
+<span><span class="co">#&gt; There are 1102 nontrivial constraints involving B_D_F, 1096 inequalities and 6 linearly independent equalities.</span></span>
 <span><span class="co">#&gt; The first 4 expressions are</span></span>
 <span><span class="co">#&gt; -P(B = 0|A = 0)P(D = 1|B = 0,A = 0,C = 0)P(F = 0|B = 0,D = 1 ...[truncated]</span></span>
 <span><span class="co">#&gt; -P(B = 0|A = 0)P(D = 1|B = 0,A = 0,C = 0)P(F = 0|B = 0,D = 1 ...[truncated]</span></span>
@@ -446,16 +433,28 @@ necessarily complete.</p>
 <span><span class="co">#&gt; ------------</span></span>
 <span><span class="co">#&gt; There are no conditional independence relations.</span></span>
 <span><span class="co">#&gt; * Equality and inequality constraints by district:</span></span>
-<span><span class="co">#&gt; There are 4 possibly nontrivial constraints involving A_Y, 2 inequalities and 2 equalities.</span></span>
-<span><span class="co">#&gt; The first 4 expressions are</span></span>
-<span><span class="co">#&gt; -P(A = 0)P(Y = 0|A = 0,M = 0) - P(A = 0)P(Y = 1|A = 0,M = 0) ...[truncated]</span></span>
-<span><span class="co">#&gt; P(A = 0)P(Y = 0|A = 0,M = 0) + P(A = 0)P(Y = 1|A = 0,M = 0)  ...[truncated]</span></span>
-<span><span class="co">#&gt; P(A = 0)P(Y = 0|A = 0,M = 0) + P(A = 0)P(Y = 1|A = 0,M = 0)  ...[truncated]</span></span>
-<span><span class="co">#&gt; -P(A = 0)P(Y = 0|A = 0,M = 0) - P(A = 0)P(Y = 1|A = 0,M = 0) ...[truncated]</span></span>
-<span><span class="co">#&gt; There are 0 possibly nontrivial constraints involving M, 0 inequalities and 0 equalities.</span></span></code></pre></div>
-<p>Even though we report 4 possibly nontrivial constraints, they are all
-obviously trivial.</p>
+<span><span class="co">#&gt; There are 0 nontrivial constraints involving A_Y, 0 inequalities and 0 linearly independent equalities.</span></span>
+<span><span class="co">#&gt; There are 0 nontrivial constraints involving M, 0 inequalities and 0 linearly independent equalities.</span></span></code></pre></div>
+<p>None of the constraints are nontrivial. In terms of the P*
+probabilities, some of them look as if they could be violated:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">fdcn</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, prob <span class="op">=</span> <span class="va">fdcn</span><span class="op">$</span><span class="va">functional_relations</span><span class="op">$</span><span class="va">probstarform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "-P*(A = 0,Y = 0|M = 1) &lt;= 0"                                                                          </span></span>
+<span><span class="co">#&gt;  [2] "-P*(A = 0,Y = 0|M = 0) &lt;= 0"                                                                          </span></span>
+<span><span class="co">#&gt;  [3] "-P*(A = 0,Y = 0|M = 0) - P*(A = 0,Y = 1|M = 0) + P*(A = 0,Y = 0|M = 1) &lt;= 0"                          </span></span>
+<span><span class="co">#&gt;  [4] "-P*(A = 0,Y = 1|M = 0) &lt;= 0"                                                                          </span></span>
+<span><span class="co">#&gt;  [5] "-P*(A = 1,Y = 0|M = 1) &lt;= 0"                                                                          </span></span>
+<span><span class="co">#&gt;  [6] "-P*(A = 1,Y = 0|M = 0) &lt;= 0"                                                                          </span></span>
+<span><span class="co">#&gt;  [7] "P*(A = 0,Y = 0|M = 0) + P*(A = 0,Y = 1|M = 0) + P*(A = 1,Y = 0|M = 1) &lt;= 1"                           </span></span>
+<span><span class="co">#&gt;  [8] "P*(A = 0,Y = 0|M = 0) + P*(A = 1,Y = 0|M = 0) + P*(A = 0,Y = 1|M = 0) &lt;= 1"                           </span></span>
+<span><span class="co">#&gt;  [9] "-P*(A = 0,Y = 0|M = 0) - P*(A = 1,Y = 0|M = 0) - P*(A = 0,Y = 1|M = 0) - P*(A = 1,Y = 1|M = 0)  =  -1"</span></span>
+<span><span class="co">#&gt; [10] "P*(A = 0,Y = 0|M = 0) + P*(A = 0,Y = 1|M = 0) - P*(A = 0,Y = 0|M = 1) - P*(A = 0,Y = 1|M = 1)  =  0"  </span></span>
+<span><span class="co">#&gt; [11] "-P*(A = 0,Y = 0|M = 0) - P*(A = 0,Y = 1|M = 0) - P*(A = 1,Y = 0|M = 1) - P*(A = 1,Y = 1|M = 1)  =  -1"</span></span></code></pre></div>
+<p>But each inequality is a nonnegativity constraint once the equality
+constraints are added to it, and the one equality beyond normalization
+says that the distribution of A under do(M) does not depend on M. In
+observed probabilities, that is P(A = a) = P(A = a).</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">fdcn</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, prob <span class="op">=</span> <span class="va">fdcn</span><span class="op">$</span><span class="va">functional_relations</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "-P(A = 0)P(Y = 0|A = 0,M = 1) &lt;= 0"                                                                                               </span></span>
 <span><span class="co">#&gt;  [2] "-P(A = 0)P(Y = 0|A = 0,M = 0) &lt;= 0"                                                                                               </span></span>
@@ -468,35 +467,28 @@ obviously trivial.</p>
 <span><span class="co">#&gt;  [9] "-P(A = 0)P(Y = 0|A = 0,M = 0) - P(A = 1)P(Y = 0|A = 1,M = 0) - P(A = 0)P(Y = 1|A = 0,M = 0) - P(A = 1)P(Y = 1|A = 1,M = 0)  =  -1"</span></span>
 <span><span class="co">#&gt; [10] "P(A = 0)P(Y = 0|A = 0,M = 0) + P(A = 0)P(Y = 1|A = 0,M = 0) - P(A = 0)P(Y = 0|A = 0,M = 1) - P(A = 0)P(Y = 1|A = 0,M = 1)  =  0"  </span></span>
 <span><span class="co">#&gt; [11] "-P(A = 0)P(Y = 0|A = 0,M = 0) - P(A = 0)P(Y = 1|A = 0,M = 0) - P(A = 1)P(Y = 0|A = 1,M = 1) - P(A = 1)P(Y = 1|A = 1,M = 1)  =  -1"</span></span></code></pre></div>
-<p>In the first district, we flag some of them as not definitely
-trivial. Why is that? Well, they can be violated if we observed a
-distribution where we intervened on M. This can be seen when we look at
-the constraints in terms of the P* probabilities.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## all trivial unless you can intervene on M</span></span>
-<span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">fdcn</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, </span>
-<span>             prob <span class="op">=</span> <span class="va">fdcn</span><span class="op">$</span><span class="va">functional_relations</span><span class="op">$</span><span class="va">probstarform</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span></span>
-<span>               <span class="va">fdcn</span><span class="op">$</span><span class="va">trivial_if_false</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span>               <span class="op">]</span></span>
-<span><span class="co">#&gt; [1] "-P*(A = 0,Y = 0|M = 0) - P*(A = 0,Y = 1|M = 0) + P*(A = 0,Y = 0|M = 1) &lt;= 0"                          </span></span>
-<span><span class="co">#&gt; [2] "P*(A = 0,Y = 0|M = 0) + P*(A = 0,Y = 1|M = 0) + P*(A = 1,Y = 0|M = 1) &lt;= 1"                           </span></span>
-<span><span class="co">#&gt; [3] "P*(A = 0,Y = 0|M = 0) + P*(A = 0,Y = 1|M = 0) - P*(A = 0,Y = 0|M = 1) - P*(A = 0,Y = 1|M = 1)  =  0"  </span></span>
-<span><span class="co">#&gt; [4] "-P*(A = 0,Y = 0|M = 0) - P*(A = 0,Y = 1|M = 0) - P*(A = 1,Y = 0|M = 1) - P*(A = 1,Y = 1|M = 1)  =  -1"</span></span></code></pre></div>
+<p>The cruder screen <code><a href="../reference/prob_simplex_screen.html">prob_simplex_screen()</a></code>, which ignores
+the equality constraints, flags 4 of them:</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fu"><a href="../reference/prob_simplex_screen.html">prob_simplex_screen</a></span><span class="op">(</span><span class="va">fdcn</span><span class="op">$</span><span class="va">functional_relations</span>, <span class="va">fdcn</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">)</span>, <span class="va">sum</span><span class="op">)</span></span>
+<span><span class="co">#&gt; A_Y   M </span></span>
+<span><span class="co">#&gt;   4   0</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="more-difficult-example">More difficult example<a class="anchor" aria-label="anchor" href="#more-difficult-example"></a>
 </h2>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dhvm.html">dhvm</a></span><span class="op">(</span><span class="fu"><a href="https://caugi.org/reference/caugi.html" class="external-link">caugi</a></span><span class="op">(</span><span class="va">V1</span> <span class="op">%--&gt;%</span> <span class="va">V2</span>, <span class="va">V2</span> <span class="op">%--&gt;%</span> <span class="va">V3</span>, <span class="va">V3</span> <span class="op">%--&gt;%</span> <span class="va">V4</span>, <span class="va">U1</span> <span class="op">%--&gt;%</span> <span class="va">V1</span><span class="op">+</span> <span class="va">V3</span>, <span class="va">U2</span> <span class="op">%--&gt;%</span> <span class="va">V2</span> <span class="op">+</span> <span class="va">V4</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">d1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="examples_files/figure-html/unnamed-chunk-20-1.png" width="700"></p>
+<p><img src="examples_files/figure-html/unnamed-chunk-21-1.png" width="700"></p>
 <p>This has no conditional independences:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/dhvm_list_independences.html">dhvm_list_independences</a></span><span class="op">(</span><span class="va">d1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; list()</span></span></code></pre></div>
-<p>It does however have possibly nontrivial constraints that we can
-find.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/dhvm_list_independences.html">dhvm_list_independences</a></span><span class="op">(</span><span class="va">d1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; list()</span></span>
+<span><span class="co">#&gt; attr(,"sets")</span></span>
+<span><span class="co">#&gt; list()</span></span></code></pre></div>
+<p>It does however have nontrivial constraints that we can find.</p>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d1cn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/meraconstraints.html">meraconstraints</a></span><span class="op">(</span><span class="va">d1</span><span class="op">)</span></span>
 <span><span class="va">d1cn</span></span>
 <span><span class="co">#&gt; MERA constraints on the dhvm: d1 </span></span>
@@ -508,13 +500,8 @@ find.</p>
 <span><span class="co">#&gt; ------------</span></span>
 <span><span class="co">#&gt; There are no conditional independence relations.</span></span>
 <span><span class="co">#&gt; * Equality and inequality constraints by district:</span></span>
-<span><span class="co">#&gt; There are 4 possibly nontrivial constraints involving V1_V3, 2 inequalities and 2 equalities.</span></span>
-<span><span class="co">#&gt; The first 4 expressions are</span></span>
-<span><span class="co">#&gt; -P(V1 = 0)P(V3 = 0|V1 = 0,V2 = 0) - P(V1 = 0)P(V3 = 1|V1 = 0 ...[truncated]</span></span>
-<span><span class="co">#&gt; P(V1 = 0)P(V3 = 0|V1 = 0,V2 = 0) + P(V1 = 0)P(V3 = 1|V1 = 0, ...[truncated]</span></span>
-<span><span class="co">#&gt; P(V1 = 0)P(V3 = 0|V1 = 0,V2 = 0) + P(V1 = 0)P(V3 = 1|V1 = 0, ...[truncated]</span></span>
-<span><span class="co">#&gt; -P(V1 = 0)P(V3 = 0|V1 = 0,V2 = 0) - P(V1 = 0)P(V3 = 1|V1 = 0 ...[truncated]</span></span>
-<span><span class="co">#&gt; There are 22 possibly nontrivial constraints involving V2_V4, 15 inequalities and 7 equalities.</span></span>
+<span><span class="co">#&gt; There are 0 nontrivial constraints involving V1_V3, 0 inequalities and 0 linearly independent equalities.</span></span>
+<span><span class="co">#&gt; There are 10 nontrivial constraints involving V2_V4, 8 inequalities and 2 linearly independent equalities.</span></span>
 <span><span class="co">#&gt; The first 4 expressions are</span></span>
 <span><span class="co">#&gt; P(V2 = 0|V1 = 0)P(V4 = 0|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 ...[truncated]</span></span>
 <span><span class="co">#&gt; P(V2 = 0|V1 = 0)P(V4 = 1|V2 = 0,V1 = 0,V3 = 0) + P(V2 = 0|V1 ...[truncated]</span></span>
@@ -522,7 +509,7 @@ find.</p>
 <span><span class="co">#&gt; P(V2 = 1|V1 = 0)P(V4 = 0|V2 = 1,V1 = 0,V3 = 0) + P(V2 = 0|V1 ...[truncated]</span></span></code></pre></div>
 <p>Let’s sample some probability distributions without any restrictions
 as see if anything is violated.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="cn">NA</span>, nrow <span class="op">=</span> <span class="fl">500</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">d1cn</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span>, <span class="va">nrow</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">baseprob</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>V1 <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, V2 <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, V3 <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, V4 <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -550,7 +537,7 @@ as see if anything is violated.</p>
 <p>So none of the first set of constraints on probabilities of the form
 P(V1 = 0)P(V3 = 0|V1 = 0,V2 = 0) are nontrivial, but the following ones
 are:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/hrep_to_text.html">hrep_to_text</a></span><span class="op">(</span><span class="va">d1cn</span><span class="op">$</span><span class="va">polytope</span><span class="op">$</span><span class="va">Hrep</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="va">d1cn</span><span class="op">$</span><span class="va">functional_relations</span><span class="op">$</span><span class="va">probform</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">11</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;</span> <span class="fl">1</span><span class="op">)</span></span>
 <span>  <span class="op">]</span>, sep <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span></span>

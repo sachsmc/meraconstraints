@@ -39,7 +39,7 @@ trivially implied by the probability simplex."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Screen constraints that are implied by the probability simplex</h1>
-      <small class="dont-index">Source: <a href="https://github.com/sachsmc/meraconstraints/blob/HEAD/R/constraint-conversion-and-parsing.R" class="external-link"><code>R/constraint-conversion-and-parsing.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/sachsmc/meraconstraints/blob/HEAD/R/screening-trivial.R" class="external-link"><code>R/screening-trivial.R</code></a></small>
       <div class="d-none name"><code>prob_simplex_screen.Rd</code></div>
     </div>
 
@@ -77,6 +77,13 @@ trivially implied by the probability simplex.</p>
     <p>A list of logical vectors, one for each district, with one element
   per constraint that is `TRUE` if the constraint is possibly nontrivial and
   `FALSE` if it is implied by the probability simplex</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>This is a necessary condition for nontriviality only: a flagged constraint
+may still be trivial, and whether it is flagged depends on how the row is
+written. [nontrivial_screen()] gives the exact answer and is used by
+[meraconstraints()].</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

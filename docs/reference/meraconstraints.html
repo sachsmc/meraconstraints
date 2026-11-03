@@ -56,7 +56,10 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of class `meraconstraints`, with some methods.</p>
+    <p>An object of class `meraconstraints`, with some methods. Its
+  element `nontrivial` marks the nontrivial constraints of each district,
+  as returned by [nontrivial_screen()]. `trivial_if_false` is the same list,
+  kept for compatibility with earlier versions.</p>
     </div>
 
     <div class="section level2">
@@ -72,7 +75,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> There are no conditional independence relations.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> * Equality and inequality constraints by district:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> There are 4 possibly nontrivial constraints involving X_Y, 4 inequalities and 0 equalities.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> There are 4 nontrivial constraints involving X_Y, 4 inequalities and 0 linearly independent equalities.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> The first 4 expressions are</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -P(X = 0|Z = 0)P(Y = 0|X = 0,Z = 0) - P(X = 1|Z = 0)P(Y = 0| ...[truncated]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> P(X = 1|Z = 0)P(Y = 0|X = 1,Z = 0) - P(X = 0|Z = 1)P(Y = 0|X ...[truncated]</span>

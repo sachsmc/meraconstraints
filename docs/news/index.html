@@ -42,6 +42,13 @@
 <li>
 <code>combinations()</code> is no longer exported.</li>
 <li>screening of potentially nontrivial constraints improved (thanks to anonymous reviewer)</li>
+<li>New <code><a href="../reference/nontrivial_screen.html">nontrivial_screen()</a></code> identifies exactly the nontrivial constraints of each district (Proposition 4 of the paper). An inequality is trivial if and only if it is a nonnegativity constraint, possibly rewritten using the equality constraints; an equality is trivial if and only if it follows from the conditional independencies. <code><a href="../reference/meraconstraints.html">meraconstraints()</a></code> now uses it, stores the result in <code>nontrivial</code> (with <code>trivial_if_false</code> kept as an alias), and no longer flags trivial constraints such as those of the front door model. <code><a href="../reference/prob_simplex_screen.html">prob_simplex_screen()</a></code> and <code><a href="../reference/prob_simplex_extremes.html">prob_simplex_extremes()</a></code> are kept but superseded.</li>
+<li>
+<code><a href="../reference/dhvm_relations_to_polytope.html">dhvm_relations_to_polytope()</a></code> also returns <code>HrepQ</code>, the H-representations in exact rational arithmetic, which <code><a href="../reference/nontrivial_screen.html">nontrivial_screen()</a></code> uses to decide exactly which vertices lie on each facet.</li>
+<li>
+<code><a href="../reference/dhvm_list_independences.html">dhvm_list_independences()</a></code> now returns the ordered local Markov statements for every ancestral set (Richardson, 2003), with the statements for sets of variables in the attribute <code>"sets"</code>. The previous list had one separator for each pair of variables. It did not imply joint statements such as <code>(V1, V2) _||_ (V4, V5) | V3</code> in the sequential IV model, so a distribution outside the model could pass it.</li>
+<li>
+<code><a href="../reference/print.meraconstraints.html">print.meraconstraints()</a></code> now prints conditioning sets with more than one element correctly.</li>
 <li>dedupe columns of V-rep</li>
 </ul></div>
     <div class="section level2">
